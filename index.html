@@ -1808,6 +1808,7 @@ function selectPanel(diagName, displayLabel) {
   sel.classList.remove('none');
   document.getElementById('pl-clear').style.display = '';
   syncPanelBtns(diagName);
+  buildPdrSizes();
   // Step 1 stays open — the diagram lives inside it, so we don't auto-collapse.
 }
 
@@ -1819,6 +1820,7 @@ function clearPanel() {
   sel.classList.add('none');
   document.getElementById('pl-clear').style.display = 'none';
   document.querySelectorAll('.pl-btn').forEach(function(b){ b.classList.remove('on'); });
+  buildPdrSizes();
 }
 
 function syncPanelBtns(diagName) {
@@ -2846,11 +2848,14 @@ function setService(svc) {
 
 function buildPdrSizes() {
   var grid = document.getElementById('pdr-size-grid');
+  var panelKey = S.panelDiag ? S.panelDiag.split(' — ')[0].trim() : '';
+  var minP = PANEL_MIN_PRICES[panelKey] || 0;
   grid.innerHTML = PDR_SIZES.map(function(price, idx){
     var n = idx + 1;
     var lbl = (PDR_SIZE_LABELS[idx] || n) + 'cm';
+    var dispPrice = Math.max(price, minP);
     return '<div class="size-btn" data-size="'+n+'" data-price="'+price+'" onclick="pdrSelectSize('+n+','+price+')">'
-      +'<div class="size-n">'+lbl+'</div><div class="size-p">'+CS+price+'</div></div>';
+      +'<div class="size-n">'+lbl+'</div><div class="size-p">'+CS+dispPrice+'</div></div>';
   }).join('');
 }
 
