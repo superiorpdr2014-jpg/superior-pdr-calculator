@@ -1242,12 +1242,12 @@ var I18N = {
     sms_body:'感謝您選擇 {company}{veh}。您的免烤漆凹痕修復估價單已附上。PDR 保留您的原廠烤漆，無需補土、無需重新烤漆，車輛歷史紀錄完全不受影響。',
     sms_tiers:'您將看到多種修復方案，讓您掌控成果與預算。',
     sms_valid:'本估價有效期為 {days} 天，至 {date} 止。',
-    sms_close:'如有疑問，請致電或傳訊 {phone}。',
+    sms_close:'',
     email_thanks:'感謝您選擇 {company}{veh}。您的估價單已附上。',
     email_value:'免烤漆凹痕修復保留您車輛的原廠烤漆。無需補土、無需重新烤漆，車輛歷史紀錄完全不受影響。鈑件從內側修復，保持製造商的原始品質，同時保護車輛的外觀與價值。',
     email_tiers:'您將看到多種修復方案。每種方案都是經過專業施工的品質修復。唯一的差異在於最終細節的精緻程度，讓您在不犧牲品質的前提下掌控成果與預算。',
     email_valid:'本估價有效期為 {days} 天，至 {date} 止。請在到期前聯繫我們以鎖定此價格。',
-    email_close:'如有任何問題，請回覆此郵件或致電／傳訊 {phone}。{guaranteeLong}',
+    email_close:'如有任何問題，請回覆此郵件。{guaranteeLong}',
     est_vehicles:'車輛', custom_item:'自訂項目', generating:'產生中…',
     edit_banner:'正在編輯修復項目 #{n}——請在上方修改，然後按下'
   }
@@ -2706,12 +2706,12 @@ function buildPitchMessage(channel) {
     if (plan.view === 'itemized' || plan.exact) {
       repairLines += 'Total: ' + CS + tt.premium.toLocaleString();
     } else if (plan.view === '3tier') {
-      repairLines += '\nPremium: ' + money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08));
-      repairLines += '\nPractical (30% less): ' + money(fl100(tt.practical*0.92)) + ' - ' + money(fl100(tt.practical*1.08));
-      repairLines += '\nImprovement (50% less): ' + money(fl100(tt.improvement*0.92)) + ' - ' + money(fl100(tt.improvement*1.08));
+      repairLines += '\n' + t('est_premiumRepair') + ': ' + money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08));
+      repairLines += '\n' + t('est_practicalRepair') + ': ' + money(fl100(tt.practical*0.92)) + ' - ' + money(fl100(tt.practical*1.08));
+      repairLines += '\n' + t('est_improvementRepair') + ': ' + money(fl100(tt.improvement*0.92)) + ' - ' + money(fl100(tt.improvement*1.08));
     } else {
-      repairLines += '\nPremium: ' + money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08));
-      repairLines += '\nPractical (30% less): ' + money(fl100(tt.practical*0.92)) + ' - ' + money(fl100(tt.practical*1.08));
+      repairLines += '\n' + t('est_premiumRepair') + ': ' + money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08));
+      repairLines += '\n' + t('est_practicalRepair') + ': ' + money(fl100(tt.practical*0.92)) + ' - ' + money(fl100(tt.practical*1.08));
     }
   }
 
