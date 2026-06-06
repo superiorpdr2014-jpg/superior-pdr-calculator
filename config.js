@@ -20,7 +20,7 @@ window.SHOP_CONFIG = {
     logoUrl:      'logo.png',
     phone:        '0901242511',
     phonePretty:  '0901-242-511',
-    website:      'https://www.superior-tim.com',
+    website:      'https://www.tar-tw.com/',
     accentColor:  '#cc0000',               // Red accent (can customize)
     imageAccent:  '#cc0000',
     currencySymbol: 'NT$',                 // New Taiwan Dollar
