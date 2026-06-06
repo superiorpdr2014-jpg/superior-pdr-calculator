@@ -1007,6 +1007,7 @@ window.SHOP_CONFIG = {
       <button class="dl-btn" onclick="saveEstimateImage(this)"><span data-i18n="saveImage">Save Image</span></button>
       <button class="sms-btn" onclick="sendTextEstimate()"><span data-i18n="textShort">Text</span></button>
       <button class="email-btn" onclick="sendEmailEstimate()"><span data-i18n="emailShort">Email</span></button>
+      <button id="line-send-btn" class="dl-btn" style="background:#06c755;display:none" onclick="sendToLineUser(this)"><span>傳到LINE用戶</span></button>
     </div>
   </div>
 </div>
@@ -2608,6 +2609,54 @@ function saveEstimateImage(btn) {
   renderEstimateCanvas(reps, function(c, err){
     if (!c) { alert('Save failed: '+(err&&err.message||err)); if (span) span.textContent = orig; return; }
     shareOrDownloadCanvas(c, vehicle, done);
+  });
+}
+
+// ── Send estimate image to LINE user via ECHO server ─────────────────────────
+var LINE_USER_ID = (function(){
+  try { return new URLSearchParams(location.search).get('line_id') || ''; } catch(e) { return ''; }
+})();
+
+(function(){
+  if (LINE_USER_ID) {
+    var btn = document.getElementById('line-send-btn');
+    if (btn) btn.style.display = '';
+  }
+})();
+
+function sendToLineUser(btn) {
+  if (!LINE_USER_ID) { alert('找不到 LINE 用戶 ID，請從 Telegram 開始估價按鈕進入。'); return; }
+  var span = btn ? btn.querySelector('span') : null;
+  var orig = span ? span.textContent : '傳到LINE用戶';
+  function done(ok) {
+    if (span) {
+      span.textContent = ok ? '✓ 已傳送' : '傳送失敗';
+      setTimeout(function(){ span.textContent = orig; if (btn) btn.disabled = false; }, 2500);
+    } else { if (btn) btn.disabled = false; }
+  }
+  if (span) span.textContent = '傳送中…';
+  if (btn) btn.disabled = true;
+
+  function sendBase64(base64) {
+    fetch('https://echo.pdrsuperior.com/echo/send-line-estimate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lineUserId: LINE_USER_ID, imageBase64: base64 })
+    }).then(function(r){ return r.json(); }).then(function(j){
+      done(!!j.ok);
+    }).catch(function(e){ console.error(e); done(false); });
+  }
+
+  var canvas = document.querySelector('#preview-img-wrap canvas');
+  if (canvas) {
+    sendBase64(canvas.toDataURL('image/jpeg', 0.92));
+    return;
+  }
+  var reps = collectRepairs();
+  if (!reps.length) { alert('請先新增修復項目再傳送。'); if (btn) btn.disabled = false; return; }
+  renderEstimateCanvas(reps, function(c, err){
+    if (!c) { alert('圖片產生失敗：' + (err && err.message || err)); done(false); return; }
+    sendBase64(c.toDataURL('image/jpeg', 0.92));
   });
 }
 
