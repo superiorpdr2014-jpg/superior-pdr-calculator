@@ -2332,8 +2332,9 @@ function tierTotals(reps) {
   };
 }
 function money(n){ n=(typeof n==='number'&&!isNaN(n))?n:0; return CS + Math.round(n).toLocaleString(); }
-function rng(n){ return money(n*0.92) + ' &ndash; ' + money(n*1.08); }
-function rngDash(n){ return money(n*0.92) + ' – ' + money(n*1.08); }
+function fl100(n){ return Math.floor(n/100)*100; }
+function rng(n){ return money(fl100(n*0.92)) + ' &ndash; ' + money(fl100(n*1.08)); }
+function rngDash(n){ return money(fl100(n*0.92)) + ' – ' + money(fl100(n*1.08)); }
 // Does the estimate contain any tier-discountable (PDR) work?
 function hasTierWork(reps){ return reps.some(function(r){ return (r.tierBase||0) > 0; }); }
 
@@ -2705,12 +2706,12 @@ function buildPitchMessage(channel) {
     if (plan.view === 'itemized' || plan.exact) {
       repairLines += 'Total: ' + CS + tt.premium.toLocaleString();
     } else if (plan.view === '3tier') {
-      repairLines += '\nPremium: ' + money(tt.premium*0.92) + ' - ' + money(tt.premium*1.08);
-      repairLines += '\nPractical (30% less): ' + money(tt.practical*0.92) + ' - ' + money(tt.practical*1.08);
-      repairLines += '\nImprovement (50% less): ' + money(tt.improvement*0.92) + ' - ' + money(tt.improvement*1.08);
+      repairLines += '\nPremium: ' + money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08));
+      repairLines += '\nPractical (30% less): ' + money(fl100(tt.practical*0.92)) + ' - ' + money(fl100(tt.practical*1.08));
+      repairLines += '\nImprovement (50% less): ' + money(fl100(tt.improvement*0.92)) + ' - ' + money(fl100(tt.improvement*1.08));
     } else {
-      repairLines += '\nPremium: ' + money(tt.premium*0.92) + ' - ' + money(tt.premium*1.08);
-      repairLines += '\nPractical (30% less): ' + money(tt.practical*0.92) + ' - ' + money(tt.practical*1.08);
+      repairLines += '\nPremium: ' + money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08));
+      repairLines += '\nPractical (30% less): ' + money(fl100(tt.practical*0.92)) + ' - ' + money(fl100(tt.practical*1.08));
     }
   }
 
