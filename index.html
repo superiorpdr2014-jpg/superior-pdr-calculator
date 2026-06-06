@@ -700,7 +700,8 @@ window.SHOP_CONFIG = {
   // ---- PRICING (TWD — New Taiwan Dollar) ----------------------------
   // Base: Dent Time USD prices × 0.6 (40% less) × 32 (USD→TWD), rounded to nearest 100
   pricing: {
-    pdrSizes: [3800,5100,6600,8200,9700,11200,12800,14300,15800,17400,18900,20400,22000,23500,25000,26600,28100,29700,31200,32800,34300,35800,37400,38900],
+    pdrSizes: [1500,2000,2600,3200,3800,4400,5100,5700,6300,6900,7500,8100,8800,9400,10000,10600,11200,11800,12400,13100,13700,14300,14900,15500],
+    pdrSizeLabels: [3,5,8,10,13,15,18,20,23,25,28,30,33,35,38,40,43,45,48,50,53,55,58,60],
 
     pdrGroups: [
       { id:'access',   factors:[ {id:'braced',pct:25}, {id:'edge',pct:25}, {id:'obstructed',pct:25}, {id:'bodyline',pct:50} ] },
@@ -1550,6 +1551,7 @@ function presentationPlan(reps) {
 
 // ─── PDR DATA ────────────────────────────────────────────────────────────────
 var PDR_SIZES = PRICING.pdrSizes || [];
+var PDR_SIZE_LABELS = PRICING.pdrSizeLabels || [];
 var PDR_GROUPS = (PRICING.pdrGroups || []).map(function(g){ return { title:t('pgroup_'+g.id), factors:g.factors.map(function(fr){ return { id:fr.id, pct:fr.pct, label:t('pf_'+fr.id) }; }) }; });
 var PDR_LABELS = {};
 PDR_GROUPS.forEach(function(g){ g.factors.forEach(function(f){ PDR_LABELS[f.id] = f.label; }); });
@@ -2830,8 +2832,9 @@ function buildPdrSizes() {
   var grid = document.getElementById('pdr-size-grid');
   grid.innerHTML = PDR_SIZES.map(function(price, idx){
     var n = idx + 1;
+    var lbl = (PDR_SIZE_LABELS[idx] || n) + 'cm';
     return '<div class="size-btn" data-size="'+n+'" data-price="'+price+'" onclick="pdrSelectSize('+n+','+price+')">'
-      +'<div class="size-n">'+n+'″</div><div class="size-p">'+CS+price+'</div></div>';
+      +'<div class="size-n">'+lbl+'</div><div class="size-p">'+CS+price+'</div></div>';
   }).join('');
 }
 
@@ -2880,12 +2883,12 @@ function slideSpdPrice(val) {
 }
 
 function pdrSelectSize(n, price) {
-  S.pdrSize = { size:n, price:price };
+  S.pdrSize = { size:n, label:(PDR_SIZE_LABELS[n-1]||n)+'cm', price:price };
   document.querySelectorAll('#pdr-size-grid .size-btn').forEach(function(b){
     b.classList.toggle('on', parseInt(b.dataset.size,10) === n);
   });
   var sel = document.getElementById('size-sel');
-  sel.textContent = n + '″  —  ' + CS + price;
+  sel.textContent = (PDR_SIZE_LABELS[n-1]||n) + 'cm  —  ' + CS + price;
   sel.classList.remove('none');
   document.getElementById('size-clear').style.display = '';
   document.getElementById('size-card').classList.remove('open');
@@ -2980,7 +2983,7 @@ function slidePdrFactor(id, val) {
 function pdrLines() {
   if (!S.pdrSize) return [];
   var basePrice = (S.pdrDiscount > 0 && S.pdrPriceOverride >= 0) ? S.pdrPriceOverride : S.pdrSize.price;
-  var lines = [{ label:t('est_baseDent')+' ('+S.pdrSize.size+'″)'+(S.pdrDiscount>0?' [Adj]':''), price:basePrice }];
+  var lines = [{ label:t('est_baseDent')+' ('+(S.pdrSize.label||S.pdrSize.size+'cm')+')'+(S.pdrDiscount>0?' [Adj]':''), price:basePrice }];
   Object.keys(S.pdrFactors).forEach(function(id){
     var amt = S.pdrFactors[id].amount;
     if (amt > 0) lines.push({ label:(PDR_LABELS[id]||id), price:amt });
@@ -3005,7 +3008,7 @@ function pdrTierBase() {
 
 function pdrHeader() {
   var loc = S.panelDiag || '';
-  return (loc ? tp(loc) + ' — ' : 'PDR ') + S.pdrSize.size + '″ ' + t('dentWord') + (S.pdrDiscount > 0 ? ' (Adj)' : '');
+  return (loc ? tp(loc) + ' — ' : 'PDR ') + (S.pdrSize.label||S.pdrSize.size+'cm') + ' ' + t('dentWord') + (S.pdrDiscount > 0 ? ' (Adj)' : '');
 }
 
 function updatePdrAddBtn() {
