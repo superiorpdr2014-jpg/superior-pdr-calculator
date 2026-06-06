@@ -3563,5 +3563,24 @@ applyConfig();   // sets logo/accent/title + runs localizeDOM()
   setInterval(postH, 1000);
 })();
 </script>
+
+<script>
+// Auto-fill from URL parameters (?name=陳大明&year=2022&make=Toyota&model=RAV4)
+window.addEventListener('load', function () {
+  var p = new URLSearchParams(location.search);
+  var set = function (id, val) {
+    var el = document.getElementById(id);
+    if (el && val) { el.value = val; el.dispatchEvent(new Event('input')); }
+  };
+  set('client-name', p.get('name'));
+  set('veh-year',  p.get('year'));
+  set('veh-make',  p.get('make'));
+  set('veh-model', p.get('model'));
+  if (p.get('year') || p.get('make') || p.get('model')) {
+    if (typeof aluDebounce  === 'function') aluDebounce();
+    if (typeof refreshMsgBox === 'function') refreshMsgBox();
+  }
+});
+</script>
 </body>
 </html>
