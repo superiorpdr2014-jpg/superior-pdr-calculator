@@ -71,6 +71,15 @@ window.SHOP_CONFIG = {
 
     paint: [ { id:'flat', price:0 }, { id:'tricoat', price:3000 } ],
 
-    tiers: { practical:0.7, improvement:0.6 }
+    tiers: { practical:0.7, improvement:0.6 },
+
+    panelMinPrices: {
+      'Roof': 1800,
+      'Hood': 1800,
+      'Left Quarter': 1800,
+      'Right Quarter': 1800,
+      'Trunk': 1800,
+      'Tailgate': 1800
+    }
   }
 };

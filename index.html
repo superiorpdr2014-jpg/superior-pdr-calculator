@@ -724,7 +724,16 @@ window.SHOP_CONFIG = {
 
     paint: [ { id:'flat', price:0 }, { id:'tricoat', price:3000 } ],
 
-    tiers: { practical:0.7, improvement:0.6 }
+    tiers: { practical:0.7, improvement:0.6 },
+
+    panelMinPrices: {
+      'Roof': 1800,
+      'Hood': 1800,
+      'Left Quarter': 1800,
+      'Right Quarter': 1800,
+      'Trunk': 1800,
+      'Tailgate': 1800
+    }
   }
 };
 
@@ -1552,6 +1561,7 @@ function presentationPlan(reps) {
 // ─── PDR DATA ────────────────────────────────────────────────────────────────
 var PDR_SIZES = PRICING.pdrSizes || [];
 var PDR_SIZE_LABELS = PRICING.pdrSizeLabels || [];
+var PANEL_MIN_PRICES = PRICING.panelMinPrices || {};
 var PDR_GROUPS = (PRICING.pdrGroups || []).map(function(g){ return { title:t('pgroup_'+g.id), factors:g.factors.map(function(fr){ return { id:fr.id, pct:fr.pct, label:t('pf_'+fr.id) }; }) }; });
 var PDR_LABELS = {};
 PDR_GROUPS.forEach(function(g){ g.factors.forEach(function(f){ PDR_LABELS[f.id] = f.label; }); });
@@ -2889,19 +2899,22 @@ function slideSpdPrice(val) {
 }
 
 function pdrSelectSize(n, price) {
-  S.pdrSize = { size:n, label:(PDR_SIZE_LABELS[n-1]||n)+'cm', price:price };
+  var panelKey = S.panelDiag ? S.panelDiag.split(' — ')[0].trim() : '';
+  var minP = PANEL_MIN_PRICES[panelKey] || 0;
+  var effPrice = Math.max(price, minP);
+  S.pdrSize = { size:n, label:(PDR_SIZE_LABELS[n-1]||n)+'cm', price:effPrice };
   document.querySelectorAll('#pdr-size-grid .size-btn').forEach(function(b){
     b.classList.toggle('on', parseInt(b.dataset.size,10) === n);
   });
   var sel = document.getElementById('size-sel');
-  sel.textContent = (PDR_SIZE_LABELS[n-1]||n) + 'cm  —  ' + CS + price;
+  sel.textContent = (PDR_SIZE_LABELS[n-1]||n) + 'cm  —  ' + CS + effPrice;
   sel.classList.remove('none');
   document.getElementById('size-clear').style.display = '';
   document.getElementById('size-card').classList.remove('open');
   var _fc = document.getElementById('factors-card'); if (_fc) _fc.classList.add('open');
-  S.pdrPriceOverride = price;
+  S.pdrPriceOverride = effPrice;
   S.pdrDiscount = 0;
-  var _spr2=document.getElementById('spd-range'); if(_spr2){ _spr2.max=price; _spr2.value=price; }
+  var _spr2=document.getElementById('spd-range'); if(_spr2){ _spr2.max=effPrice; _spr2.value=effPrice; }
   updateSpdUI();
   recomputePdrFactors();   // refresh each selected factor's default $ for the new base
   if (typeof checkAluminum === 'function') checkAluminum();   // re-check now that a size exists
