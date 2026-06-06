@@ -1215,7 +1215,7 @@ var I18N = {
     bf_xl:'大面積金屬刮傷', bf_body:'鈑金作業', bf_punch:'穿孔', bf_crack:'裂縫',
     bf_corner:'凹角', bf_ri:'R&I（拆裝費）', bf_custom:'其他／自訂',
     paint_flat:'素色', paint_flatSub:'不加價', paint_tricoat:'三層珠光漆',
-    tier_premiumName:'精緻修復', tier_practicalName:'實用修復', tier_improvementName:'改善修復',
+    tier_premiumName:'精緻修復', tier_practicalName:'平整修復', tier_improvementName:'大概修復',
     tier_premiumDesc:'修復至近乎完美的狀態。投入額外時間與精準度於最終細節，確保在任何角度與光線下都呈現正確外觀。',
     tier_practicalDesc:'在正常觀看距離與常見角度下呈現乾淨、良好的修復效果。外觀自然且整潔——降低30%費用，但品質不打折。',
     tier_improvementDesc:'以精緻修復50%的費用，顯著改善受損區域的外觀。雖無法達到精緻修復的完美程度，但能大幅提升鈑件狀態。',
@@ -1229,13 +1229,13 @@ var I18N = {
     est_validThrough:'有效至', est_covers:'本估價涵蓋：',
     est_estimatedCost:'預估費用', est_cost:'費用', est_option:'方案',
     est_pctLess:'% 折扣', est_30less:'減少30%', est_40less:'減少50%',
-    est_premiumRepair:'精緻修復', est_practicalRepair:'實用修復', est_improvementRepair:'改善修復',
+    est_premiumRepair:'精緻修復', est_practicalRepair:'平整修復', est_improvementRepair:'大概修復',
     intro_3tier:'以下提供三種專業修復方案供您選擇最適合的成果與價值。每種方案都是品質修復，差異在於精緻程度，而非品質。',
     intro_exact:'經現場檢查車輛後，以下是我們討論之損傷的確切修復費用。',
     intro_2opt:'我們提供兩種專業修復方案，讓您完全掌控最終成果。差異在於精緻程度，而非品質。',
     riNoteAll:'所有方案皆包含拆裝費：', riNoteBoth:'兩種方案皆包含拆裝費：',
-    btext_3tier:'每種方案都能交付優質成果，沒有錯誤的選擇。許多客戶從實用或改善修復開始，並可在同次施工中升級。決定權始終在您手中。',
-    btext_2opt:'兩種方案都提供極佳價值，沒有錯誤的選擇。許多客戶從實用修復開始，並在同次施工中升級至精緻修復。決定權始終在您手中。',
+    btext_3tier:'每種方案都能交付優質成果，沒有錯誤的選擇。許多客戶從實用或大概修復開始，並可在同次施工中升級。決定權始終在您手中。',
+    btext_2opt:'兩種方案都提供極佳價值，沒有錯誤的選擇。許多客戶從平整修復開始，並在同次施工中升級至精緻修復。決定權始終在您手中。',
     veh_for:'，車輛：',
     email_hi:'{name} 您好，', email_hiNo:'您好，',
     sms_hi:'{name} 您好，', sms_hiNo:'您好，',
@@ -3576,25 +3576,6 @@ applyConfig();   // sets logo/accent/title + runs localizeDOM()
   try{ if(window.ResizeObserver) new ResizeObserver(function(){ setTimeout(postH,30); }).observe(document.body); }catch(e){}
   setInterval(postH, 1000);
 })();
-</script>
-
-<script>
-// Auto-fill from URL parameters (?name=陳大明&year=2022&make=Toyota&model=RAV4)
-window.addEventListener('load', function () {
-  var p = new URLSearchParams(location.search);
-  var set = function (id, val) {
-    var el = document.getElementById(id);
-    if (el && val) { el.value = val; el.dispatchEvent(new Event('input')); }
-  };
-  set('client-name', p.get('name'));
-  set('veh-year',  p.get('year'));
-  set('veh-make',  p.get('make'));
-  set('veh-model', p.get('model'));
-  if (p.get('year') || p.get('make') || p.get('model')) {
-    if (typeof aluDebounce  === 'function') aluDebounce();
-    if (typeof refreshMsgBox === 'function') refreshMsgBox();
-  }
-});
 </script>
 </body>
 </html>
