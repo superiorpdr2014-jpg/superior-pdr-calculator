@@ -3368,13 +3368,27 @@ function checkAluminum() {
       })[0];
       if (!match) { alertDiv.style.display='none'; return; }
 
-      var panelNames = { hood:'引擎蓋', front_fenders:'前葉子板', doors:'所有車門', rear_quarters:'後葉子板', roof:'車頂', trunk:'後行李廂蓋', liftgate:'後尾門', tailgate:'後尾門' };
+      var panelNames = { hood:'引擎蓋', front_fenders:'前葉子板', rear_fenders:'後葉子板', front_doors:'前車門', rear_doors:'後車門', doors:'所有車門', rear_quarters:'後葉子板', roof:'車頂', trunk:'後行李廂蓋', liftgate:'後尾門', tailgate:'後尾門' };
       var panels = (match.aluminum_panels||[]).map(function(p){ return panelNames[p]||p; });
       var html = '<strong>⚠ 偵測到鋁合金車款</strong><br>';
       html += '<b>' + make + ' ' + model + '</b>';
       if (panels.length) html += ' — 鋁合金鈑件：<b>' + panels.join('、') + '</b>。';
       if (match.magnet_test_required) html += '<br>⚡ 建議對未列出的鈑件進行磁鐵測試。';
-      if (match.notes) html += '<br><span style="font-size:11px;opacity:.8">' + match.notes + '</span>';
+      if (match.notes) {
+        var note = match.notes
+          .replace(/Hood\s*\(frunk\)/gi,'引擎蓋（前行李廂）')
+          .replace(/front\s+fenders?/gi,'前葉子板')
+          .replace(/rear\s+fenders?/gi,'後葉子板')
+          .replace(/front\s+doors?/gi,'前車門')
+          .replace(/rear\s+falcon\s+doors?/gi,'後車門（獵鷹門）')
+          .replace(/rear\s+doors?/gi,'後車門')
+          .replace(/liftgate/gi,'後尾門')
+          .replace(/tailgate/gi,'後尾門')
+          .replace(/\baluminum\b/gi,'鋁合金')
+          .replace(/\bsteel\b/gi,'鋼板')
+          .replace(/confirm with magnet before quoting/gi,'報價前請用磁鐵確認');
+        html += '<br><span style="font-size:11px;opacity:.8">' + note + '</span>';
+      }
       alertContent.innerHTML = html;
       alertDiv.style.display = '';
 
