@@ -677,7 +677,7 @@ window.SHOP_CONFIG = {
     accentColor:  '#cc0000',               // Red accent (can customize)
     imageAccent:  '#cc0000',
     currencySymbol: 'NT$',                 // New Taiwan Dollar
-    validityDays: 7,
+    validityDays: 30,
 
     experienceLine: 'Superior PDR 提供最專業的免烤漆凹痕修復服務，保留您車輛的原廠烤漆品質。',
     guaranteeShort: '滿意保證，不滿意不收費。',
@@ -1032,7 +1032,7 @@ var SHOP = (typeof window!=='undefined' && window.SHOP_CONFIG) ? window.SHOP_CON
 var CONFIG = SHOP.brand || {
   companyName:'Dent Time', logoUrl:'https://denttime.com/wp-content/uploads/2022/03/denttime_500.png',
   phone:'858-408-6200', phonePretty:'(858) 408-6200', website:'https://www.tar-tw.com/',
-  accentColor:'#ff4444', imageAccent:'#cc0000', validityDays:7,
+  accentColor:'#ff4444', imageAccent:'#cc0000', validityDays:30,
   experienceLine:'', guaranteeShort:'', guaranteeLong:'',
   apiBase:'', smsEndpoint:'/api/estimate-sms/send', emailEndpoint:'/api/estimate-email/send',
   aluminum:{ enabled:false }
@@ -1218,7 +1218,7 @@ var I18N = {
     paint_flat:'素色', paint_flatSub:'不加價', paint_tricoat:'三層珠光漆',
     tier_premiumName:'精緻修復', tier_practicalName:'平整修復', tier_improvementName:'大概修復',
     tier_premiumDesc:'修復至近乎完美的狀態。投入額外時間與精準度於最終細節，確保在任何角度與光線下都呈現正確外觀。',
-    tier_practicalDesc:'在正常觀看距離與常見角度下呈現乾淨、良好的修復效果。外觀自然且整潔——降低30%費用，但品質不打折。',
+    tier_practicalDesc:'在正常觀看距離與常見角度下呈現乾淨、良好的修復效果。外觀自然且整潔——降低30%費用，符合市場平均修復品質。',
     tier_improvementDesc:'以精緻修復50%的費用，顯著改善受損區域的外觀。雖無法達到精緻修復的完美程度，但能大幅提升鈑件狀態。',
     est_repairEstimate:'維修估價單', est_client:'客戶', est_vehicle:'車輛', est_date:'日期',
     est_pdrSection:'免烤漆凹痕修復', est_bumperSection:'保險桿與鈑件修復', est_subtotal:'小計',
