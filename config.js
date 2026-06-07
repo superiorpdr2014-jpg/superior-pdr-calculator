@@ -57,29 +57,29 @@ window.SHOP_CONFIG = {
     ],
 
     bumperFactors: [
-      { id:'scuff',   base:7600 },
-      { id:'blend',   base:5700 },
-      { id:'scratch', base:10600 },
-      { id:'xl',      base:14400 },
-      { id:'body',    base:5500 },
-      { id:'punch',   base:3700 },
-      { id:'crack',   base:3500 },
-      { id:'corner',  base:4800 },
-      { id:'ri',      base:4800, min:1000, max:17300 },
-      { id:'custom',  base:4800, min:0,    max:38400, custom:true }
+      { id:'scuff',   base:3800 },
+      { id:'blend',   base:2850 },
+      { id:'scratch', base:5300 },
+      { id:'xl',      base:7200 },
+      { id:'body',    base:2750 },
+      { id:'punch',   base:1850 },
+      { id:'crack',   base:1750 },
+      { id:'corner',  base:2400 },
+      { id:'ri',      base:2400, min:500,  max:8650 },
+      { id:'custom',  base:2400, min:0,    max:19200, custom:true }
     ],
 
-    paint: [ { id:'flat', price:0 }, { id:'tricoat', price:3000 } ],
+    paint: [ { id:'flat', price:0 }, { id:'tricoat', price:2500 } ],
 
     tiers: { practical:0.7, improvement:0.6 },
 
     panelMinPrices: {
-      'Roof': 1800,
-      'Hood': 1800,
-      'Left Quarter': 1800,
-      'Right Quarter': 1800,
-      'Trunk': 1800,
-      'Tailgate': 1800
+      'Roof': 900,
+      'Hood': 900,
+      'Left Quarter': 900,
+      'Right Quarter': 900,
+      'Trunk': 900,
+      'Tailgate': 900
     }
   }
 };
