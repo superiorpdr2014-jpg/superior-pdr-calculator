@@ -418,10 +418,10 @@
     .total-amt{font-size:2.8em;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1;margin-bottom:14px;}
     .total-amt.ph{font-size:1em;font-weight:400;font-style:italic;color:#666;letter-spacing:0;}
     .breakdown{border-top:1px solid var(--line-soft);padding-top:12px;display:flex;flex-direction:column;gap:5px;}
-    .repair-time-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,68,68,.15);border-radius:6px;margin-top:8px;}
-    .repair-time-lbl{font-size:12px;color:#aaa;font-weight:600;white-space:nowrap;}
+    .repair-time-card{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);}
+    .repair-time-lbl{font-size:13px;color:#aaa;font-weight:600;white-space:nowrap;}
     .repair-time-wrap{display:flex;align-items:center;gap:6px;}
-    .repair-time-input{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fff;font-size:14px;font-weight:700;padding:5px 10px;width:120px;font-family:inherit;text-align:center;}
+    .repair-time-input{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:4px;color:#fff;font-size:14px;font-weight:700;padding:5px 10px;width:110px;font-family:inherit;text-align:center;}
     .repair-time-input:focus{outline:none;border-color:rgba(255,68,68,.5);}
     .repair-time-reset{background:none;border:none;color:#555;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:3px;line-height:1;}
     .repair-time-reset:hover{color:#aaa;}
@@ -929,6 +929,13 @@ window.SHOP_CONFIG = {
           <div class="pdr-sub" id="pdr-sub" style="display:none;">
             <span data-i18n="dentSubtotal">Dent subtotal</span><span id="pdr-sub-amt">$0</span>
           </div>
+          <div class="repair-time-card" id="repair-time-card" style="display:none;">
+            <span class="repair-time-lbl">⏱ 預估維修工時</span>
+            <div class="repair-time-wrap">
+              <input type="text" id="repair-time-val" class="repair-time-input" placeholder="—" oninput="repairTimeEdited()">
+              <button class="repair-time-reset" title="重新計算" onclick="repairTimeReset()">↺</button>
+            </div>
+          </div>
         </div>
       </div>
       <button class="add-btn" id="pdr-add-btn" disabled onclick="pdrAddItem()">
@@ -954,13 +961,6 @@ window.SHOP_CONFIG = {
     <div class="total-lbl" id="total-lbl">Estimated Total</div>
     <div class="total-amt ph" id="total-amt">Add a repair to calculate</div>
     <div class="breakdown" id="breakdown" style="display:none;"></div>
-    <div class="repair-time-card" id="repair-time-card" style="display:none;">
-      <span class="repair-time-lbl">⏱ 預估維修工時</span>
-      <div class="repair-time-wrap">
-        <input type="text" id="repair-time-val" class="repair-time-input" placeholder="—" oninput="repairTimeEdited()">
-        <button class="repair-time-reset" title="重新計算" onclick="repairTimeReset()">↺</button>
-      </div>
-    </div>
   </div>
 
   <!-- Ready-to-send SMS message — copy and paste into your texting app -->
