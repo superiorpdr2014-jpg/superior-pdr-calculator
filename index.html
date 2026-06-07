@@ -924,9 +924,6 @@ window.SHOP_CONFIG = {
             <span class="ri-label" data-i18n="riLabel">R&amp;I (Removal &amp; Install)</span>
             <div class="ri-wrap"><span id="ri-cs">$</span><input type="number" id="pdr-ri" min="0" step="100" value="0" oninput="pdrRecalc()"></div>
           </div>
-          <div class="pdr-sub" id="pdr-sub" style="display:none;">
-            <span data-i18n="dentSubtotal">Dent subtotal</span><span id="pdr-sub-amt">$0</span>
-          </div>
           <div class="repair-time-card" id="repair-time-card" style="display:none;">
             <span class="repair-time-lbl">預估維修工時</span>
             <div class="repair-time-wrap">
@@ -940,6 +937,9 @@ window.SHOP_CONFIG = {
               </div>
               <button class="repair-time-reset" title="重新計算" onclick="repairTimeReset()">↺</button>
             </div>
+          </div>
+          <div class="pdr-sub" id="pdr-sub" style="display:none;">
+            <span data-i18n="dentSubtotal">Dent subtotal</span><span id="pdr-sub-amt">$0</span>
           </div>
         </div>
       </div>
