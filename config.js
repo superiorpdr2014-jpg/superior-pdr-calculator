@@ -24,7 +24,7 @@ window.SHOP_CONFIG = {
     accentColor:  '#cc0000',               // Red accent (can customize)
     imageAccent:  '#cc0000',
     currencySymbol: 'NT$',                 // New Taiwan Dollar
-    validityDays: 7,
+    validityDays: 30,
 
     experienceLine: 'Superior PDR 提供最專業的免烤漆凹痕修復服務，保留您車輛的原廠烤漆品質。',
     guaranteeShort: '滿意保證，不滿意不收費。',
