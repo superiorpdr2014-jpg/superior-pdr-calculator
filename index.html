@@ -2862,7 +2862,7 @@ function buildPitchMessage(channel) {
   }
 
   var rtLabel = getRepairTimeLabel();
-  var rtLine = (rtLabel && rtLabel !== '—') ? '\n預估維修工時：' + rtLabel : '';
+  var rtLine = (rtLabel && rtLabel !== '—') ? '\n預估維修工時：' + rtLabel + '\n本估價單有效期為 ' + CONFIG.validityDays + ' 天' : '';
 
   if (channel === 'sms') {
     return (nm ? fillT(t('sms_hi'),M) : t('sms_hiNo'))
@@ -2886,7 +2886,7 @@ function buildPitchMessage(channel) {
       var dmg = (r.factors||[]).map(function(fx){ return fx.label; }).join(', ');
       emailRepairs += (i+1) + '. ' + r.panel + (dmg ? ' (' + dmg + ')' : '') + '\n';
     });
-    if (rtLabel && rtLabel !== '—') emailRepairs += '預估維修工時：' + rtLabel;
+    if (rtLabel && rtLabel !== '—') emailRepairs += '預估維修工時：' + rtLabel + '\n本估價單有效期為 ' + CONFIG.validityDays + ' 天';
     p.push(emailRepairs.trim());
   }
   p.push(fillT(t('email_valid'),M));
