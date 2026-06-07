@@ -2872,9 +2872,8 @@ function buildPitchMessage(channel) {
         + '感謝您選擇 ' + CONFIG.companyName + (vp ? vp : '') + '。您的免烤漆凹痕修復估價單已附上。'
         + repairLines
         + rtLine
-        + rangeDisclaimer + '\n'
-        + fillT(t('sms_valid'),M) + '\n'
-        + CONFIG.guaranteeShort;
+        + rangeDisclaimer + '\n\n'
+        + fillT(t('sms_valid'),M) + CONFIG.guaranteeShort;
     }
     return (nm ? fillT(t('sms_hi'),M) : t('sms_hiNo'))
       + fillT(t('sms_body'),M)
