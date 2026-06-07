@@ -2862,7 +2862,7 @@ function buildPitchMessage(channel) {
   }
 
   var rtLabel = getRepairTimeLabel();
-  var rtLine = (rtLabel && rtLabel !== '—') ? '\n預估維修工時：' + rtLabel : '';
+  var rtLine = (rtLabel && rtLabel !== '—') ? '\n預估維修工時：' + rtLabel + '\n' : '';
 
   if (channel === 'sms') {
     return (nm ? fillT(t('sms_hi'),M) : t('sms_hiNo'))
