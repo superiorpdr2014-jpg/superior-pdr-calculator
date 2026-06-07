@@ -2754,12 +2754,12 @@ function buildPitchMessage(channel) {
       repairLines += (i+1) + '. ' + r.panel + '\n   ' + (dmg || 'Base repair') + '\n';
     });
     repairLines += '\n';
-    if (plan.view === 'itemized' || plan.exact) {
-      repairLines += 'Total: ' + CS + tt.premium.toLocaleString();
-    } else if (plan.view === '3tier') {
+    if (plan.view === '3tier') {
       repairLines += '\n' + t('est_premiumRepair') + ': ' + money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08));
       repairLines += '\n' + t('est_practicalRepair') + ': ' + money(fl100(tt.practical*0.92)) + ' - ' + money(fl100(tt.practical*1.08));
       repairLines += '\n' + t('est_improvementRepair') + ': ' + money(fl100(tt.improvement*0.92)) + ' - ' + money(fl100(tt.improvement*1.08));
+    } else if (plan.view === 'itemized') {
+      repairLines += '\n' + t('est_estimatedRange') + ': ' + money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08));
     } else {
       repairLines += '\n' + t('est_premiumRepair') + ': ' + money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08));
       repairLines += '\n' + t('est_practicalRepair') + ': ' + money(fl100(tt.practical*0.92)) + ' - ' + money(fl100(tt.practical*1.08));
