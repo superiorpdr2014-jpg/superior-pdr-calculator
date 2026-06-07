@@ -418,6 +418,13 @@
     .total-amt{font-size:2.8em;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1;margin-bottom:14px;}
     .total-amt.ph{font-size:1em;font-weight:400;font-style:italic;color:#666;letter-spacing:0;}
     .breakdown{border-top:1px solid var(--line-soft);padding-top:12px;display:flex;flex-direction:column;gap:5px;}
+    .repair-time-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,68,68,.15);border-radius:6px;margin-top:8px;}
+    .repair-time-lbl{font-size:12px;color:#aaa;font-weight:600;white-space:nowrap;}
+    .repair-time-wrap{display:flex;align-items:center;gap:6px;}
+    .repair-time-input{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#fff;font-size:14px;font-weight:700;padding:5px 10px;width:120px;font-family:inherit;text-align:center;}
+    .repair-time-input:focus{outline:none;border-color:rgba(255,68,68,.5);}
+    .repair-time-reset{background:none;border:none;color:#555;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:3px;line-height:1;}
+    .repair-time-reset:hover{color:#aaa;}
     .brow{display:flex;justify-content:space-between;font-size:13px;gap:8px;}
     .brow .bn{flex:1;color:#999;}
     .brow .bp{font-weight:600;color:#eee;white-space:nowrap;}
@@ -947,6 +954,13 @@ window.SHOP_CONFIG = {
     <div class="total-lbl" id="total-lbl">Estimated Total</div>
     <div class="total-amt ph" id="total-amt">Add a repair to calculate</div>
     <div class="breakdown" id="breakdown" style="display:none;"></div>
+    <div class="repair-time-card" id="repair-time-card" style="display:none;">
+      <span class="repair-time-lbl">⏱ 預估維修工時</span>
+      <div class="repair-time-wrap">
+        <input type="text" id="repair-time-val" class="repair-time-input" placeholder="—" oninput="repairTimeEdited()">
+        <button class="repair-time-reset" title="重新計算" onclick="repairTimeReset()">↺</button>
+      </div>
+    </div>
   </div>
 
   <!-- Ready-to-send SMS message — copy and paste into your texting app -->
@@ -2342,6 +2356,49 @@ function money(n){ n=fl100((typeof n==='number'&&!isNaN(n))?n:0); return CS + n.
 function fl100(n){ return Math.floor(n/100)*100; }
 function rng(n){ return money(fl100(n*0.92)) + ' &ndash; ' + money(fl100(n*1.08)); }
 function rngDash(n){ return money(fl100(n*0.92)) + ' – ' + money(fl100(n*1.08)); }
+
+var _rtUserEdited = false;
+
+function calcRepairTime(amount) {
+  var totalHours = Math.round(amount / 1000);
+  if (totalHours <= 0) return '—';
+  var days = Math.floor(totalHours / 8);
+  var hrs = totalHours % 8;
+  if (days > 0 && hrs > 0) return days + '天 ' + hrs + '小時';
+  if (days > 0) return days + '天';
+  return hrs + '小時';
+}
+
+function updateRepairTimeField() {
+  var reps = collectRepairs();
+  var card = document.getElementById('repair-time-card');
+  var field = document.getElementById('repair-time-val');
+  if (!field) return;
+  if (!reps.length) {
+    if (card) card.style.display = 'none';
+    field.value = ''; _rtUserEdited = false;
+    return;
+  }
+  if (card) card.style.display = '';
+  if (!_rtUserEdited) {
+    var tt = tierTotals(reps);
+    field.value = calcRepairTime(tt.premium);
+  }
+}
+
+function repairTimeEdited() { _rtUserEdited = true; refreshMsgBox(); }
+
+function repairTimeReset() {
+  _rtUserEdited = false;
+  updateRepairTimeField();
+  refreshMsgBox();
+}
+
+function getRepairTimeLabel() {
+  var field = document.getElementById('repair-time-val');
+  return field ? field.value.trim() : '';
+}
+
 // Does the estimate contain any tier-discountable (PDR) work?
 function hasTierWork(reps){ return reps.some(function(r){ return (r.tierBase||0) > 0; }); }
 
@@ -2395,6 +2452,9 @@ function buildEstimateHTML(o) {
   h += '.ft .note{background:#fff8e1;border-left:4px solid #ff9800;padding:10px 12px;margin-bottom:12px;font-size:.76em;color:#666;line-height:1.45}';
   h += '.ft .ct{text-align:center;font-size:.85em;color:#666;line-height:1.6}';
   h += '.ft .ph{color:#cc0000;font-weight:bold}';
+  h += '.labor{display:flex;justify-content:space-between;align-items:center;background:#f5f5f5;border-radius:6px;padding:10px 14px;margin-bottom:12px;font-size:.84em;}';
+  h += '.labor .ll{color:#888;font-weight:600;}';
+  h += '.labor .lv{color:#222;font-weight:800;}';
   // option-card (tiered) styles — matches the original Dent Time estimate
   h += '.intro{margin-bottom:16px;line-height:1.6;color:#444;font-size:.85em}';
   h += '.covers{font-size:.8em;color:#555;margin-bottom:16px;line-height:1.55}';h += '.locs{background:#f7f7f7;border:1px solid #ececec;border-radius:9px;padding:11px 14px;margin-bottom:15px}';h += '.locs-t{font-size:.62em;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#cc0000;margin-bottom:7px}';h += '.loc-row{display:flex;justify-content:space-between;gap:10px;font-size:.82em;color:#444;padding:4px 0;border-top:1px solid #eee}';h += '.loc-row:first-of-type{border-top:none}';h += '.loc-row .ln-name{font-weight:600;color:#222}';h += '.loc-row .ln-dmg{font-size:.92em;color:#888}';
@@ -2510,7 +2570,11 @@ function buildEstimateHTML(o) {
     h += '<div class="btext">'+(view === '3tier' ? t('btext_3tier') : t('btext_2opt'))+'</div>';
   }
   h += '</div>';
-  h += '<div class="ft"><div class="valid">'+t('est_validGood')+' '+CONFIG.validityDays+' '+t('est_days')+'<br><b>'+t('est_validThrough')+' '+expStr+'</b></div>';
+  h += '<div class="ft">';
+  if (o.laborTime && o.laborTime !== '—') {
+    h += '<div class="labor"><span class="ll">⏱ 預估維修工時</span><span class="lv">'+esc(o.laborTime)+'</span></div>';
+  }
+  h += '<div class="valid">'+t('est_validGood')+' '+CONFIG.validityDays+' '+t('est_days')+'<br><b>'+t('est_validThrough')+' '+expStr+'</b></div>';
   h += '<div class="note">'+t('est_preliminary')+'</div>';
   h += '<div class="ct">'+CONFIG.website+'</div></div>';
   h += '</div></body></html>';
@@ -2539,7 +2603,7 @@ function renderEstimateCanvas(reps, cb) {
     return new Promise(function(res){ var fr=new FileReader(); fr.onload=function(){res(fr.result);}; fr.readAsDataURL(blob); });
   }).catch(function(){ return DT_LOGO; }).then(function(logoSrc){
     var _vin = (document.getElementById('vin-input')||{}).value||'';
-    var html = buildEstimateHTML({reps:reps, vin:_vin, client:client, vehicle:vehicle, date:today, expires:expires}).split(DT_LOGO).join(logoSrc);
+    var html = buildEstimateHTML({reps:reps, vin:_vin, client:client, vehicle:vehicle, date:today, expires:expires, laborTime:getRepairTimeLabel()}).split(DT_LOGO).join(logoSrc);
     var iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:480px;height:1600px;border:none;visibility:hidden;';
     document.body.appendChild(iframe);
@@ -2711,6 +2775,7 @@ function fallbackCopy(txt) {
 
 // Keep the always-visible "Estimate Message to Send" box in sync with the estimate
 function refreshMsgBox() {
+  updateRepairTimeField();
   var card = document.getElementById('msg-card');
   var box  = document.getElementById('msg-box');
   if (!card || !box) return;
@@ -2784,10 +2849,14 @@ function buildPitchMessage(channel) {
     }
   }
 
+  var rtLabel = getRepairTimeLabel();
+  var rtLine = (rtLabel && rtLabel !== '—') ? '\n預估維修工時：' + rtLabel : '';
+
   if (channel === 'sms') {
     return (nm ? fillT(t('sms_hi'),M) : t('sms_hiNo'))
       + fillT(t('sms_body'),M)
       + repairLines
+      + rtLine
       + (tiers ? '\n\n' + t('sms_tiers') : '')
       + fillT(t('sms_valid'),M)
       + fillT(t('sms_close'),M) + CONFIG.guaranteeShort;
@@ -2805,6 +2874,7 @@ function buildPitchMessage(channel) {
       var dmg = (r.factors||[]).map(function(fx){ return fx.label; }).join(', ');
       emailRepairs += (i+1) + '. ' + r.panel + (dmg ? ' (' + dmg + ')' : '') + '\n';
     });
+    if (rtLabel && rtLabel !== '—') emailRepairs += '預估維修工時：' + rtLabel;
     p.push(emailRepairs.trim());
   }
   p.push(fillT(t('email_valid'),M));
