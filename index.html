@@ -769,7 +769,7 @@ window.SHOP_CONFIG = {
         <input type="text" id="vin-input" class="cb-input vin-field" placeholder="Type or scan VIN" maxlength="17" oninput="this.value=this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g,'');if(this.value.length===17)decodeVinFromField();">
         <button type="button" class="vin-scan-btn" onclick="openVinCamera()" title="Snap VIN with camera">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          <span>Snap VIN</span>
+          <span>掃描車身碼</span>
         </button>
         <button type="button" class="vin-go-btn" onclick="decodeVinFromField()" title="Look up VIN">Decode</button>
         <div style="font-size:10px;color:#777;margin-top:4px;width:100%">輸入擋風玻璃上的 17 碼 VIN — 輸入完整後自動解碼</div>
@@ -787,12 +787,12 @@ window.SHOP_CONFIG = {
     <div id="vin-modal" class="vin-modal">
       <div class="vin-modal-box">
         <div class="vin-modal-head">
-          <h3>Snap VIN</h3>
+          <h3>掃描車身碼</h3>
           <button class="vin-modal-close" onclick="closeVinCamera()">&times;</button>
         </div>
         <div class="vin-video-wrap">
           <video id="vin-video" playsinline muted onclick="snapVin()"></video>
-          <div class="vin-reticle">TAP TO SNAP</div>
+          <div class="vin-reticle">點擊螢幕拍攝</div>
           <div id="vin-cam-fallback" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#111;text-align:center;padding:20px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,68,68,0.8)" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             <div style="color:#ccc;font-size:14px;line-height:1.5;">點擊下方開啟相機<br><span style="color:#888;font-size:12px;">（拍完後自動辨識 VIN）</span></div>
@@ -801,8 +801,8 @@ window.SHOP_CONFIG = {
           <input type="file" id="vin-file-input" accept="image/*" capture="environment" style="display:none" onchange="vinFileSelected(this)">
         </div>
         <div class="vin-modal-foot">
-          <div class="vin-hint" id="vin-hint-div">Point at the VIN. <b>Tap the screen or the button below to snap.</b></div>
-          <button class="vin-snap-btn" id="vin-snap-btn" onclick="snapVin()">Snap</button>
+          <div class="vin-hint" id="vin-hint-div">對準車身碼。<b>點擊螢幕或下方按鈕拍攝。</b></div>
+          <button class="vin-snap-btn" id="vin-snap-btn" onclick="snapVin()">拍攝</button>
           <div class="vin-ocr-result" id="vin-result"></div>
           <div class="vin-status" id="vin-status"></div>
           <div class="vin-manual-row" style="margin-top:10px">
@@ -3350,7 +3350,7 @@ function snapVin(){
   })
   .then(function(r){ return r.json(); })
   .then(function(d){
-    if(btn){ btn.disabled=false; btn.textContent='Snap'; }
+    if(btn){ btn.disabled=false; btn.textContent='拍攝'; }
     if(d.error && !d.vin){
       if(status) status.textContent = d.error;
       if(result) result.textContent = d.raw || '';
@@ -3376,7 +3376,7 @@ function snapVin(){
     }
   })
   .catch(function(err){
-    if(btn){ btn.disabled=false; btn.textContent='Snap'; }
+    if(btn){ btn.disabled=false; btn.textContent='拍攝'; }
     if(status) status.textContent = 'Error: '+err.message;
   });
 }
