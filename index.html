@@ -421,8 +421,6 @@
     .repair-time-card{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);}
     .repair-time-lbl{font-size:13px;color:#aaa;font-weight:600;white-space:nowrap;}
     .repair-time-wrap{display:flex;align-items:center;gap:6px;}
-    .repair-time-input{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:4px;color:#fff;font-size:14px;font-weight:700;padding:5px 10px;width:110px;font-family:inherit;text-align:center;}
-    .repair-time-input:focus{outline:none;border-color:rgba(255,68,68,.5);}
     .repair-time-reset{background:none;border:none;color:#555;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:3px;line-height:1;}
     .repair-time-reset:hover{color:#aaa;}
     .brow{display:flex;justify-content:space-between;font-size:13px;gap:8px;}
@@ -932,7 +930,14 @@ window.SHOP_CONFIG = {
           <div class="repair-time-card" id="repair-time-card" style="display:none;">
             <span class="repair-time-lbl">⏱ 預估維修工時</span>
             <div class="repair-time-wrap">
-              <input type="text" id="repair-time-val" class="repair-time-input" placeholder="—" oninput="repairTimeEdited()">
+              <div class="ri-wrap" style="padding:6px 10px;">
+                <input type="number" id="repair-days" min="0" step="1" value="0" style="width:36px;text-align:right;" oninput="repairTimeEdited()">
+                <span style="color:#ddd;font-size:13px;font-weight:600;">天</span>
+              </div>
+              <div class="ri-wrap" style="padding:6px 10px;">
+                <input type="number" id="repair-hours" min="0" max="23" step="1" value="0" style="width:36px;text-align:right;" oninput="repairTimeEdited()">
+                <span style="color:#ddd;font-size:13px;font-weight:600;">小時</span>
+              </div>
               <button class="repair-time-reset" title="重新計算" onclick="repairTimeReset()">↺</button>
             </div>
           </div>
@@ -2361,28 +2366,27 @@ var _rtUserEdited = false;
 
 function calcRepairTime(amount) {
   var totalHours = Math.round(amount / 1000);
-  if (totalHours <= 0) return '—';
-  var days = Math.floor(totalHours / 8);
-  var hrs = totalHours % 8;
-  if (days > 0 && hrs > 0) return days + '天 ' + hrs + '小時';
-  if (days > 0) return days + '天';
-  return hrs + '小時';
+  if (totalHours < 0) totalHours = 0;
+  return { days: Math.floor(totalHours / 8), hours: totalHours % 8 };
 }
 
 function updateRepairTimeField() {
   var reps = collectRepairs();
   var card = document.getElementById('repair-time-card');
-  var field = document.getElementById('repair-time-val');
-  if (!field) return;
+  var dEl = document.getElementById('repair-days');
+  var hEl = document.getElementById('repair-hours');
+  if (!dEl || !hEl) return;
   if (!reps.length) {
     if (card) card.style.display = 'none';
-    field.value = ''; _rtUserEdited = false;
+    dEl.value = 0; hEl.value = 0; _rtUserEdited = false;
     return;
   }
   if (card) card.style.display = '';
   if (!_rtUserEdited) {
     var tt = tierTotals(reps);
-    field.value = calcRepairTime(tt.premium);
+    var rt = calcRepairTime(tt.premium);
+    dEl.value = rt.days;
+    hEl.value = rt.hours;
   }
 }
 
@@ -2395,8 +2399,16 @@ function repairTimeReset() {
 }
 
 function getRepairTimeLabel() {
-  var field = document.getElementById('repair-time-val');
-  return field ? field.value.trim() : '';
+  var d = parseInt(document.getElementById('repair-days')||{value:'0'}).value, h = parseInt((document.getElementById('repair-hours')||{value:'0'}).value);
+  var dEl = document.getElementById('repair-days');
+  var hEl = document.getElementById('repair-hours');
+  if (!dEl || !hEl) return '';
+  d = parseInt(dEl.value) || 0;
+  h = parseInt(hEl.value) || 0;
+  if (d === 0 && h === 0) return '';
+  if (d > 0 && h > 0) return d + '天 ' + h + '小時';
+  if (d > 0) return d + '天';
+  return h + '小時';
 }
 
 // Does the estimate contain any tier-discountable (PDR) work?
