@@ -793,9 +793,15 @@ window.SHOP_CONFIG = {
         <div class="vin-video-wrap">
           <video id="vin-video" playsinline muted onclick="snapVin()"></video>
           <div class="vin-reticle">TAP TO SNAP</div>
+          <div id="vin-cam-fallback" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#111;text-align:center;padding:20px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,68,68,0.8)" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <div style="color:#ccc;font-size:14px;line-height:1.5;">點擊下方開啟相機<br><span style="color:#888;font-size:12px;">（拍完後自動辨識 VIN）</span></div>
+            <button onclick="document.getElementById('vin-file-input').click()" style="background:rgba(255,68,68,.9);border:1px solid rgba(255,68,68,.5);border-radius:6px;color:#fff;font-size:15px;font-weight:700;padding:14px 28px;cursor:pointer;font-family:inherit;">📷 開啟相機</button>
+          </div>
+          <input type="file" id="vin-file-input" accept="image/*" capture="environment" style="display:none" onchange="vinFileSelected(this)">
         </div>
         <div class="vin-modal-foot">
-          <div class="vin-hint">Point at the VIN. <b>Tap the screen or the button below to snap.</b></div>
+          <div class="vin-hint" id="vin-hint-div">Point at the VIN. <b>Tap the screen or the button below to snap.</b></div>
           <button class="vin-snap-btn" id="vin-snap-btn" onclick="snapVin()">Snap</button>
           <div class="vin-ocr-result" id="vin-result"></div>
           <div class="vin-status" id="vin-status"></div>
@@ -3284,9 +3290,22 @@ function openVinCamera(){
   var result = document.getElementById('vin-result'); if(result) result.textContent='';
   var btn = document.getElementById('vin-snap-btn'); if(btn) btn.disabled=false;
   var video = document.getElementById('vin-video');
+  var fb = document.getElementById('vin-cam-fallback');
+  var hintDiv = document.getElementById('vin-hint-div');
+  if(fb) fb.style.display='none';
+  if(video) video.style.display='';
+  if(hintDiv) hintDiv.style.display='';
+  if(btn) btn.style.display='';
   navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment', width:{ideal:1920}, height:{ideal:1080}, aspectRatio:{ideal:16/9} }, audio:false })
     .then(function(stream){ _vinStream=stream; video.srcObject=stream; video.play(); })
-    .catch(function(){ if(status) status.textContent='Camera blocked. Allow camera access or type the VIN below.'; });
+    .catch(function(){
+      // iframe or permission blocked — show file-input fallback
+      if(video) video.style.display='none';
+      if(fb){ fb.style.display='flex'; }
+      if(hintDiv) hintDiv.style.display='none';
+      if(btn) btn.style.display='none';
+      if(status) status.textContent='';
+    });
 }
 
 function closeVinCamera(){
@@ -3295,7 +3314,9 @@ function closeVinCamera(){
   document.body.style.overflow = '';
   try { if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
   if(_vinStream){ _vinStream.getTracks().forEach(function(t){ t.stop(); }); _vinStream=null; }
-  var v=document.getElementById('vin-video'); if(v) v.srcObject=null;
+  var v=document.getElementById('vin-video'); if(v){ v.srcObject=null; v.style.display=''; }
+  var fb=document.getElementById('vin-cam-fallback'); if(fb) fb.style.display='none';
+  var fi=document.getElementById('vin-file-input'); if(fi) fi.value='';
   document.getElementById('vin-modal').classList.remove('show');
 }
 
@@ -3358,6 +3379,52 @@ function snapVin(){
     if(btn){ btn.disabled=false; btn.textContent='Snap'; }
     if(status) status.textContent = 'Error: '+err.message;
   });
+}
+
+function vinFileSelected(input){
+  if(!input.files || !input.files[0]) return;
+  var status = document.getElementById('vin-status');
+  var result = document.getElementById('vin-result');
+  var reader = new FileReader();
+  if(status) status.textContent='AI is reading the VIN…';
+  if(result) result.textContent='…';
+  reader.onload = function(e){
+    var imageData = e.target.result;
+    var apiBase = (typeof CONFIG!=='undefined' && CONFIG.apiBase) || '';
+    fetch(apiBase + '/api/vin-read', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({imageBase64:imageData})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.error && !d.vin){
+        if(status) status.textContent = d.error;
+        if(result) result.textContent = d.raw || '';
+        return;
+      }
+      if(d.vin){
+        if(result) result.textContent = d.vin;
+        document.getElementById('vin-manual').value = d.vin;
+        document.getElementById('vin-input').value = d.vin;
+        var yEl=document.getElementById('veh-year');  if(yEl && d.year)  yEl.value=d.year;
+        var mEl=document.getElementById('veh-make');  if(mEl && d.make)  mEl.value=titleCase(d.make);
+        var dEl=document.getElementById('veh-model'); if(dEl && d.model) dEl.value=d.model;
+        if(typeof refreshMsgBox==='function') refreshMsgBox();
+        if(typeof checkAluminum==='function') checkAluminum();
+        showVinDisplay(d.vin);
+        if(status) status.textContent = d.year+' '+titleCase(d.make)+' '+d.model+' — fields filled.';
+        if(navigator.vibrate) navigator.vibrate(80);
+        setTimeout(closeVinCamera, 1200);
+      } else {
+        if(status) status.textContent = 'No VIN found. Try again.';
+        if(result) result.textContent = d.raw || '';
+      }
+      var fi=document.getElementById('vin-file-input'); if(fi) fi.value='';
+    })
+    .catch(function(){ if(status) status.textContent='Network error. Try again.'; });
+  };
+  reader.readAsDataURL(input.files[0]);
 }
 
 function cleanVin(raw){
