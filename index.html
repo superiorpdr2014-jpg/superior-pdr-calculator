@@ -2828,6 +2828,7 @@ function buildPitchMessage(channel) {
   // Build repair summary from actual items
   var reps = collectRepairs();
   var repairLines = '';
+  var exact = false;
   if (reps.length) {
     repairLines = '\n\n';
     var tt = tierTotals(reps);
@@ -2837,7 +2838,7 @@ function buildPitchMessage(channel) {
       repairLines += (i+1) + '. ' + r.panel + '\n   ' + (dmg || 'Base repair') + '\n';
     });
     repairLines += '\n';
-    var exact = plan.exact;
+    exact = plan.exact;
     if (plan.view === '3tier') {
       if (exact) {
         repairLines += '\n' + t('est_premiumRepair') + ': ' + money(tt.premium);
@@ -2865,6 +2866,16 @@ function buildPitchMessage(channel) {
   var rtLine = (rtLabel && rtLabel !== '—') ? '\n預估維修工時：' + rtLabel + '\n' : '';
 
   if (channel === 'sms') {
+    if (!exact) {
+      var rangeDisclaimer = '因為照片或影片上呈現的凹痕大小跟深度，以我們經驗會跟實際的傷有落差，所以我們只能給您一個參考的價格區間，實際價格還需要現場評估後才會知道喔！這點請您見諒。';
+      return (nm ? fillT(t('sms_hi'),M) : t('sms_hiNo'))
+        + '感謝您選擇 ' + CONFIG.companyName + (vp ? vp : '') + '。您的免烤漆凹痕修復估價單已附上。'
+        + repairLines
+        + rtLine
+        + rangeDisclaimer + '\n'
+        + fillT(t('sms_valid'),M) + '\n'
+        + CONFIG.guaranteeShort;
+    }
     return (nm ? fillT(t('sms_hi'),M) : t('sms_hiNo'))
       + fillT(t('sms_body'),M)
       + repairLines
