@@ -3384,14 +3384,23 @@ function openVinCamera(){
   var video = document.getElementById('vin-video');
   var fb = document.getElementById('vin-cam-fallback');
   var hintDiv = document.getElementById('vin-hint-div');
+  var inIframe = (window.self !== window.top);
   if(fb) fb.style.display='none';
   if(video) video.style.display='';
   if(hintDiv) hintDiv.style.display='';
   if(btn) btn.style.display='';
+  if(inIframe) {
+    // Inside iframe (e.g. tar-tw.com) — skip getUserMedia, go straight to file input
+    if(video) video.style.display='none';
+    if(fb){ fb.style.display='flex'; }
+    if(hintDiv) hintDiv.style.display='none';
+    if(btn) btn.style.display='none';
+    return;
+  }
   navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment', width:{ideal:1920}, height:{ideal:1080}, aspectRatio:{ideal:16/9} }, audio:false })
     .then(function(stream){ _vinStream=stream; video.srcObject=stream; video.play(); })
     .catch(function(){
-      // iframe or permission blocked — show file-input fallback
+      // permission blocked — show file-input fallback
       if(video) video.style.display='none';
       if(fb){ fb.style.display='flex'; }
       if(hintDiv) hintDiv.style.display='none';
