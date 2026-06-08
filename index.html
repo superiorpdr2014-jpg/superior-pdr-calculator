@@ -960,6 +960,16 @@ window.SHOP_CONFIG = {
     <div class="mode-row" id="mode-row"></div>
     <div class="total-lbl" id="total-lbl">Estimated Total</div>
     <div class="total-amt ph" id="total-amt">Add a repair to calculate</div>
+    <div id="range-slider-row" style="display:none; margin-top:12px; padding:0 2px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <span style="font-size:11px; color:#777;">縮小範圍</span>
+        <span id="range-slider-val" style="font-size:11px; color:#aaa; font-weight:600;">標準範圍</span>
+        <span style="font-size:11px; color:#777;">擴大範圍</span>
+      </div>
+      <input type="range" id="range-slider" min="0" max="3000" step="200" value="0"
+        style="width:100%; accent-color:#cc0000; cursor:pointer; height:4px;"
+        oninput="onRangeSlider(this)">
+    </div>
     <div class="breakdown" id="breakdown" style="display:none;"></div>
   </div>
 
@@ -2194,12 +2204,14 @@ function recalc() {
   var lblEl   = document.getElementById('total-lbl');
 
   var reps = collectRepairs();
+  var sliderRow = document.getElementById('range-slider-row');
   if (!reps.length) {
     totalEl.style.display = '';
     totalEl.textContent = t('addToCalc');
     totalEl.classList.add('ph');
     breakEl.style.display = 'none';
     lblEl.textContent = t('estimatedTotal');
+    if (sliderRow) sliderRow.style.display = 'none';
     var ftEmpty = document.getElementById('float-total'); if (ftEmpty) ftEmpty.style.display = 'none';
     refreshMsgBox();
     return;
@@ -2209,6 +2221,7 @@ function recalc() {
   var tt = tierTotals(reps);
   var plan = presentationPlan(reps);
   var exact = plan.exact;
+  if (sliderRow) sliderRow.style.display = exact ? 'none' : '';
   var px = function(n){ return exact ? money(n) : rngDash(n); };  // price formatter
   var rows = [];
 
@@ -2299,6 +2312,7 @@ function scrollToEstimate() {
 
 function resetAll() {
   _estimatePhotos = []; renderPhotoThumbs(); var _ps=document.getElementById('photo-status'); if(_ps) _ps.textContent='';
+  _rangeOffset = 0; var _rs=document.getElementById('range-slider'); if(_rs){_rs.value=0;} var _rv=document.getElementById('range-slider-val'); if(_rv) _rv.textContent='標準範圍';
   S.items = [];
   S.pdrView = '2opt'; S.exact = false;
   S.editIndex = null; S.editKind = null;
@@ -2354,8 +2368,25 @@ function tierTotals(reps) {
 }
 function money(n){ n=fl100((typeof n==='number'&&!isNaN(n))?n:0); return CS + n.toLocaleString(); }
 function fl100(n){ return Math.floor(n/100)*100; }
-function rng(n){ return money(fl100(n*0.92)) + ' &ndash; ' + money(fl100(n*1.08)); }
-function rngDash(n){ return money(fl100(n*0.92)) + ' – ' + money(fl100(n*1.08)); }
+var _rangeOffset = 0;
+
+function rng(n){
+  var lo = Math.max(0, fl100(n*0.92) - _rangeOffset);
+  var hi = fl100(n*1.08) + _rangeOffset;
+  return money(lo) + ' &ndash; ' + money(hi);
+}
+function rngDash(n){
+  var lo = Math.max(0, fl100(n*0.92) - _rangeOffset);
+  var hi = fl100(n*1.08) + _rangeOffset;
+  return money(lo) + ' – ' + money(hi);
+}
+
+function onRangeSlider(slider) {
+  _rangeOffset = parseInt(slider.value) / 2;
+  var lbl = document.getElementById('range-slider-val');
+  if (lbl) lbl.textContent = _rangeOffset > 0 ? '±NT$' + _rangeOffset.toLocaleString() : '標準範圍';
+  recalc();
+}
 
 var _rtUserEdited = false;
 
