@@ -2019,7 +2019,7 @@ function addItem() {
   });
   var sub = workingSubtotal();
   var item = {
-    service: 'Bumper',
+    service: 'PAINTING',
     vehicle: getVehicleInfo(),
     panel: tp(S.panelDiag) || t('unspecified'),
     factors: factors,
@@ -2345,7 +2345,7 @@ function collectRepairs() {
       fs.push({ label:factorLabel(id), price:S.factors[id] });
     });
     var bsub = workingSubtotal();
-    reps.push({ service:'Bumper', vehicle:getVehicleInfo(), panel:tp(S.panelDiag)||t('unspecified'), factors:fs, paint:(S.paint.price>0?S.paint.price:0), subtotal:bsub, tierBase:0, tierFixed:bsub });
+    reps.push({ service:'PAINTING', vehicle:getVehicleInfo(), panel:tp(S.panelDiag)||t('unspecified'), factors:fs, paint:(S.paint.price>0?S.paint.price:0), subtotal:bsub, tierBase:0, tierFixed:bsub });
   } else if (S.service === 'pdr' && S.pdrSize) {
     reps.push({ service:'PDR', vehicle:getVehicleInfo(), panel:pdrHeader(), factors:pdrLines(), paint:0, subtotal:pdrSubtotal(), tierBase:pdrTierBase(), tierFixed:pdrRiCost() });
   }
