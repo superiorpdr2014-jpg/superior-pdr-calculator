@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>鈑金烤漆修復估價計算器 — Superior PDR</title>
+  <title>Bumper & Panel Repair Calculator — Dent Time</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
@@ -1216,14 +1216,14 @@ var I18N = {
     subtitle:'估價計算器', customer:'客戶', vehicle:'車輛',
     ph_clientName:'客戶姓名', ph_phone:'電話（用於簡訊）', ph_email:'電子信箱（用於估價單）',
     ph_year:'年份', ph_make:'廠牌', ph_model:'車型',
-    svc_pdr:'鈑金修復', svc_bumper:'保險桿與鈑件',
+    svc_pdr:'PDR 凹痕修復', svc_bumper:'保險桿與鈑件',
     step_panel:'鈑件位置', noneSelected:'尚未選擇', clear:'清除',
     vehicleType:'車型類別', sedan:'轎車', suv:'休旅車', truck:'貨卡',
-    tapPanel:'點選受損的鈑件', pickFromList:'從清單選擇',
+    tapPanel:'點選凹痕所在的鈑件', pickFromList:'從清單選擇',
     step_damage:'損傷類型', selectAllApply:'選擇所有適用項目', step_paint:'烤漆',
-    step_size:'損傷大小', selectSize:'選擇尺寸', step_factors:'修復因素',
-    checkAllApply:'勾選所有適用項目', riLabel:'R&I（拆裝費）', dentSubtotal:'修復小計',
-    addRepair:'新增修復項目至估價', addDentRepair:'新增鈑金修復至估價',
+    step_size:'凹痕大小', selectSize:'選擇尺寸', step_factors:'修復因素',
+    checkAllApply:'勾選所有適用項目', riLabel:'R&I（拆裝費）', dentSubtotal:'凹痕小計',
+    addRepair:'新增修復項目至估價', addDentRepair:'新增凹痕修復至估價',
     addAnother:'新增其他修復', updateRepair:'更新此修復項目',
     repairsInEstimate:'本估價中的修復項目', estimatedTotal:'估計總額',
     addToCalc:'新增修復項目以進行計算', msgToSend:'估價訊息內容',
@@ -1234,8 +1234,8 @@ var I18N = {
     saveImage:'儲存圖片', textShort:'簡訊', emailShort:'信箱',
     repairModes:'修復模式', range:'範圍', exact:'精確', flat:'固定',
     view_2opt:'精緻 - 實用', view_3tier:'精緻 - 實用+', view_flat:'固定',
-    shownByService:'鈑金 + 保險桿依服務分類顯示',
-    cancel:'取消', dentWord:'損傷', unspecified:'未指定鈑件',
+    shownByService:'PDR + 保險桿依服務分類顯示',
+    cancel:'取消', dentWord:'凹痕', unspecified:'未指定鈑件',
     pgroup_access:'位置與通道', pgroup_severity:'損傷程度', pgroup_material:'材質與特殊',
     pf_braced:'加固鈑件', pf_edge:'鈑件邊緣', pf_obstructed:'受阻通道', pf_bodyline:'車身折線上',
     pf_shallow:'淺層凹痕', pf_medium:'中度凹痕', pf_deep:'深層凹痕', pf_crease:'摺痕',
@@ -1251,10 +1251,10 @@ var I18N = {
     tier_practicalDesc:'在正常觀看距離與常見角度下呈現乾淨、良好的修復效果。外觀自然且整潔——降低30%費用，符合市場平均修復品質。',
     tier_improvementDesc:'以精緻修復50%的費用，顯著改善受損區域的外觀。雖無法達到精緻修復的完美程度，但能大幅提升鈑件狀態。',
     est_repairEstimate:'維修估價單', est_client:'客戶', est_vehicle:'車輛', est_date:'日期',
-    est_pdrSection:'傳統鈑金烤漆修復', est_bumperSection:'保險桿與鈑件修復', est_subtotal:'小計',
+    est_pdrSection:'免烤漆凹痕修復', est_bumperSection:'保險桿與鈑件修復', est_subtotal:'小計',
     est_estimatedRange:'估計範圍', est_combinedTotal:'合計總額', est_total:'總計',
     est_flatTotal:'固定總額', est_combinedRange:'合計範圍',
-    est_baseDent:'基礎鈑金修復', est_triCoat:'水晶珍珠漆',
+    est_baseDent:'基礎凹痕修復', est_triCoat:'水晶珍珠漆',
     est_preliminary:'此為初步估價。最終費用需經現場檢查後確認。',
     est_questions:'有疑問？請致電或傳訊', est_validGood:'本估價有效期為', est_days:'天',
     est_validThrough:'有效至', est_covers:'本估價涵蓋：',
@@ -1270,12 +1270,12 @@ var I18N = {
     veh_for:'，車輛：',
     email_hi:'{name} 您好，', email_hiNo:'您好，',
     sms_hi:'{name} 您好，', sms_hiNo:'您好，',
-    sms_body:'感謝您選擇 {company}{veh}。您的鈑金烤漆修復估價單已附上。傳統板金烤漆採用原廠色號，完整修復各類車身損傷，恢復車輛外觀至最佳狀態。',
+    sms_body:'感謝您選擇 {company}{veh}。您的免烤漆凹痕修復估價單已附上。PDR 保留您的原廠烤漆，無需補土、無需重新烤漆，車輛歷史紀錄完全不受影響。',
     sms_tiers:'您將看到多種修復方案，讓您掌控成果與預算。',
     sms_valid:'本估價有效期為 {days} 天，至 {date} 止。',
     sms_close:'',
     email_thanks:'感謝您選擇 {company}{veh}。您的估價單已附上。',
-    email_value:'傳統板金烤漆修復能有效處理各類車身損傷，包含刮傷、凹痕、鏽蝕及碰撞損傷。修復過程採用原廠色號精準配色，確保修復區域與車輛整體外觀完美一致，全面恢復車輛美觀與市場價值。',
+    email_value:'免烤漆凹痕修復保留您車輛的原廠烤漆。無需補土、無需重新烤漆，車輛歷史紀錄完全不受影響。鈑件從內側修復，保持製造商的原始品質，同時保護車輛的外觀與價值。',
     email_tiers:'您將看到多種修復方案。每種方案都是經過專業施工的品質修復。唯一的差異在於最終細節的精緻程度，讓您在不犧牲品質的前提下掌控成果與預算。',
     email_valid:'本估價有效期為 {days} 天，至 {date} 止。請在到期前聯繫我們以鎖定此價格。',
     email_close:'如有任何問題，請回覆此郵件。{guaranteeLong}',
@@ -2893,9 +2893,9 @@ function buildPitchMessage(channel) {
 
   if (channel === 'sms') {
     if (!exact) {
-      var rangeDisclaimer = '因為照片或影片上呈現的損傷大小跟範圍，以我們經驗會跟實際的傷有落差，所以我們只能給您一個參考的價格區間，實際價格還需要現場評估後才會知道喔！這點請您見諒。';
+      var rangeDisclaimer = '因為照片或影片上呈現的凹痕大小跟深度，以我們經驗會跟實際的傷有落差，所以我們只能給您一個參考的價格區間，實際價格還需要現場評估後才會知道喔！這點請您見諒。';
       return (nm ? fillT(t('sms_hi'),M) : t('sms_hiNo'))
-        + '感謝您選擇 ' + CONFIG.companyName + (vp ? vp : '') + '。您的鈑金烤漆修復估價單已附上。'
+        + '感謝您選擇 ' + CONFIG.companyName + (vp ? vp : '') + '。您的免烤漆凹痕修復估價單已附上。'
         + repairLines
         + rtLine
         + rangeDisclaimer + '\n\n'
@@ -3770,3 +3770,4 @@ applyConfig();   // sets logo/accent/title + runs localizeDOM()
 </script>
 </body>
 </html>
+
