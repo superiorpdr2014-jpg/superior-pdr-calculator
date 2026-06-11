@@ -26,7 +26,7 @@ window.SHOP_CONFIG = {
     currencySymbol: 'NT$',                 // New Taiwan Dollar
     validityDays: 30,
 
-    experienceLine: 'Superior PDR 提供最專業的免烤漆凹痕修復服務，保留您車輛的原廠烤漆品質。',
+    experienceLine: 'Superior 提供專業傳統板金烤漆修復服務，採用原廠色號與標準工序，確保修復品質與整體外觀完美一致。',
     guaranteeShort: '滿意保證，不滿意不收費。',
     guaranteeLong:  '我們保證您對修復結果完全滿意，否則不收取任何費用。',
 
@@ -57,16 +57,14 @@ window.SHOP_CONFIG = {
     ],
 
     bumperFactors: [
-      { id:'scuff',   base:3800 },
+      { id:'scuff',   base:6000 },
       { id:'blend',   base:2850 },
-      { id:'scratch', base:5300 },
-      { id:'xl',      base:7200 },
-      { id:'body',    base:2750 },
+      { id:'xl_body', base:10000 },
+      { id:'body',    base:7500 },
       { id:'punch',   base:1850 },
       { id:'crack',   base:1750 },
-      { id:'corner',  base:2400 },
-      { id:'ri',      base:2400, min:500,  max:8650 },
-      { id:'custom',  base:2400, min:0,    max:19200, custom:true }
+      { id:'ri',      base:2000, min:500,  max:8650 },
+      { id:'custom',  base:3000, min:0,    max:19200, custom:true }
     ],
 
     paint: [ { id:'flat', price:0 }, { id:'tricoat', price:2500 } ],
@@ -83,3 +81,4 @@ window.SHOP_CONFIG = {
     }
   }
 };
+
