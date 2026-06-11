@@ -2872,19 +2872,19 @@ function buildPitchMessage(channel) {
         repairLines += '\n' + t('est_practicalRepair') + ': ' + money(tt.practical);
         repairLines += '\n' + t('est_improvementRepair') + ': ' + money(tt.improvement);
       } else {
-        repairLines += '\n' + t('est_premiumRepair') + ': ' + money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08));
-        repairLines += '\n' + t('est_practicalRepair') + ': ' + money(fl100(tt.practical*0.92)) + ' - ' + money(fl100(tt.practical*1.08));
-        repairLines += '\n' + t('est_improvementRepair') + ': ' + money(fl100(tt.improvement*0.92)) + ' - ' + money(fl100(tt.improvement*1.08));
+        repairLines += '\n' + t('est_premiumRepair') + ': ' + rngDash(tt.premium);
+        repairLines += '\n' + t('est_practicalRepair') + ': ' + rngDash(tt.practical);
+        repairLines += '\n' + t('est_improvementRepair') + ': ' + rngDash(tt.improvement);
       }
     } else if (plan.view === 'itemized') {
-      repairLines += '\n' + t('est_estimatedRange') + ': ' + (exact ? money(tt.premium) : money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08)));
+      repairLines += '\n' + t('est_estimatedRange') + ': ' + (exact ? money(tt.premium) : rngDash(tt.premium));
     } else {
       if (exact) {
         repairLines += '\n' + t('est_premiumRepair') + ': ' + money(tt.premium);
         repairLines += '\n' + t('est_practicalRepair') + ': ' + money(tt.practical);
       } else {
-        repairLines += '\n' + t('est_premiumRepair') + ': ' + money(fl100(tt.premium*0.92)) + ' - ' + money(fl100(tt.premium*1.08));
-        repairLines += '\n' + t('est_practicalRepair') + ': ' + money(fl100(tt.practical*0.92)) + ' - ' + money(fl100(tt.practical*1.08));
+        repairLines += '\n' + t('est_premiumRepair') + ': ' + rngDash(tt.premium);
+        repairLines += '\n' + t('est_practicalRepair') + ': ' + rngDash(tt.practical);
       }
     }
   }
