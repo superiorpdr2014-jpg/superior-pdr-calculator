@@ -57,14 +57,16 @@ window.SHOP_CONFIG = {
     ],
 
     bumperFactors: [
-      { id:'scuff',   base:3800 },
+      { id:'scuff',   base:6000 },
       { id:'blend',   base:2850 },
-      { id:'body',    base:2750 },
-      { id:'xl_body', base:4500 },
+      { id:'scratch', base:5300 },
+      { id:'xl',      base:10000 },
+      { id:'body',    base:7500 },
       { id:'punch',   base:1850 },
       { id:'crack',   base:1750 },
-      { id:'ri',      base:2400, min:500,  max:8650 },
-      { id:'custom',  base:2400, min:0,    max:19200, custom:true }
+      { id:'corner',  base:2400 },
+      { id:'ri',      base:2000, min:500,  max:8650 },
+      { id:'custom',  base:3000, min:0,    max:19200, custom:true }
     ],
 
     paint: [ { id:'flat', price:0 }, { id:'tricoat', price:2500 } ],
@@ -81,3 +83,4 @@ window.SHOP_CONFIG = {
     }
   }
 };
+
