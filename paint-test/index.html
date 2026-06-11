@@ -2396,6 +2396,13 @@ function calcRepairTime(amount) {
   return { days: Math.floor(totalHours / 8), hours: totalHours % 8 };
 }
 
+function calcPaintingDays(panelCount) {
+  if (panelCount <= 0) return 0;
+  if (panelCount === 1) return 5;
+  if (panelCount === 2) return 6;
+  return 2 * panelCount + 2;
+}
+
 function updateRepairTimeField() {
   var reps = collectRepairs();
   var card = document.getElementById('repair-time-card');
@@ -2409,10 +2416,20 @@ function updateRepairTimeField() {
   }
   if (card) card.style.display = '';
   if (!_rtUserEdited) {
-    var tt = tierTotals(reps);
-    var rt = calcRepairTime(tt.premium);
-    dEl.value = rt.days;
-    hEl.value = rt.hours;
+    var bumpReps = reps.filter(function(r){ return r.service !== 'PDR'; });
+    var pdrReps  = reps.filter(function(r){ return r.service === 'PDR'; });
+    var days = 0, hours = 0;
+    if (bumpReps.length > 0) {
+      days += calcPaintingDays(bumpReps.length);
+    }
+    if (pdrReps.length > 0) {
+      var pdrTT = tierTotals(pdrReps);
+      var pdrRT = calcRepairTime(pdrTT.premium);
+      days += pdrRT.days;
+      hours += pdrRT.hours;
+    }
+    dEl.value = days;
+    hEl.value = hours;
   }
 }
 
