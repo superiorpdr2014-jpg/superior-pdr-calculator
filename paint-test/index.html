@@ -2019,7 +2019,7 @@ function addItem() {
   });
   var sub = workingSubtotal();
   var item = {
-    service: 'Bumper',
+    service: (S.panelDiag && S.panelDiag.indexOf('Bumper') >= 0) ? 'Bumper' : 'Painting',
     vehicle: getVehicleInfo(),
     panel: tp(S.panelDiag) || t('unspecified'),
     factors: factors,
