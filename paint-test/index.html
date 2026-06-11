@@ -2178,7 +2178,7 @@ function renderItems() {
       +'<div class="item-panel">'+it.panel+tag+'</div>'
       +'<div class="item-detail">'+dmg+'</div>'
       +'</div>'
-      +'<div class="item-price">'+money(it.subtotal)+'</div>'
+      +'<div class="item-price">'+(S.exact?'':'<span style="font-size:.7em;color:#888;margin-right:2px">均價</span>')+money(it.subtotal)+'</div>'
       +editBtn
       +'<button class="item-remove" title="Remove" onclick="removeItem('+i+')">&times;</button>'
       +'</div>';
@@ -2548,8 +2548,11 @@ function buildEstimateHTML(o) {
 
   function renderRep(r, n) {
     var tag = r.service ? '<span class="tag">'+esc(r.service)+'</span>' : '';
+    var priceStr = exact
+      ? money(r.subtotal)
+      : '<span style="font-size:.6em;font-weight:700;color:#999;letter-spacing:.3px;margin-right:3px">均價</span>'+money(r.subtotal);
     var s = '<div class="rep">';
-    s += '<div class="rep-hd"><span class="n">'+n+'</span><span class="p">'+esc(r.panel)+'</span>'+tag+'<span class="s">'+money(r.subtotal)+'</span></div>';
+    s += '<div class="rep-hd"><span class="n">'+n+'</span><span class="p">'+esc(r.panel)+'</span>'+tag+'<span class="s">'+priceStr+'</span></div>';
     s += '<div class="rep-lines">';
     r.factors.forEach(function(f){
       s += '<div class="ln"><span>'+esc(f.label)+'</span><span class="lp">'+money(f.price)+'</span></div>';
