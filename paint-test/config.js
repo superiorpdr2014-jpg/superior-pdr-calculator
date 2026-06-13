@@ -58,11 +58,11 @@ window.SHOP_CONFIG = {
 
     bumperFactors: [
       { id:'scuff',       base:6000 },
-      { id:'blend',       base:2800 },
+      { id:'blend',       base:4000 },
       { id:'body',        base:7500 },
       { id:'xl_body',     base:10000 },
-      { id:'alu_body',    base:3000 },
-      { id:'alu_xl_body', base:9000 },
+      { id:'alu_body',    base:10000 },
+      { id:'alu_xl_body', base:20000 },
       { id:'punch',       base:1850 },
       { id:'crack',       base:1750 },
       { id:'ri',          base:2000, min:500,  max:8650 },
