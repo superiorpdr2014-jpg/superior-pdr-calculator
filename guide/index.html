@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>估價系統操作手冊 — Superior PDR</title>
+<style>
+  :root {
+    --red: #cc0000;
+    --red-hi: #ff2222;
+    --bg: #0a0b0f;
+    --bg2: #111318;
+    --bg3: #1a1c24;
+    --border: rgba(255,255,255,.07);
+    --text: #e0e0e0;
+    --muted: #888;
+    --green: #2e9e4f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: linear-gradient(135deg, #0e0f14 0%, #1a0505 100%);
+    border-bottom: 2px solid var(--red);
+    padding: 24px 20px 20px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 24px rgba(0,0,0,.6);
+  }
+  .site-header img { height: 36px; margin-bottom: 8px; }
+  .site-header h1 { font-size: 18px; font-weight: 800; letter-spacing: .5px; color: #fff; }
+  .site-header p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 20px 16px;
+  }
+  .toc-title { font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+  .toc a {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .toc a:last-child { border-bottom: none; }
+  .toc a:hover { color: var(--red-hi); }
+  .toc-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--red); color: #fff;
+    font-size: 11px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    margin: 0 12px 20px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .section-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 18px;
+    background: rgba(204,0,0,.08);
+    border-bottom: 1px solid var(--border);
+  }
+  .step-badge {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--red); color: #fff;
+    font-size: 14px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-head h2 { font-size: 16px; font-weight: 800; color: #fff; }
+  .section-body { padding: 16px 18px; }
+
+  /* ── STEP LIST ── */
+  .step-list { list-style: none; }
+  .step-list li {
+    display: flex; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--red); margin-top: 8px; flex-shrink: 0;
+  }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  th {
+    background: rgba(204,0,0,.15);
+    color: #fff; font-weight: 700;
+    padding: 8px 10px; text-align: left;
+    border-bottom: 1px solid rgba(204,0,0,.3);
+  }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    display: flex; gap: 10px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-size: 13.5px;
+  }
+  .callout.tip    { background: rgba(46,158,79,.12); border-left: 3px solid var(--green); }
+  .callout.warn   { background: rgba(204,0,0,.1);   border-left: 3px solid var(--red); }
+  .callout.info   { background: rgba(60,120,255,.1); border-left: 3px solid #3c78ff; }
+  .callout-icon   { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: #0d0e12;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12.5px;
+    color: #b0d4ff;
+    line-height: 1.8;
+    margin: 12px 0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  /* ── FLOW CHART ── */
+  .flow {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0; margin: 16px 0;
+  }
+  .flow-box {
+    background: var(--bg3);
+    border: 1px solid rgba(204,0,0,.4);
+    border-radius: 8px;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 13px; font-weight: 700;
+    color: #fff;
+    width: 100%; max-width: 280px;
+  }
+  .flow-box.accent { background: rgba(204,0,0,.2); border-color: var(--red); }
+  .flow-box.green  { background: rgba(46,158,79,.15); border-color: var(--green); }
+  .flow-arrow {
+    color: var(--red); font-size: 20px; line-height: 1;
+    padding: 2px 0;
+  }
+
+  /* ── TIER CARDS ── */
+  .tier-cards { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+  .tier-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .tier-card.t1 { border-left: 4px solid #ffd700; }
+  .tier-card.t2 { border-left: 4px solid #aaa; }
+  .tier-card.t3 { border-left: 4px solid #cd7f32; }
+  .tier-name  { font-weight: 800; font-size: 14px; }
+  .tier-desc  { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .tier-price { font-size: 12px; color: var(--red); font-weight: 700; }
+
+  /* ── PROBLEM SECTION ── */
+  .problem-section {
+    margin: 0 12px 32px;
+    background: linear-gradient(135deg, rgba(204,0,0,.12) 0%, rgba(10,11,15,.8) 100%);
+    border: 1px solid rgba(204,0,0,.3);
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .problem-section h2 {
+    font-size: 18px; font-weight: 900;
+    color: #fff; margin-bottom: 10px;
+  }
+  .problem-section p {
+    font-size: 14px; color: var(--muted);
+    line-height: 1.8; margin-bottom: 16px;
+  }
+  .tg-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #0088cc; color: #fff;
+    padding: 12px 24px; border-radius: 8px;
+    font-weight: 800; font-size: 14px;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(0,136,204,.3);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    background: rgba(204,0,0,.2);
+    border: 1px solid rgba(204,0,0,.4);
+    color: #ff6666;
+    border-radius: 4px;
+    font-size: 11px; font-weight: 800;
+    padding: 2px 7px; letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+  .badge.green { background: rgba(46,158,79,.2); border-color: rgba(46,158,79,.4); color: #5fd87a; }
+
+  .link-row {
+    display: flex; flex-direction: column; gap: 8px; margin: 12px 0;
+  }
+  .link-card {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px;
+    text-decoration: none; color: var(--text);
+  }
+  .link-card:hover { border-color: rgba(204,0,0,.4); }
+  .link-card-icon { font-size: 20px; }
+  .link-card-label { font-size: 12px; color: var(--muted); }
+  .link-card-url { font-size: 13px; font-weight: 600; color: #7ab8ff; word-break: break-all; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="site-header">
+  <img src="https://superiorpdr2014-jpg.github.io/superior-pdr-calculator/logo.png" alt="Superior PDR" onerror="this.style.display='none'">
+  <h1>估價系統操作手冊</h1>
+  <p>店長專用版 · Superior PDR · 2026.06</p>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">目錄</div>
+  <a href="#s1"><span class="toc-num">1</span>從 Telegram 進入估價</a>
+  <a href="#s2"><span class="toc-num">2</span>PDR 凹痕修復估價</a>
+  <a href="#s3"><span class="toc-num">3</span>調整估價區間大小</a>
+  <a href="#s4"><span class="toc-num">4</span>三種維修等級估價單</a>
+  <a href="#s5"><span class="toc-num">5</span>混合估價（PDR + 鈑金烤漆）</a>
+  <a href="#s6"><span class="toc-num">6</span>傳送估價單 &amp; 複製簡訊</a>
+  <a href="#s7"><span class="toc-num">7</span>儀表板確認報價狀態</a>
+  <a href="#problem">⚠️ 遇到問題怎麼辦</a>
+</div>
+
+<!-- SECTION 1 -->
+<div class="section" id="s1">
+  <div class="section-head">
+    <div class="step-badge">1</div>
+    <h2>從 Telegram 通知進入估價</h2>
+  </div>
+  <div class="section-body">
+    <p>當客戶透過 LINE 傳送損傷照片後，你的 Telegram 會收到系統通知：</p>
+    <div class="code-block">📍 新客戶詢問
+客戶：王小姐
+車款：2022 Toyota RAV4
+損傷描述：車頂凹痕</div>
+    <ul class="step-list">
+      <li><div class="step-dot"></div><div>點擊通知訊息下方的 <strong>【開始估價】</strong> 按鈕</div></li>
+      <li><div class="step-dot"></div><div>系統會自動開啟估價表單，並帶入客戶姓名與車款</div></li>
+      <li><div class="step-dot"></div><div>不需要手動輸入客戶資料</div></li>
+    </ul>
+    <div class="callout tip">
+      <div class="callout-icon">✅</div>
+      <div>系統自動帶入：客戶姓名、車款、日期。確認資料正確後即可開始估價。</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2 -->
+<div class="section" id="s2">
+  <div class="section-head">
+    <div class="step-badge">2</div>
+    <h2>PDR 凹痕修復估價操作</h2>
+  </div>
+  <div class="section-body">
+    <p>確認上方已選擇 <span class="badge">PDR凹痕修復</span> 服務模式，按照以下步驟操作：</p>
+
+    <p style="margin-top:14px;font-weight:700;color:#fff;">Step 1 — 選擇損傷部位</p>
+    <ul class="step-list">
+      <li><div class="step-dot"></div><div>在車身圖示上點擊受損的部位（車頂、葉子板、車門等）</div></li>
+      <li><div class="step-dot"></div><div>選擇區域：駕駛側 / 中間 / 副駕側</div></li>
+    </ul>
+
+    <p style="margin-top:14px;font-weight:700;color:#fff;">Step 2 — 選擇損傷尺寸</p>
+    <ul class="step-list">
+      <li><div class="step-dot"></div><div>從下拉選單選擇損傷直徑（cm）</div></li>
+      <li><div class="step-dot"></div><div>尺寸越大，基礎報價越高</div></li>
+    </ul>
+
+    <p style="margin-top:14px;font-weight:700;color:#fff;">Step 3 — 勾選損傷因素（可複選）</p>
+    <table>
+      <tr><th>因素</th><th>說明</th></tr>
+      <tr><td>受阻通道</td><td>凹痕位置難以從背面進入</td></tr>
+      <tr><td>中度 / 深度凹痕</td><td>凹痕深度偏深或嚴重</td></tr>
+      <tr><td>折痕</td><td>有明顯折線</td></tr>
+      <tr><td>需膠拉修復</td><td>無法從背面操作，需使用膠拉</td></tr>
+      <tr><td>鋁合金／高強度鋼</td><td>特殊材質，難度較高</td></tr>
+    </table>
+
+    <p style="margin-top:14px;font-weight:700;color:#fff;">Step 4 — 新增項目</p>
+    <ul class="step-list">
+      <li><div class="step-dot"></div><div>右上角費用即時更新，確認金額後點擊 <strong>「新增修復項目」</strong></div></li>
+      <li><div class="step-dot"></div><div>可重複步驟新增多個損傷部位</div></li>
+    </ul>
+
+    <div class="callout info">
+      <div class="callout-icon">💡</div>
+      <div>每新增一個部位，下方估價列表就會多一筆。新增完所有損傷後再進行下一步。</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3 -->
+<div class="section" id="s3">
+  <div class="section-head">
+    <div class="step-badge">3</div>
+    <h2>調整估價區間大小</h2>
+  </div>
+  <div class="section-body">
+    <p>估價單預設為 <strong>範圍模式</strong>，總金額會顯示一個上下區間（例如 NT$9,800 – NT$11,500）。</p>
+    <p style="margin-top:10px;">總金額下方有一條 <strong>調整滑桿</strong>：</p>
+    <table>
+      <tr><th>操作</th><th>效果</th><th>適用情境</th></tr>
+      <tr><td>往左拖曳</td><td>縮小區間</td><td>損傷清楚、有把握時</td></tr>
+      <tr><td>中間（預設）</td><td>標準範圍 ±8%</td><td>一般狀況</td></tr>
+      <tr><td>往右拖曳</td><td>擴大區間</td><td>損傷複雜、照片不清晰時</td></tr>
+    </table>
+    <div class="callout tip">
+      <div class="callout-icon">✅</div>
+      <div>滑桿調整後，估價圖片與簡訊文字的金額會自動同步，不需要另外修改。</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4 -->
+<div class="section" id="s4">
+  <div class="section-head">
+    <div class="step-badge">4</div>
+    <h2>三種維修等級估價單</h2>
+  </div>
+  <div class="section-body">
+    <p>在 PDR 凹痕修復模式下，切換檢視模式為 <strong>「精緻 - 實用+」</strong>，估價單會同時顯示三個等級讓客戶選擇：</p>
+    <div class="tier-cards">
+      <div class="tier-card t1">
+        <div>
+          <div class="tier-name">✨ 精緻修復</div>
+          <div class="tier-desc">完美修復，看不出任何痕跡，達到原廠水準</div>
+        </div>
+        <div class="tier-price">全額</div>
+      </div>
+      <div class="tier-card t2">
+        <div>
+          <div class="tier-name">⚡ 平整修復</div>
+          <div class="tier-desc">大幅改善外觀，遠看看不出，近看略有痕跡</div>
+        </div>
+        <div class="tier-price">－30%</div>
+      </div>
+      <div class="tier-card t3">
+        <div>
+          <div class="tier-name">🔧 大概修復</div>
+          <div class="tier-desc">明顯改善受損區域，但仍有可見痕跡</div>
+        </div>
+        <div class="tier-price">－40%</div>
+      </div>
+    </div>
+    <div class="callout info">
+      <div class="callout-icon">💡</div>
+      <div>讓客戶自行選擇等級，給予不同預算的彈性，也讓客戶有掌控感，提升成交率。</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5 -->
+<div class="section" id="s5">
+  <div class="section-head">
+    <div class="step-badge">5</div>
+    <h2>混合估價（PDR + 鈑金烤漆）</h2>
+  </div>
+  <div class="section-body">
+    <p>當客戶同時有凹痕修復與傳統板金烤漆需求時，可在同一張估價單合併顯示：</p>
+    <ul class="step-list">
+      <li><div class="step-dot"></div><div>先在 <span class="badge">PDR凹痕修復</span> 模式下完成所有凹痕項目</div></li>
+      <li><div class="step-dot"></div><div>切換到 <span class="badge">保險桿與鈑金烤漆</span> 模式</div></li>
+      <li><div class="step-dot"></div><div>選擇損傷部位（車頂、葉子板、保險桿等）</div></li>
+      <li><div class="step-dot"></div><div>勾選損傷類型（擦傷、鈑金作業、大面積鈑金等）</div></li>
+      <li><div class="step-dot"></div><div>選擇烤漆顏色：素色（不加價）或水晶珍珠漆（+NT$2,500）</div></li>
+      <li><div class="step-dot"></div><div>點擊 <strong>「新增修復項目」</strong></div></li>
+    </ul>
+    <p style="margin-top:12px;">估價單會自動分區顯示：</p>
+    <div class="code-block">PDR凹痕修復          小計 NT$9,800 – NT$11,500
+保險桿與鈑金烤漆     小計 NT$7,800 – NT$9,100
+─────────────────────────────────────
+合計範圍            NT$17,600 – NT$20,600</div>
+    <div class="callout tip">
+      <div class="callout-icon">✅</div>
+      <div>保險桿部位標籤顯示 <span class="badge">BUMPER</span>，其他鈑件顯示 <span class="badge">PAINTING</span>，客戶一目了然。</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6 -->
+<div class="section" id="s6">
+  <div class="section-head">
+    <div class="step-badge">6</div>
+    <h2>傳送估價單 &amp; 複製簡訊</h2>
+  </div>
+  <div class="section-body">
+    <p>所有項目新增完成後，點擊底部 <strong>「預覽估價單」</strong> 按鈕：</p>
+
+    <p style="margin-top:14px;font-weight:700;color:#fff;">📲 傳到 LINE 用戶</p>
+    <ul class="step-list">
+      <li><div class="step-dot"></div><div>點擊預覽視窗內的 <strong>「傳到LINE用戶」</strong> 按鈕</div></li>
+      <li><div class="step-dot"></div><div>估價圖片會直接傳送給同一位 LINE 客戶</div></li>
+      <li><div class="step-dot"></div><div>儀表板服務進度自動更新為 <span class="badge green">已報價</span></div></li>
+    </ul>
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div>必須透過預覽視窗內的按鈕傳送，儀表板狀態才會自動更新。直接複製圖片傳送不會觸發更新。</div>
+    </div>
+
+    <p style="margin-top:16px;font-weight:700;color:#fff;">📋 複製簡訊內容</p>
+    <ul class="step-list">
+      <li><div class="step-dot"></div><div>預覽視窗下方有 <strong>「簡訊內容」</strong> 欄位</div></li>
+      <li><div class="step-dot"></div><div>點擊 <strong>「複製」</strong> 按鈕，貼到 LINE 另外發送</div></li>
+      <li><div class="step-dot"></div><div>以防圖片字體太小，客戶可以直接閱讀文字版報價</div></li>
+    </ul>
+    <p style="margin-top:10px; font-size:13px; color:var(--muted);">簡訊範例：</p>
+    <div class="code-block">王小姐 您好，感謝您選擇 Superior PDR。您的愛車估價單已附上。
+
+1. 車頂（凹痕修復）
+   基礎鈑金修復 (13cm), 需膠拉修復
+
+估計範圍：NT$9,800 – NT$11,500
+預估維修工時：1天 6小時
+
+本估價有效期為 30 天，至 2026年7月13日 止。
+滿意保證，不滿意不收費。</div>
+  </div>
+</div>
+
+<!-- SECTION 7 -->
+<div class="section" id="s7">
+  <div class="section-head">
+    <div class="step-badge">7</div>
+    <h2>儀表板確認報價狀態</h2>
+  </div>
+  <div class="section-body">
+    <p>傳送估價後，前往儀表板確認客戶狀態已更新：</p>
+    <div class="link-row">
+      <a class="link-card" href="https://myke-agent-9bszwrtvwrw7bmts7fgpqq.streamlit.app/" target="_blank">
+        <div class="link-card-icon">📊</div>
+        <div>
+          <div class="link-card-label">服務進度儀表板</div>
+          <div class="link-card-url">myke-agent-9bszwrtvwrw7bmts7fgpqq.streamlit.app</div>
+        </div>
+      </a>
+      <a class="link-card" href="https://superiorpdr2014-jpg.github.io/superior-pdr-calculator/" target="_blank">
+        <div class="link-card-icon">🧮</div>
+        <div>
+          <div class="link-card-label">估價計算器</div>
+          <div class="link-card-url">superiorpdr2014-jpg.github.io/superior-pdr-calculator</div>
+        </div>
+      </a>
+    </div>
+    <p style="margin-top:10px;">找到該客戶的服務紀錄，確認 <strong>服務進度</strong> 欄位顯示 <span class="badge green">已報價</span>。</p>
+
+    <p style="margin-top:16px;font-weight:700;color:#fff;">📌 完整操作流程</p>
+    <div class="flow">
+      <div class="flow-box accent">Telegram 通知 → 點擊【開始估價】</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-box">系統自動帶入客戶資料</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-box">選部位 → 選尺寸 → 勾選因素 → 新增</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-box">（選用）切換鈑金烤漆模式 → 新增</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-box">調整範圍滑桿</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-box accent">預覽估價單</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-box green">傳到LINE用戶 → 儀表板自動「已報價」</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-box">複製簡訊內容 → 貼到 LINE 傳給客戶</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM SECTION -->
+<div class="problem-section" id="problem">
+  <h2>⚠️ 遇到問題怎麼辦？</h2>
+  <p>
+    如果在操作過程中遇到任何問題、發現數字不對、或是功能不正常，<br>
+    請 <strong style="color:#fff;">在店長群組發布消息給 JAY 知道</strong>。<br><br>
+    說明遇到的問題、當時的操作步驟，以及截圖（如果方便的話），<br>
+    讓大家一起了解狀況，再進行討論與修改。<br><br>
+    <strong style="color:#ff9999;">不要自行假設是自己操作錯誤而忽略，有任何異常都請回報！</strong>
+  </p>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:4px;">
+    <div style="font-size:13px;color:var(--muted);">回報方式：在以下群組發訊息</div>
+    <div style="background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:12px 24px;font-weight:800;font-size:15px;color:#fff;">
+      📣 Superior PDR 店長群組
+    </div>
+  </div>
+</div>
+
+<footer>
+  Superior PDR 店長操作手冊 · 版本 2026.06 · 如有更新將另行通知
+</footer>
+
+</body>
+</html>
