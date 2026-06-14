@@ -152,20 +152,12 @@ window.SHOP_CONFIG = {
   }
 
   function inject() {
-    // 1. 主按鈕區（預覽按鈕後方）
-    var previewBtn = document.getElementById('preview-btn');
-    if (previewBtn && !document.getElementById('line-send-btn')) {
-      var lb = createLineBtn(false);
-      lb.id = 'line-send-btn';
-      previewBtn.parentNode.insertBefore(lb, previewBtn.nextSibling);
-    }
-
-    // 2. Modal 裡的操作列（預覽彈窗內）
+    // 預覽彈窗的操作列（點「預覽估價單」後才看到）
     var modalActions = document.querySelector('.modal-actions');
-    if (modalActions && !modalActions.querySelector('.line-modal-btn')) {
-      var lb2 = createLineBtn(true);
-      lb2.classList.add('line-modal-btn');
-      modalActions.insertBefore(lb2, modalActions.firstChild);
+    if (modalActions && !document.getElementById('line-send-btn')) {
+      var lb = createLineBtn(true);
+      lb.id = 'line-send-btn';
+      modalActions.insertBefore(lb, modalActions.firstChild);
     }
   }
 
