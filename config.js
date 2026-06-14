@@ -1,9 +1,9 @@
 /* =====================================================================
-   PER-SHOP CONFIG  —  Superior PDR (Jay Ma, Taiwan)
+   PER-SHOP CONFIG — Superior PDR (Jay Ma, Taiwan)
 
    locale: 'zh' = Traditional Chinese (繁體中文)
    currency: NT$ (New Taiwan Dollar)
-   pricing: Dent Time base × 0.6 (40% less) → converted to TWD (~32:1)
+   pricing: Dent Time base × 0.6 (40% less) × converted to TWD (~32:1)
 
    ★ This file is SAFE across engine updates. When the seller ships a new
      calculator.html with new features, this config is never touched — the
@@ -84,3 +84,95 @@ window.SHOP_CONFIG = {
   }
 };
 
+// ── LINE 傳送整合 ──────────────────────────────────────────────────────────────
+// 當 URL 帶有 line_id 參數時（由 ECHO Telegram 按鈕帶入），
+// 在估價計算器的按鈕區注入「傳到LINE用戶」按鈕。
+// 點擊後：渲染估價圖 → base64 → POST /echo/send-line-estimate → 自動傳給客戶並更新 Airtable 已報價。
+(function () {
+  var LINE_ENDPOINT = 'https://echo.pdrsuperior.com/echo/send-line-estimate';
+  var LINE_ID = new URLSearchParams(window.location.search).get('line_id') || null;
+  if (!LINE_ID) return; // 非 ECHO 來源，不注入
+
+  function createLineBtn(forModal) {
+    var btn = document.createElement('button');
+    btn.className = forModal ? 'dl-btn' : 'chat-btn';
+    btn.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:8px;background:#00b900;color:#fff;border:none;' +
+      (forModal ? 'flex:1;padding:11px;border-radius:4px;font-size:13px;font-weight:800;cursor:pointer;' : 'padding:14px;border-radius:10px;font-size:14px;font-weight:800;letter-spacing:.4px;cursor:pointer;');
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 5.92 2 10.72c0 3.07 1.73 5.78 4.35 7.43L5.5 22l4.48-2.33C10.6 19.88 11.3 20 12 20c5.52 0 10-3.92 10-8.72S17.52 2 12 2z"/></svg>' +
+      '<span>傳到LINE用戶</span>';
+    btn.addEventListener('click', function () { doSendToLine(btn); });
+    return btn;
+  }
+
+  function doSendToLine(btn) {
+    if (typeof collectRepairs === 'undefined') { alert('估價工具尚未載入，請稍後再試。'); return; }
+    var reps = collectRepairs();
+    if (!reps.length) { alert('請先新增修復項目。'); return; }
+    var span = btn.querySelector('span');
+    var orig = span ? span.textContent : '';
+    if (span) span.textContent = '傳送中…';
+    btn.disabled = true;
+
+    var priceEl = document.getElementById('total-val') || document.querySelector('.total-val') || document.querySelector('[id*="total"]');
+    var priceText = priceEl ? priceEl.textContent.trim() : '';
+
+    renderEstimateCanvas(reps, function (canvas, err) {
+      if (!canvas) {
+        alert('圖片生成失敗：' + (err && err.message || err || '未知錯誤'));
+        if (span) span.textContent = orig;
+        btn.disabled = false;
+        return;
+      }
+      fetch(LINE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lineUserId:  LINE_ID,
+          imageBase64: canvas.toDataURL('image/jpeg', 0.88),
+          priceText:   priceText
+        })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.ok) {
+            if (span) span.textContent = '✅ 已傳送！';
+            setTimeout(function () { if (span) span.textContent = orig; btn.disabled = false; }, 3000);
+          } else {
+            alert('傳送失敗：' + (d.error || '伺服器錯誤'));
+            if (span) span.textContent = orig;
+            btn.disabled = false;
+          }
+        })
+        .catch(function (e) {
+          alert('網路錯誤：' + e.message);
+          if (span) span.textContent = orig;
+          btn.disabled = false;
+        });
+    });
+  }
+
+  function inject() {
+    // 1. 主按鈕區（預覽按鈕後方）
+    var previewBtn = document.getElementById('preview-btn');
+    if (previewBtn && !document.getElementById('line-send-btn')) {
+      var lb = createLineBtn(false);
+      lb.id = 'line-send-btn';
+      previewBtn.parentNode.insertBefore(lb, previewBtn.nextSibling);
+    }
+
+    // 2. Modal 裡的操作列（預覽彈窗內）
+    var modalActions = document.querySelector('.modal-actions');
+    if (modalActions && !modalActions.querySelector('.line-modal-btn')) {
+      var lb2 = createLineBtn(true);
+      lb2.classList.add('line-modal-btn');
+      modalActions.insertBefore(lb2, modalActions.firstChild);
+    }
+  }
+
+  // 等 DOM 與估價工具都載入完畢
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(inject, 800); });
+  } else {
+    setTimeout(inject, 800);
+  }
+})();
