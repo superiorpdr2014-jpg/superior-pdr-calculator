@@ -918,6 +918,22 @@ window.SHOP_CONFIG = {
           </div>
         </div>
       </div>
+      <!-- Step 4: 同鈑件追加 -->
+      <div class="r-card" id="sp-extra-card" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="step">4</span>
+            <span style="font-size:13px;font-weight:700;color:#ccc;">同鈑件追加</span>
+            <span style="font-size:11px;color:#555;">第二顆以上</span>
+          </div>
+          <button onclick="addSpRow()" style="display:flex;align-items:center;gap:4px;padding:5px 12px;background:rgba(255,68,68,.8);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;">＋ 新增</button>
+        </div>
+        <div id="sp-rows" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <div id="sp-subtotal-row" style="display:none;justify-content:flex-end;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07);">
+          <span style="font-size:11px;color:#666;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">小計</span>
+          <span id="sp-total" style="font-size:14px;font-weight:800;color:#fff;font-family:'JetBrains Mono',monospace;">NT$0</span>
+        </div>
+      </div>
       <button class="add-btn" id="pdr-add-btn" disabled onclick="pdrAddItem()">
         <span class="plus">+</span><span id="pdr-add-label" data-i18n="addDentRepair">Add Dent Repair to Estimate</span>
       </button>
@@ -936,18 +952,6 @@ window.SHOP_CONFIG = {
     <div id="items-list"></div>
   </div>
 
-  <!-- 同鈑件追加 -->
-  <div class="items-card" id="sp-extra-card" style="margin-top:12px;">
-    <div class="items-head">
-      <span class="items-title">同鈑件追加</span>
-      <button onclick="addSpRow()" style="margin-left:auto;display:flex;align-items:center;gap:4px;padding:5px 12px;background:rgba(255,68,68,.8);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:800;letter-spacing:.5px;cursor:pointer;font-family:inherit;">＋ 新增</button>
-    </div>
-    <div id="sp-rows" style="display:flex;flex-direction:column;gap:8px;"></div>
-    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07);">
-      <span style="font-size:11px;color:#666;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">小計</span>
-      <span id="sp-total" style="font-size:15px;font-weight:800;color:#fff;font-family:'JetBrains Mono',monospace;">NT$0</span>
-    </div>
-  </div>
 
   <div class="total-card">
     <div class="mode-row" id="mode-row"></div>
@@ -2202,9 +2206,6 @@ function recalc() {
   var lblEl   = document.getElementById('total-lbl');
 
   var reps = collectRepairs();
-  var hasPdr = S.items.some(function(it){ return it.service === 'PDR'; });
-  var spCard = document.getElementById('sp-extra-card');
-  if (spCard) spCard.style.display = hasPdr ? '' : 'none';
   var sliderRow = document.getElementById('range-slider-row');
   if (!reps.length) {
     totalEl.style.display = '';
@@ -2225,7 +2226,6 @@ function recalc() {
   if (sliderRow) sliderRow.style.display = exact ? 'none' : '';
   var px = function(n){ return exact ? money(n) : rngDash(n); };  // price formatter
   var rows = [];
-  var spExtra = (S.samePanelItems||[]).reduce(function(a,r){ return a+(r.qty||0)*(r.price||0); }, 0);
 
   // comparison card (used by the tier views so both/all options are clearly visible)
   function cmp(name, tag, price, hi) {
@@ -2248,40 +2248,35 @@ function recalc() {
     }
     section(t('est_pdrSection'), pdrR, pdrSum);
     section(t('est_bumperSection'), bumpR, bumpSum);
-    var grand = pdrSum + bumpSum + spExtra;
-    if (spExtra > 0) rows.push('<div class="brow"><span class="bn">同鈑件追加</span><span class="bp">'+money(spExtra)+'</span></div>');
+    var grand = pdrSum + bumpSum;
     totalEl.textContent = px(grand);
     rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_combinedTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+px(grand)+'</span></div>');
 
   } else if (plan.view === 'itemized') {
     totalEl.style.display = '';
     lblEl.textContent = exact ? t('est_flatTotal') : t('est_estimatedRange');
-    var itemTotal = tt.premium + spExtra;
-    totalEl.textContent = px(itemTotal);
+    totalEl.textContent = px(tt.premium);
     reps.forEach(function(r,i){
       rows.push('<div class="bsub">'+(i+1)+'. '+r.panel+'</div>');
       r.factors.forEach(function(f){ rows.push('<div class="brow"><span class="bn">'+f.label+'</span><span class="bp">'+money(f.price)+'</span></div>'); });
       if (r.paint>0) rows.push('<div class="brow"><span class="bn">Tri Coat Paint</span><span class="bp">'+money(r.paint)+'</span></div>');
     });
-    if (spExtra > 0) rows.push('<div class="brow"><span class="bn">同鈑件追加</span><span class="bp">'+money(spExtra)+'</span></div>');
-    rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_flatTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+px(itemTotal)+'</span></div>');
+    rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_flatTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+px(tt.premium)+'</span></div>');
 
   } else if (plan.view === '3tier') {
     totalEl.style.display = 'none';                 // show the option comparison instead of one big number
-    totalEl.textContent = px(tt.premium + spExtra);  // (still feeds the floating total)
+    totalEl.textContent = px(tt.premium);
     lblEl.textContent = t('view_3tier') + ' — ' + (exact?t('exact'):t('range'));
-    rows.push(cmp(t('est_premiumRepair'), '', px(tt.premium + spExtra), true));
-    rows.push(cmp(t('est_practicalRepair'), t('est_30less'), px(tt.practical + spExtra), false));
-    rows.push(cmp(t('est_improvementRepair'), t('est_40less'), px(tt.improvement + spExtra), false));
-    if (spExtra > 0) rows.push('<div class="brow" style="font-size:11px;color:#666;padding:6px 0;">含同鈑件追加 NT$'+spExtra.toLocaleString()+'</div>');
+    rows.push(cmp(t('est_premiumRepair'), '', px(tt.premium), true));
+    rows.push(cmp(t('est_practicalRepair'), t('est_30less'), px(tt.practical), false));
+    rows.push(cmp(t('est_improvementRepair'), t('est_40less'), px(tt.improvement), false));
 
   } else { // 2opt
     totalEl.style.display = 'none';
-    totalEl.textContent = px(tt.premium + spExtra);
+    totalEl.textContent = px(tt.premium);
     lblEl.textContent = t('view_2opt') + ' — ' + (exact?t('exact'):t('range'));
-    rows.push(cmp(t('est_premiumRepair'), '', px(tt.premium + spExtra), true));
-    rows.push(cmp(t('est_practicalRepair'), t('est_30less'), px(tt.practical + spExtra), false));
-    if (spExtra > 0) rows.push('<div class="brow" style="font-size:11px;color:#666;padding:6px 0;">含同鈑件追加 NT$'+spExtra.toLocaleString()+'</div>');
+    rows.push(cmp(t('est_premiumRepair'), '', px(tt.premium), true));
+    rows.push(cmp(t('est_practicalRepair'), t('est_30less'), px(tt.practical), false));
   }
 
   breakEl.innerHTML = rows.join('');
@@ -2321,9 +2316,7 @@ function resetAll() {
   _estimatePhotos = []; renderPhotoThumbs(); var _ps=document.getElementById('photo-status'); if(_ps) _ps.textContent='';
   _rangeOffset = 0; var _rs=document.getElementById('range-slider'); if(_rs){_rs.value=0;} var _rv=document.getElementById('range-slider-val'); if(_rv) _rv.textContent='標準範圍';
   S.items = [];
-  S.samePanelItems = []; _spRows = [];
-  renderSpRows();
-  var _spt=document.getElementById('sp-total'); if(_spt) _spt.textContent='NT$0';
+  S.samePanelItems = [];
   S.pdrView = '2opt'; S.exact = false;
   S.editIndex = null; S.editKind = null;
   renderModeButtons();
@@ -2357,7 +2350,7 @@ function collectRepairs() {
     var bsub = workingSubtotal();
     reps.push({ service:'Painting', vehicle:getVehicleInfo(), panel:tp(S.panelDiag)||t('unspecified'), factors:fs, paint:(S.paint.price>0?S.paint.price:0), subtotal:bsub, tierBase:0, tierFixed:bsub });
   } else if (S.service === 'pdr' && S.pdrSize) {
-    reps.push({ service:'PDR', vehicle:getVehicleInfo(), panel:pdrHeader(), factors:pdrLines(), paint:0, subtotal:pdrSubtotal(), tierBase:pdrTierBase(), tierFixed:pdrRiCost() });
+    reps.push({ service:'PDR', vehicle:getVehicleInfo(), panel:pdrHeader(), factors:pdrLines(), paint:0, subtotal:pdrSubtotal(), tierBase:pdrTierBase(), tierFixed:pdrRiCost()+spExtraTotal() });
   }
   return reps;
 }
@@ -3130,8 +3123,10 @@ function syncSpTotal() {
   var total = _spRows.reduce(function(a,r){ return a+(r.qty||0)*(r.price||0); }, 0);
   var el = document.getElementById('sp-total');
   if (el) el.textContent = 'NT$' + total.toLocaleString();
+  var ssr = document.getElementById('sp-subtotal-row');
+  if (ssr) ssr.style.display = (_spRows.length > 0 && total > 0) ? 'flex' : 'none';
   S.samePanelItems = _spRows.map(function(r){ return {qty:r.qty||0, price:r.price||0}; });
-  recalc();
+  pdrRecalc();
 }
 
 
@@ -3231,6 +3226,10 @@ function slidePdrFactor(id, val) {
 
 // ─── PDR: PRICING ────────────────────────────────────────────────────────────
 
+function spExtraTotal() {
+  return _spRows.reduce(function(a,r){ return a+(r.qty||0)*(r.price||0); }, 0);
+}
+
 function pdrLines() {
   if (!S.pdrSize) return [];
   var basePrice = S.pdrSize.price;
@@ -3241,6 +3240,10 @@ function pdrLines() {
   });
   var ri = pdrRiCost();
   if (ri > 0) lines.push({ label:'R&I (Removal & Install)', price:ri });
+  _spRows.forEach(function(r) {
+    var amt = (r.qty||0)*(r.price||0);
+    if (amt > 0) lines.push({ label:'同鈑件追加 ×'+r.qty, price:amt });
+  });
   return lines;
 }
 
@@ -3301,7 +3304,7 @@ function pdrAddItem() {
   var pf = {};
   Object.keys(S.pdrFactors).forEach(function(id){ pf[id] = { pct:S.pdrFactors[id].pct, amount:S.pdrFactors[id].amount }; });
   var item = { service:'PDR', vehicle:getVehicleInfo(), panel:pdrHeader(), factors:pdrLines(), paint:0,
-               subtotal:pdrSubtotal(), tierBase:pdrTierBase(), tierFixed:pdrRiCost(),
+               subtotal:pdrSubtotal(), tierBase:pdrTierBase(), tierFixed:pdrRiCost()+spExtraTotal(),
                _edit:{ kind:'pdr',
                  panelDiag:S.panelDiag, panelLabel:panelLabelNow(),
                  pdrSize:{ size:S.pdrSize.size, price:S.pdrSize.price },
@@ -3328,6 +3331,9 @@ function clearPdrWorking() {
   var fc = document.getElementById('factors-card'); if (fc) fc.classList.remove('open');      // Repair Factors back to closed
   document.querySelectorAll('#pdr-factors .pdr-f').forEach(function(f){ f.classList.remove('on'); });
   var ri = document.getElementById('pdr-ri'); if(ri) ri.value = 0;
+  _spRows = []; renderSpRows();
+  var spt = document.getElementById('sp-total'); if(spt) spt.textContent = 'NT$0';
+  var ssr = document.getElementById('sp-subtotal-row'); if(ssr) ssr.style.display = 'none';
   clearPanel();
   updatePdrAddBtn();
 }
