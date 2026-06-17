@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -86,10 +86,9 @@
     input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);box-shadow:0 2px 12px rgba(255,68,68,.6);}
     input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 2px 8px rgba(255,68,68,.4);cursor:pointer;}
     input[type=range]::-moz-range-track{height:6px;background:rgba(255,255,255,.1);border-radius:3px;}
-    .spd-card input[type=range]{margin:8px 0 0;}
     .spd-adjusted{margin-top:8px;font-size:12px;color:#aaa;padding-top:8px;border-top:1px solid var(--line);}
     .spd-adjusted b{color:#fff;font-weight:800;}
-    .spd-card .spd-val{font-size:16px;font-weight:900;color:#fff;}
+    .spd-card input[type=number]::-webkit-outer-spin-button,.spd-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     .chat-btn{display:flex;align-items:center;justify-content:center;gap:9px;padding:14px;background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;font-family:inherit;cursor:pointer;transition:all .14s;box-shadow:0 0 14px rgba(255,68,68,.25);}
     .chat-btn:hover{filter:brightness(1.08);}
     .chat-btn:disabled{opacity:.6;cursor:default;}
@@ -898,12 +897,13 @@ window.SHOP_CONFIG = {
       <div class="spd-card" id="spd-card">
         <div class="spd-note" id="spd-note" style="display:none"></div>
         <div class="spd-row">
-          <span class="spd-lbl">Adjust base price</span>
-          <span class="spd-val" id="spd-price"></span>
+          <span class="spd-lbl">同鈑件優惠價格</span>
         </div>
-        <input type="range" id="spd-range" min="0" max="500" step="5" value="500" oninput="slideSpdPrice(this.value)">
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:#555;margin-top:2px">
-          <span>$0</span><span id="spd-max"></span>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+          <span style="font-size:14px;color:#9a9a9a;font-weight:700;flex-shrink:0;">NT$</span>
+          <input type="number" id="spd-range" min="0" step="100" placeholder="輸入優惠金額"
+            style="flex:1;padding:8px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:7px;color:#fff;font-size:15px;font-weight:700;font-family:inherit;outline:none;-moz-appearance:textfield;appearance:textfield;"
+            oninput="slideSpdPrice(this.value)">
         </div>
         <div class="spd-adjusted" id="spd-adjusted" style="display:none"></div>
       </div>
@@ -3087,26 +3087,18 @@ function updateSpdUI() {
   if (card) card.classList.toggle('show', !!S.pdrSize);
   if (!S.pdrSize) return;
   var full = S.pdrSize.price;
-  var range = document.getElementById('spd-range');
-  if (range) { range.max = full; }
-  // If price override hasn't been touched, show full price
   var cur = (S.pdrPriceOverride > 0 || S.pdrDiscount) ? S.pdrPriceOverride : full;
-  var priceEl = document.getElementById('spd-price');
-  if (priceEl) priceEl.textContent = CS + cur + (cur < full ? ' (adjusted)' : ' (full price)');
-  var maxEl = document.getElementById('spd-max');
-  if (maxEl) maxEl.textContent = CS + full;
   var adjEl = document.getElementById('spd-adjusted');
   if (adjEl) {
     var saved = full - cur;
-    if (saved > 0) { adjEl.innerHTML = 'Full ' + CS + full + ' &rarr; <b>' + CS + cur + '</b> (saves ' + CS + saved + ')'; adjEl.style.display = ''; }
+    if (saved > 0) { adjEl.innerHTML = '原價 NT$' + full + ' &rarr; <b>NT$' + cur + '</b>（省 NT$' + saved + '）'; adjEl.style.display = ''; }
     else { adjEl.style.display = 'none'; }
   }
-  // Same-panel detection: check if this panel already has a dent in the estimate
   var noteEl = document.getElementById('spd-note');
   if (noteEl && S.panelDiag) {
     var samePanelCount = S.items.filter(function(it){ return it.panel && it.panel.indexOf(S.panelDiag) >= 0 && it.service === 'PDR'; }).length;
     if (samePanelCount > 0) {
-      noteEl.innerHTML = 'This panel already has ' + samePanelCount + ' dent' + (samePanelCount>1?'s':'') + ' in the estimate. R&I is likely already included.';
+      noteEl.innerHTML = '此鈑件已有 ' + samePanelCount + ' 顆凹痕，R&I 費用可能已含在內。';
       noteEl.style.display = '';
     } else { noteEl.style.display = 'none'; }
   } else if (noteEl) { noteEl.style.display = 'none'; }
@@ -3134,7 +3126,7 @@ function pdrSelectSize(n, price) {
   var _fc = document.getElementById('factors-card'); if (_fc) _fc.classList.add('open');
   S.pdrPriceOverride = effPrice;
   S.pdrDiscount = 0;
-  var _spr2=document.getElementById('spd-range'); if(_spr2){ _spr2.max=effPrice; _spr2.value=effPrice; }
+  var _spr2=document.getElementById('spd-range'); if(_spr2){ _spr2.value=effPrice; }
   updateSpdUI();
   recomputePdrFactors();   // refresh each selected factor's default $ for the new base
   if (typeof checkAluminum === 'function') checkAluminum();   // re-check now that a size exists
@@ -3149,7 +3141,9 @@ function clearPdrSize() {
   sel.classList.add('none');
   document.getElementById('size-clear').style.display = 'none';
   document.getElementById('size-card').classList.add('open');
-  S.pdrDiscount = 0; S.pdrPriceOverride = 0; updateSpdUI();
+  S.pdrDiscount = 0; S.pdrPriceOverride = 0;
+  var _spr3=document.getElementById('spd-range'); if(_spr3){ _spr3.value=''; }
+  updateSpdUI();
   recomputePdrFactors();
   pdrRecalc();
 }
