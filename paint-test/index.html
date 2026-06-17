@@ -919,14 +919,12 @@ window.SHOP_CONFIG = {
         </div>
       </div>
       <!-- Step 4: 同鈑件追加 -->
-      <div class="r-card" id="sp-extra-card" style="padding:14px 16px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="step">4</span>
-            <span style="font-size:13px;font-weight:700;color:#ccc;">同鈑件追加</span>
-            <span style="font-size:11px;color:#555;">第二顆以上</span>
-          </div>
-          <button onclick="addSpRow()" style="display:flex;align-items:center;gap:4px;padding:5px 12px;background:rgba(255,68,68,.8);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;">＋ 新增</button>
+      <div class="r-card" id="sp-extra-card">
+        <div class="drawer-head" style="cursor:default;">
+          <span class="step">4</span>
+          <span>同鈑件追加</span>
+          <span class="head-note">第二顆以上</span>
+          <button onclick="addSpRow()" style="display:flex;align-items:center;gap:4px;padding:5px 12px;background:rgba(255,68,68,.8);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;margin-left:12px;">＋ 新增</button>
         </div>
         <div id="sp-rows" style="display:flex;flex-direction:column;gap:8px;"></div>
         <div id="sp-subtotal-row" style="display:none;justify-content:flex-end;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07);">
