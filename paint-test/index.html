@@ -75,20 +75,13 @@
     .conv-btn:hover{filter:brightness(1.08);}
     .conv-btn:disabled{opacity:.6;cursor:default;}
     /* same-panel discount */
-    .spd-card{display:none;background:rgba(45,12,12,.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,68,68,.15);border-radius:4px;position:relative;padding:14px 18px;box-shadow:0 4px 24px rgba(0,0,0,.3);}
-    .spd-card.show{display:block;}
-    .spd-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-    .spd-note{padding:10px 14px;background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.35);border-radius:10px;margin-bottom:12px;font-size:12px;color:#ffcccc;line-height:1.5;box-shadow:0 0 16px rgba(255,68,68,.06);}
-    .spd-lbl{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#9a9a9a;}
+
     /* ── CUSTOM RANGE SLIDERS ── */
     input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:rgba(255,68,68,.15);border-radius:2px;outline:none;cursor:pointer;transition:background .15s;}
     input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:3px;background:#ff4444;border:2px solid rgba(255,255,255,.8);box-shadow:0 0 16px rgba(255,68,68,.6),0 0 40px rgba(255,68,68,.2);cursor:pointer;transition:transform .15s,box-shadow .15s;}
     input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);box-shadow:0 2px 12px rgba(255,68,68,.6);}
     input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 2px 8px rgba(255,68,68,.4);cursor:pointer;}
     input[type=range]::-moz-range-track{height:6px;background:rgba(255,255,255,.1);border-radius:3px;}
-    .spd-adjusted{margin-top:8px;font-size:12px;color:#aaa;padding-top:8px;border-top:1px solid var(--line);}
-    .spd-adjusted b{color:#fff;font-weight:800;}
-    .spd-card input[type=number]::-webkit-outer-spin-button,.spd-card input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
     .chat-btn{display:flex;align-items:center;justify-content:center;gap:9px;padding:14px;background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;font-family:inherit;cursor:pointer;transition:all .14s;box-shadow:0 0 14px rgba(255,68,68,.25);}
     .chat-btn:hover{filter:brightness(1.08);}
     .chat-btn:disabled{opacity:.6;cursor:default;}
@@ -894,19 +887,6 @@ window.SHOP_CONFIG = {
           <div class="size-grid" id="pdr-size-grid"></div>
         </div>
       </div>
-      <div class="spd-card" id="spd-card">
-        <div class="spd-note" id="spd-note" style="display:none"></div>
-        <div class="spd-row">
-          <span class="spd-lbl">同鈑件優惠價格</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
-          <span style="font-size:14px;color:#9a9a9a;font-weight:700;flex-shrink:0;">NT$</span>
-          <input type="number" id="spd-range" min="0" step="100" placeholder="輸入優惠金額"
-            style="flex:1;padding:8px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:7px;color:#fff;font-size:15px;font-weight:700;font-family:inherit;outline:none;-moz-appearance:textfield;appearance:textfield;"
-            oninput="slideSpdPrice(this.value)">
-        </div>
-        <div class="spd-adjusted" id="spd-adjusted" style="display:none"></div>
-      </div>
       <div class="r-card" id="factors-card">
         <div class="drawer-head" onclick="toggleFactorsDrawer()">
           <span class="step">3</span><span data-i18n="step_factors">Repair Factors</span>
@@ -1553,7 +1533,7 @@ var PANEL_GROUPS = {
 
 var S = { service:'pdr', vehicle:'sedan', panelDiag:null, factors:{}, customName:'', paint:{id:'flat',price:0},
           pdrView:'itemized', exact:false, items:[],
-          pdrSize:null, pdrFactors:{}, pdrRI:0, pdrDiscount:0, pdrPriceOverride:0,
+          pdrSize:null, pdrFactors:{}, pdrRI:0,
           samePanelItems:[],
           editIndex:null, editKind:null };
 
@@ -2126,8 +2106,6 @@ function restoreBumperWorking(e) {
 function restorePdrWorking(e) {
   clearPdrWorking();
   if(e.pdrSize){ pdrSelectSize(e.pdrSize.size, e.pdrSize.price); }
-  S.pdrDiscount = e.pdrDiscount||0; S.pdrPriceOverride = e.pdrPriceOverride||0;
-  var _spr=document.getElementById('spd-range'); if(_spr && S.pdrDiscount>0) _spr.value=S.pdrPriceOverride; updateSpdUI();
   Object.keys(e.pdrFactors||{}).forEach(function(id){
     S.pdrFactors[id]={ pct:e.pdrFactors[id].pct, amount:e.pdrFactors[id].amount };
     var el=document.querySelector('.pdr-f[data-fid="'+id+'"]'); if(el) el.classList.add('on');
@@ -3105,27 +3083,7 @@ function toggleFactorsDrawer() {
   document.getElementById('factors-card').classList.toggle('open');
 }
 
-function updateSpdUI() {
-  var card = document.getElementById('spd-card');
-  if (card) card.classList.toggle('show', !!S.pdrSize);
-  if (!S.pdrSize) return;
-  var full = S.pdrSize.price;
-  var cur = (S.pdrPriceOverride > 0 || S.pdrDiscount) ? S.pdrPriceOverride : full;
-  var adjEl = document.getElementById('spd-adjusted');
-  if (adjEl) {
-    var saved = full - cur;
-    if (saved > 0) { adjEl.innerHTML = '原價 NT$' + full + ' &rarr; <b>NT$' + cur + '</b>（省 NT$' + saved + '）'; adjEl.style.display = ''; }
-    else { adjEl.style.display = 'none'; }
-  }
-  var noteEl = document.getElementById('spd-note');
-  if (noteEl && S.panelDiag) {
-    var samePanelCount = S.items.filter(function(it){ return it.panel && it.panel.indexOf(S.panelDiag) >= 0 && it.service === 'PDR'; }).length;
-    if (samePanelCount > 0) {
-      noteEl.innerHTML = '此鈑件已有 ' + samePanelCount + ' 顆凹痕，R&I 費用可能已含在內。';
-      noteEl.style.display = '';
-    } else { noteEl.style.display = 'none'; }
-  } else if (noteEl) { noteEl.style.display = 'none'; }
-}
+function updateSpdUI() {} // removed
 var _spRows = [];
 
 function addSpRow() {
@@ -3173,12 +3131,6 @@ function syncSpTotal() {
   recalc();
 }
 
-function slideSpdPrice(val) {
-  var v = parseInt(val, 10) || 0;
-  S.pdrPriceOverride = v;
-  S.pdrDiscount = (S.pdrSize && v < S.pdrSize.price) ? 1 : 0;
-  updateSpdUI(); pdrRecalc();
-}
 
 function pdrSelectSize(n, price) {
   var panelKey = S.panelDiag ? S.panelDiag.split(' — ')[0].trim() : '';
@@ -3194,10 +3146,6 @@ function pdrSelectSize(n, price) {
   document.getElementById('size-clear').style.display = '';
   document.getElementById('size-card').classList.remove('open');
   var _fc = document.getElementById('factors-card'); if (_fc) _fc.classList.add('open');
-  S.pdrPriceOverride = effPrice;
-  S.pdrDiscount = 0;
-  var _spr2=document.getElementById('spd-range'); if(_spr2){ _spr2.value=effPrice; }
-  updateSpdUI();
   recomputePdrFactors();   // refresh each selected factor's default $ for the new base
   if (typeof checkAluminum === 'function') checkAluminum();   // re-check now that a size exists
   pdrRecalc();
@@ -3211,9 +3159,6 @@ function clearPdrSize() {
   sel.classList.add('none');
   document.getElementById('size-clear').style.display = 'none';
   document.getElementById('size-card').classList.add('open');
-  S.pdrDiscount = 0; S.pdrPriceOverride = 0;
-  var _spr3=document.getElementById('spd-range'); if(_spr3){ _spr3.value=''; }
-  updateSpdUI();
   recomputePdrFactors();
   pdrRecalc();
 }
@@ -3285,8 +3230,8 @@ function slidePdrFactor(id, val) {
 
 function pdrLines() {
   if (!S.pdrSize) return [];
-  var basePrice = (S.pdrDiscount > 0 && S.pdrPriceOverride >= 0) ? S.pdrPriceOverride : S.pdrSize.price;
-  var lines = [{ label:t('est_baseDent')+' ('+(S.pdrSize.label||S.pdrSize.size+'cm')+')'+(S.pdrDiscount>0?' [Adj]':''), price:basePrice }];
+  var basePrice = S.pdrSize.price;
+  var lines = [{ label:t('est_baseDent')+' ('+(S.pdrSize.label||S.pdrSize.size+'cm')+')', price:basePrice }];
   Object.keys(S.pdrFactors).forEach(function(id){
     var amt = S.pdrFactors[id].amount;
     if (amt > 0) lines.push({ label:(PDR_LABELS[id]||id), price:amt });
@@ -3303,7 +3248,7 @@ function pdrRiCost() { return parseInt((document.getElementById('pdr-ri')||{}).v
 // Discountable portion (base + factor adjustments) — R&I is never discounted
 function pdrTierBase() {
   if (!S.pdrSize) return 0;
-  var _bp = (S.pdrDiscount > 0 && S.pdrPriceOverride >= 0) ? (Number(S.pdrPriceOverride)||0) : (Number(S.pdrSize.price)||0);
+  var _bp = Number(S.pdrSize.price)||0;
   var sum = _bp;
   Object.keys(S.pdrFactors).forEach(function(id){ sum += S.pdrFactors[id].amount; });
   return sum;
@@ -3311,7 +3256,7 @@ function pdrTierBase() {
 
 function pdrHeader() {
   var loc = S.panelDiag || '';
-  return (loc ? tp(loc) + ' — ' : 'PDR ') + (S.pdrSize.label||S.pdrSize.size+'cm') + ' ' + t('dentWord') + (S.pdrDiscount > 0 ? ' (Adj)' : '');
+  return (loc ? tp(loc) + ' — ' : 'PDR ') + (S.pdrSize.label||S.pdrSize.size+'cm') + ' ' + t('dentWord');
 }
 
 function updatePdrAddBtn() {
@@ -3356,7 +3301,7 @@ function pdrAddItem() {
                subtotal:pdrSubtotal(), tierBase:pdrTierBase(), tierFixed:pdrRiCost(),
                _edit:{ kind:'pdr',
                  panelDiag:S.panelDiag, panelLabel:panelLabelNow(),
-                 pdrSize:{ size:S.pdrSize.size, price:S.pdrSize.price }, pdrDiscount:S.pdrDiscount||0, pdrPriceOverride:S.pdrPriceOverride||0,
+                 pdrSize:{ size:S.pdrSize.size, price:S.pdrSize.price },
                  pdrFactors:pf, pdrRI:pdrRiCost(),
                  year:(document.getElementById('veh-year').value||''),
                  make:(document.getElementById('veh-make').value||''),
@@ -3373,7 +3318,6 @@ function pdrAddItem() {
 function clearPdrWorking() {
   S.pdrSize = null;
   S.pdrFactors = {};
-  S.pdrDiscount = 0; S.pdrPriceOverride = 0; if(typeof updateSpdUI==='function') updateSpdUI();
   document.querySelectorAll('#pdr-size-grid .size-btn').forEach(function(b){ b.classList.remove('on'); });
   var sel = document.getElementById('size-sel'); if (sel) { sel.textContent = 'Select a size'; sel.classList.add('none'); }
   var sc = document.getElementById('size-clear'); if (sc) sc.style.display = 'none';
