@@ -960,22 +960,12 @@ window.SHOP_CONFIG = {
   <div class="items-card" id="sp-extra-card" style="margin-top:12px;">
     <div class="items-head">
       <span class="items-title">同鈑件追加</span>
-      <span style="font-size:11px;color:#666;margin-left:auto;">第二顆以上同鈑件優惠金額</span>
+      <button onclick="addSpRow()" style="margin-left:auto;display:flex;align-items:center;gap:4px;padding:5px 12px;background:rgba(255,68,68,.8);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:800;letter-spacing:.5px;cursor:pointer;font-family:inherit;">＋ 新增</button>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <div style="display:flex;align-items:center;gap:6px;">
-        <input type="number" id="sp-qty" min="0" step="1" placeholder="數量"
-          style="width:64px;padding:8px 10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:7px;color:#fff;font-size:14px;font-weight:700;font-family:inherit;outline:none;text-align:center;-moz-appearance:textfield;appearance:textfield;"
-          oninput="recalcSpExtra()">
-        <span style="color:#666;font-size:13px;white-space:nowrap;">顆 × NT$</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="number" id="sp-unit" min="0" step="100" placeholder="優惠金額"
-          style="width:110px;padding:8px 10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:7px;color:#fff;font-size:14px;font-weight:700;font-family:inherit;outline:none;-moz-appearance:textfield;appearance:textfield;"
-          oninput="recalcSpExtra()">
-        <span style="color:#666;font-size:13px;">=</span>
-        <span id="sp-total" style="font-size:15px;font-weight:800;color:#fff;font-family:'JetBrains Mono',monospace;white-space:nowrap;">NT$0</span>
-      </div>
+    <div id="sp-rows" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07);">
+      <span style="font-size:11px;color:#666;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">小計</span>
+      <span id="sp-total" style="font-size:15px;font-weight:800;color:#fff;font-family:'JetBrains Mono',monospace;">NT$0</span>
     </div>
   </div>
 
@@ -1564,7 +1554,7 @@ var PANEL_GROUPS = {
 var S = { service:'pdr', vehicle:'sedan', panelDiag:null, factors:{}, customName:'', paint:{id:'flat',price:0},
           pdrView:'itemized', exact:false, items:[],
           pdrSize:null, pdrFactors:{}, pdrRI:0, pdrDiscount:0, pdrPriceOverride:0,
-          samePanelQty:0, samePanelPrice:0,
+          samePanelItems:[],
           editIndex:null, editKind:null };
 
 // Repair-tier descriptions (PDR pitch)
@@ -2254,7 +2244,7 @@ function recalc() {
   if (sliderRow) sliderRow.style.display = exact ? 'none' : '';
   var px = function(n){ return exact ? money(n) : rngDash(n); };  // price formatter
   var rows = [];
-  var spExtra = (S.samePanelQty||0) * (S.samePanelPrice||0);
+  var spExtra = (S.samePanelItems||[]).reduce(function(a,r){ return a+(r.qty||0)*(r.price||0); }, 0);
 
   // comparison card (used by the tier views so both/all options are clearly visible)
   function cmp(name, tag, price, hi) {
@@ -2278,7 +2268,7 @@ function recalc() {
     section(t('est_pdrSection'), pdrR, pdrSum);
     section(t('est_bumperSection'), bumpR, bumpSum);
     var grand = pdrSum + bumpSum + spExtra;
-    if (spExtra > 0) rows.push('<div class="brow"><span class="bn">同鈑件追加 ×'+S.samePanelQty+'</span><span class="bp">'+money(spExtra)+'</span></div>');
+    if (spExtra > 0) rows.push('<div class="brow"><span class="bn">同鈑件追加</span><span class="bp">'+money(spExtra)+'</span></div>');
     totalEl.textContent = px(grand);
     rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_combinedTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+px(grand)+'</span></div>');
 
@@ -2292,7 +2282,7 @@ function recalc() {
       r.factors.forEach(function(f){ rows.push('<div class="brow"><span class="bn">'+f.label+'</span><span class="bp">'+money(f.price)+'</span></div>'); });
       if (r.paint>0) rows.push('<div class="brow"><span class="bn">Tri Coat Paint</span><span class="bp">'+money(r.paint)+'</span></div>');
     });
-    if (spExtra > 0) rows.push('<div class="brow"><span class="bn">同鈑件追加 ×'+S.samePanelQty+'</span><span class="bp">'+money(spExtra)+'</span></div>');
+    if (spExtra > 0) rows.push('<div class="brow"><span class="bn">同鈑件追加</span><span class="bp">'+money(spExtra)+'</span></div>');
     rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_flatTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+px(itemTotal)+'</span></div>');
 
   } else if (plan.view === '3tier') {
@@ -2302,7 +2292,7 @@ function recalc() {
     rows.push(cmp(t('est_premiumRepair'), '', px(tt.premium + spExtra), true));
     rows.push(cmp(t('est_practicalRepair'), t('est_30less'), px(tt.practical + spExtra), false));
     rows.push(cmp(t('est_improvementRepair'), t('est_40less'), px(tt.improvement + spExtra), false));
-    if (spExtra > 0) rows.push('<div class="brow" style="font-size:11px;color:#666;padding:6px 0;">含同鈑件追加 ×'+S.samePanelQty+' NT$'+spExtra.toLocaleString()+'</div>');
+    if (spExtra > 0) rows.push('<div class="brow" style="font-size:11px;color:#666;padding:6px 0;">含同鈑件追加 NT$'+spExtra.toLocaleString()+'</div>');
 
   } else { // 2opt
     totalEl.style.display = 'none';
@@ -2310,7 +2300,7 @@ function recalc() {
     lblEl.textContent = t('view_2opt') + ' — ' + (exact?t('exact'):t('range'));
     rows.push(cmp(t('est_premiumRepair'), '', px(tt.premium + spExtra), true));
     rows.push(cmp(t('est_practicalRepair'), t('est_30less'), px(tt.practical + spExtra), false));
-    if (spExtra > 0) rows.push('<div class="brow" style="font-size:11px;color:#666;padding:6px 0;">含同鈑件追加 ×'+S.samePanelQty+' NT$'+spExtra.toLocaleString()+'</div>');
+    if (spExtra > 0) rows.push('<div class="brow" style="font-size:11px;color:#666;padding:6px 0;">含同鈑件追加 NT$'+spExtra.toLocaleString()+'</div>');
   }
 
   breakEl.innerHTML = rows.join('');
@@ -2350,9 +2340,8 @@ function resetAll() {
   _estimatePhotos = []; renderPhotoThumbs(); var _ps=document.getElementById('photo-status'); if(_ps) _ps.textContent='';
   _rangeOffset = 0; var _rs=document.getElementById('range-slider'); if(_rs){_rs.value=0;} var _rv=document.getElementById('range-slider-val'); if(_rv) _rv.textContent='標準範圍';
   S.items = [];
-  S.samePanelQty = 0; S.samePanelPrice = 0;
-  var _spq=document.getElementById('sp-qty'); if(_spq) _spq.value='';
-  var _spu=document.getElementById('sp-unit'); if(_spu) _spu.value='';
+  S.samePanelItems = []; _spRows = [];
+  renderSpRows();
   var _spt=document.getElementById('sp-total'); if(_spt) _spt.textContent='NT$0';
   S.pdrView = '2opt'; S.exact = false;
   S.editIndex = null; S.editKind = null;
@@ -3137,11 +3126,50 @@ function updateSpdUI() {
     } else { noteEl.style.display = 'none'; }
   } else if (noteEl) { noteEl.style.display = 'none'; }
 }
-function recalcSpExtra() {
-  S.samePanelQty   = parseInt(document.getElementById('sp-qty').value)  || 0;
-  S.samePanelPrice = parseInt(document.getElementById('sp-unit').value) || 0;
-  var total = S.samePanelQty * S.samePanelPrice;
-  document.getElementById('sp-total').textContent = 'NT$' + total.toLocaleString();
+var _spRows = [];
+
+function addSpRow() {
+  _spRows.push({ qty:0, price:0 });
+  renderSpRows();
+}
+
+function removeSpRow(i) {
+  _spRows.splice(i, 1);
+  renderSpRows();
+  syncSpTotal();
+}
+
+function updateSpRow(i, field, val) {
+  _spRows[i][field] = parseInt(val) || 0;
+  var sub = (_spRows[i].qty||0) * (_spRows[i].price||0);
+  var rowEl = document.querySelector('.sp-row[data-idx="'+i+'"]');
+  if (rowEl) rowEl.querySelector('.sp-row-sub').textContent = 'NT$' + sub.toLocaleString();
+  syncSpTotal();
+}
+
+function renderSpRows() {
+  var INP = 'padding:7px 10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:7px;color:#fff;font-size:14px;font-weight:700;font-family:inherit;outline:none;-moz-appearance:textfield;appearance:textfield;';
+  var list = document.getElementById('sp-rows');
+  if (!list) return;
+  list.innerHTML = _spRows.map(function(r, i) {
+    var sub = (r.qty||0) * (r.price||0);
+    return '<div class="sp-row" data-idx="'+i+'" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+      + '<input type="number" min="0" step="1" placeholder="數量" value="'+(r.qty||'')+'" style="width:60px;text-align:center;'+INP+'" oninput="updateSpRow('+i+',\'qty\',this.value)">'
+      + '<span style="color:#666;font-size:13px;white-space:nowrap;">顆 × NT$</span>'
+      + '<input type="number" min="0" step="100" placeholder="金額" value="'+(r.price||'')+'" style="width:100px;'+INP+'" oninput="updateSpRow('+i+',\'price\',this.value)">'
+      + '<span style="color:#666;font-size:13px;">=</span>'
+      + '<span class="sp-row-sub" style="font-size:14px;font-weight:800;color:#fff;font-family:\'JetBrains Mono\',monospace;white-space:nowrap;min-width:60px;">NT$'+sub.toLocaleString()+'</span>'
+      + '<button onclick="removeSpRow('+i+')" style="width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#777;font-size:14px;cursor:pointer;line-height:1;flex-shrink:0;">✕</button>'
+      + '</div>';
+  }).join('');
+  syncSpTotal();
+}
+
+function syncSpTotal() {
+  var total = _spRows.reduce(function(a,r){ return a+(r.qty||0)*(r.price||0); }, 0);
+  var el = document.getElementById('sp-total');
+  if (el) el.textContent = 'NT$' + total.toLocaleString();
+  S.samePanelItems = _spRows.map(function(r){ return {qty:r.qty||0, price:r.price||0}; });
   recalc();
 }
 
