@@ -2202,6 +2202,9 @@ function recalc() {
   var lblEl   = document.getElementById('total-lbl');
 
   var reps = collectRepairs();
+  var hasPdr = S.items.some(function(it){ return it.service === 'PDR'; });
+  var spCard = document.getElementById('sp-extra-card');
+  if (spCard) spCard.style.display = hasPdr ? '' : 'none';
   var sliderRow = document.getElementById('range-slider-row');
   if (!reps.length) {
     totalEl.style.display = '';
