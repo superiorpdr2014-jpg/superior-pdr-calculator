@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUPERIOR PDR 保險估價單</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;background:#111827;color:#e5e7eb;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── TOP BAR ── */
+.topbar{background:#0f172a;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1e3a5f;flex-shrink:0}
+.topbar h1{font-size:1rem;color:#f5c842;letter-spacing:.5px;font-weight:700}
+.topbar .logo{width:30px;height:30px;object-fit:contain;margin-right:10px}
+.topbar-left{display:flex;align-items:center}
+.topbar-actions{display:flex;gap:8px}
+.btn{border:none;padding:7px 16px;border-radius:6px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-print{background:#f5c842;color:#111}
+.btn-print:hover{background:#fdd640}
+.btn-clear{background:transparent;color:#9ca3af;border:1px solid #374151}
+.btn-clear:hover{color:#e5e7eb;border-color:#6b7280}
+
+/* ── MAIN LAYOUT ── */
+.main{display:flex;flex:1;overflow:hidden}
+
+/* ── LEFT PANEL ── */
+.left{width:370px;min-width:340px;background:#0f172a;overflow-y:auto;padding:14px 14px 30px;border-right:2px solid #1e3a5f;flex-shrink:0}
+.sec{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:#f5c842;margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid #1e3a5f}
+.sec:first-child{margin-top:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.grid1{display:grid;grid-template-columns:1fr;gap:5px}
+.f{display:flex;flex-direction:column;gap:3px}
+.f label{font-size:.68rem;color:#6b8db5}
+.f input,.f textarea{background:#0d1b2e;border:1px solid #263d60;color:#e5e7eb;border-radius:5px;padding:5px 8px;font-size:.8rem;font-family:inherit;width:100%}
+.f input:focus,.f textarea:focus{outline:none;border-color:#f5c842}
+.f textarea{resize:vertical;min-height:46px}
+
+/* row inputs */
+.rows-wrap{overflow-x:auto;margin-top:6px}
+.rows-inner{min-width:680px}
+.rh{display:grid;grid-template-columns:100px 52px 52px 52px 52px 52px 52px 52px 52px 44px 58px 72px;gap:3px;margin-bottom:2px}
+.rh span{font-size:.6rem;color:#4a6a94;text-align:center;line-height:1.2}
+.rh span.grp{color:#8aaccc;font-size:.65rem;font-weight:700}
+.ri{display:grid;grid-template-columns:100px 52px 52px 52px 52px 52px 52px 52px 52px 44px 58px 72px;gap:3px;margin-bottom:2px;align-items:center}
+.ri input{background:#0d1b2e;border:1px solid #263d60;color:#e5e7eb;border-radius:4px;padding:3px 5px;font-size:.75rem;font-family:inherit;width:100%;text-align:right}
+.ri input.tl{text-align:left}
+.ri input:focus{outline:none;border-color:#f5c842}
+.ri input.ro{background:#182a42;color:#7ca9e0;pointer-events:none}
+.add-btn{margin-top:6px;background:transparent;border:1px dashed #263d60;color:#4a6a94;border-radius:5px;padding:5px;width:100%;font-size:.78rem;cursor:pointer;font-family:inherit}
+.add-btn:hover{border-color:#f5c842;color:#f5c842}
+
+/* summary */
+.sumrow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a2d4a}
+.sumrow label{font-size:.8rem;color:#6b8db5}
+.sumrow .val{font-size:.95rem;color:#f5c842;font-weight:700}
+.sumrow input{background:#0d1b2e;border:1px solid #263d60;color:#f5c842;border-radius:5px;padding:4px 8px;font-size:.85rem;font-weight:700;width:120px;text-align:right}
+.sumrow input:focus{outline:none;border-color:#f5c842}
+.sumrow input.tl{text-align:left;color:#e5e7eb}
+
+/* ── RIGHT PANEL ── */
+.right{flex:1;overflow-y:auto;padding:20px;background:#1a1a2e;display:flex;justify-content:center;align-items:flex-start}
+.ef{background:#fff;color:#111;width:100%;max-width:980px;padding:14px 16px;font-size:11px;font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;box-shadow:0 4px 30px rgba(0,0,0,.5)}
+
+/* estimate header */
+.ef-hd{display:flex;align-items:center;justify-content:center;gap:10px;padding-bottom:8px;margin-bottom:8px;border-bottom:2.5px solid #c8a840}
+.ef-hd img{width:42px;height:42px;object-fit:contain}
+.ef-hd-t{text-align:center}
+.ef-hd-t .co{font-size:1.25em;font-weight:900;color:#111;letter-spacing:.5px}
+.ef-hd-t .sub{font-size:.95em;color:#444;margin-top:1px}
+
+/* info table */
+.ef-info{width:100%;border-collapse:collapse;margin-bottom:5px}
+.ef-info td{border:1px solid #bbb;padding:3px 5px;font-size:.9em}
+.ef-info td.lb{background:#f7edd4;font-weight:700;text-align:center;white-space:nowrap;width:56px}
+.ef-info td.vl{min-width:70px;color:#111}
+
+/* remarks */
+.ef-rem{width:100%;border-collapse:collapse;margin-bottom:5px}
+.ef-rem td{border:1px solid #bbb;padding:3px 5px}
+.ef-rem td.lb{background:#f7edd4;font-weight:700;text-align:center;white-space:nowrap;width:56px}
+.ef-rem td.vl{min-height:22px;font-size:.9em}
+
+/* main table */
+.ef-tbl{width:100%;border-collapse:collapse;font-size:.85em}
+.ef-tbl th{background:#f7edd4;border:1px solid #bbb;padding:3px 3px;text-align:center;font-weight:700;white-space:nowrap}
+.ef-tbl th.mh{background:#f0d98a}
+.ef-tbl td{border:1px solid #d0d0d0;padding:2px 4px;text-align:right;height:17px}
+.ef-tbl td.tn{text-align:left;min-width:80px}
+.ef-tbl td.nc{text-align:left;min-width:50px}
+.ef-tbl td.z{color:#bbb}
+.ef-tbl tr.tot td{background:#fdfaed;font-weight:700}
+
+/* footer table */
+.ef-ft{width:100%;border-collapse:collapse}
+.ef-ft td{border:1px solid #bbb;padding:3px 5px;font-size:.88em}
+.ef-ft td.lb{background:#f7edd4;font-weight:700;text-align:center;white-space:nowrap;width:56px}
+.ef-ft .amt{font-weight:700;color:#c0392b;text-align:right}
+.ef-ft .big{font-size:1em;font-weight:900;color:#a00}
+
+/* ── PRINT ── */
+@media print{
+  body{background:#fff;height:auto;overflow:visible}
+  .topbar,.left{display:none!important}
+  .main{display:block;overflow:visible}
+  .right{padding:0;background:#fff;overflow:visible;display:block}
+  .ef{box-shadow:none;max-width:100%;padding:8px}
+  @page{margin:8mm;size:A4 landscape}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <img src="../logo.png" class="logo" alt="" onerror="this.style.display='none'">
+    <h1>保險估價單</h1>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-clear" onclick="clearAll()">清除重填</button>
+    <button class="btn btn-print" onclick="window.print()">🖨 列印 / PDF</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ══ LEFT PANEL ══ -->
+  <div class="left">
+
+    <div class="sec">基本資料</div>
+    <div class="grid2">
+      <div class="f"><label>車主姓名</label><input id="i_owner" type="text" placeholder="王小明" oninput="sync()"></div>
+      <div class="f"><label>廠牌</label><input id="i_brand" type="text" placeholder="Toyota" oninput="sync()"></div>
+      <div class="f"><label>聯絡電話</label><input id="i_phone" type="text" placeholder="0912-345-678" oninput="sync()"></div>
+      <div class="f"><label>車型</label><input id="i_model" type="text" placeholder="Camry" oninput="sync()"></div>
+      <div class="f"><label>車牌</label><input id="i_plate" type="text" placeholder="ABC-1234" oninput="sync()"></div>
+      <div class="f"><label>年份</label><input id="i_year" type="text" placeholder="2022" oninput="sync()"></div>
+      <div class="f"><label>車身碼（VIN）</label><input id="i_vin" type="text" placeholder="VIN碼" oninput="sync()"></div>
+      <div class="f"><label>車色</label><input id="i_color" type="text" placeholder="珍珠白" oninput="sync()"></div>
+    </div>
+
+    <div class="sec">日期與人員</div>
+    <div class="grid2">
+      <div class="f"><label>估價日期</label><input id="i_est_date" type="date" oninput="sync()"></div>
+      <div class="f"><label>承保公司</label><input id="i_insurer" type="text" placeholder="富邦產險" oninput="sync()"></div>
+      <div class="f"><label>進廠日期</label><input id="i_in_date" type="date" oninput="sync()"></div>
+      <div class="f"><label>理賠案號</label><input id="i_claim_no" type="text" placeholder="案號" oninput="sync()"></div>
+      <div class="f"><label>交車日期</label><input id="i_out_date" type="date" oninput="sync()"></div>
+      <div class="f"><label>里程數</label><input id="i_mileage" type="text" placeholder="35,000 km" oninput="sync()"></div>
+      <div class="f"><label>估價人員</label><input id="i_estimator" type="text" placeholder="16" oninput="sync()"></div>
+      <div class="f"><label>負責人員</label><input id="i_handler" type="text" placeholder="Jay" oninput="sync()"></div>
+    </div>
+
+    <div class="sec">修理備註</div>
+    <div class="grid1">
+      <div class="f"><textarea id="i_remarks" rows="2" placeholder="備註說明..." oninput="sync()"></textarea></div>
+    </div>
+
+    <div class="sec">修理項目</div>
+    <div class="rows-wrap">
+      <div class="rows-inner">
+        <!-- Header row 1 -->
+        <div class="rh">
+          <span></span>
+          <span class="grp" style="grid-column:span 2">凹痕修復</span>
+          <span class="grp" style="grid-column:span 2">板金校正</span>
+          <span class="grp" style="grid-column:span 2">烤漆</span>
+          <span class="grp" style="grid-column:span 2">拆裝</span>
+          <span class="grp" style="grid-column:span 2">零件</span>
+          <span></span>
+        </div>
+        <!-- Header row 2 -->
+        <div class="rh">
+          <span>修理項目</span>
+          <span>估價</span><span>批價</span>
+          <span>估價</span><span>批價</span>
+          <span>估價</span><span>批價</span>
+          <span>估價</span><span>批價</span>
+          <span>數量</span><span>單價</span>
+          <span>備註</span>
+        </div>
+        <div id="rowInputs"></div>
+        <button class="add-btn" onclick="addRow()">＋ 新增修理項目</button>
+      </div>
+    </div>
+
+    <div class="sec">費用匯總</div>
+    <div class="sumrow"><label>工資合計（凹痕＋板金＋烤漆＋拆裝 批價）</label><span class="val" id="s_labor">$0</span></div>
+    <div class="sumrow"><label>零件合計</label><span class="val" id="s_parts">$0</span></div>
+    <div class="sumrow"><label>總金額（未含稅）</label><span class="val" id="s_total">$0</span></div>
+    <div class="sumrow"><label>實結金額</label><input id="i_final" type="number" placeholder="0" oninput="sync()"></div>
+    <div class="sumrow"><label>理賠人員</label><input id="i_adjuster" class="tl" type="text" placeholder="理賠員姓名" oninput="sync()"></div>
+    <div class="sumrow"><label>作業紀錄</label><input id="i_record" class="tl" type="text" placeholder="作業記錄..." oninput="sync()"></div>
+
+  </div>
+
+  <!-- ══ RIGHT PANEL (PREVIEW) ══ -->
+  <div class="right">
+    <div class="ef" id="ef">
+
+      <!-- Header -->
+      <div class="ef-hd">
+        <img src="../logo.png" alt="SUPERIOR" onerror="this.style.display='none'">
+        <div class="ef-hd-t">
+          <div class="co">卓越凹痕─車體維美中心</div>
+          <div class="sub">凹痕修復估價單</div>
+        </div>
+      </div>
+
+      <!-- Info 4×4 -->
+      <table class="ef-info">
+        <tr>
+          <td class="lb">車主姓名</td><td class="vl" id="p_owner"></td>
+          <td class="lb">廠牌</td><td class="vl" id="p_brand"></td>
+          <td class="lb">估價日期</td><td class="vl" id="p_est_date"></td>
+          <td class="lb">承保公司</td><td class="vl" id="p_insurer"></td>
+        </tr>
+        <tr>
+          <td class="lb">聯絡電話</td><td class="vl" id="p_phone"></td>
+          <td class="lb">車型</td><td class="vl" id="p_model"></td>
+          <td class="lb">進廠日期</td><td class="vl" id="p_in_date"></td>
+          <td class="lb">理賠案號</td><td class="vl" id="p_claim_no"></td>
+        </tr>
+        <tr>
+          <td class="lb">車牌</td><td class="vl" id="p_plate"></td>
+          <td class="lb">年份</td><td class="vl" id="p_year"></td>
+          <td class="lb">交車日期</td><td class="vl" id="p_out_date"></td>
+          <td class="lb">里程數</td><td class="vl" id="p_mileage"></td>
+        </tr>
+        <tr>
+          <td class="lb">車身碼</td><td class="vl" id="p_vin"></td>
+          <td class="lb">車色</td><td class="vl" id="p_color"></td>
+          <td class="lb">估價人員</td><td class="vl" id="p_estimator"></td>
+          <td class="lb">負責人員</td><td class="vl" id="p_handler"></td>
+        </tr>
+      </table>
+
+      <!-- Remarks -->
+      <table class="ef-rem">
+        <tr>
+          <td class="lb">修理備註</td>
+          <td class="vl" id="p_remarks" style="min-height:24px"></td>
+        </tr>
+      </table>
+
+      <!-- Main estimate table -->
+      <table class="ef-tbl" id="ef_tbl">
+        <thead>
+          <tr>
+            <th rowspan="2" style="min-width:85px">修理項目</th>
+            <th colspan="2" class="mh">凹痕修復</th>
+            <th colspan="2" class="mh">板金校正</th>
+            <th colspan="2" class="mh">烤漆</th>
+            <th colspan="2" class="mh">拆裝</th>
+            <th colspan="3" class="mh">零件</th>
+            <th rowspan="2" style="min-width:55px">備註</th>
+          </tr>
+          <tr>
+            <th>估價</th><th>批價</th>
+            <th>估價</th><th>批價</th>
+            <th>估價</th><th>批價</th>
+            <th>估價</th><th>批價</th>
+            <th>數量</th><th>單價</th><th>批價</th>
+          </tr>
+        </thead>
+        <tbody id="ef_body"></tbody>
+        <tfoot>
+          <tr class="tot">
+            <td class="tn">合計</td>
+            <td id="t_pdr_e">0</td><td id="t_pdr_b">0</td>
+            <td id="t_mt_e">0</td><td id="t_mt_b">0</td>
+            <td id="t_pt_e">0</td><td id="t_pt_b">0</td>
+            <td id="t_ds_e">0</td><td id="t_ds_b">0</td>
+            <td></td><td></td><td id="t_par_b">0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- Footer -->
+      <table class="ef-ft">
+        <tr>
+          <td class="lb" rowspan="2">作業紀錄</td>
+          <td rowspan="2" id="p_record" style="min-width:180px;min-height:34px;vertical-align:top"></td>
+          <td class="lb" colspan="1" rowspan="2">維修費用</td>
+          <td class="lb">工資合計</td>
+          <td class="amt" id="p_labor">0</td>
+          <td class="lb" rowspan="4">顧客簽名</td>
+          <td rowspan="4" style="min-width:110px"></td>
+        </tr>
+        <tr>
+          <td class="lb">零件合計</td>
+          <td class="amt" id="p_parts">0</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="font-size:.82em;color:#888">以上報價未含稅</td>
+          <td class="lb">總金額</td>
+          <td class="lb">總金額</td>
+          <td class="amt big" id="p_total">0</td>
+        </tr>
+        <tr>
+          <td colspan="2"></td>
+          <td class="lb">實結金額</td>
+          <td class="lb">實結金額</td>
+          <td class="amt big" id="p_final"></td>
+        </tr>
+        <tr>
+          <td colspan="2"></td>
+          <td class="lb">理賠人員</td>
+          <td colspan="2" id="p_adjuster"></td>
+          <td colspan="2"></td>
+        </tr>
+      </table>
+
+    </div>
+  </div>
+
+</div><!-- end main -->
+
+<script>
+const MAX_ROWS = 18;
+let rows = [];
+
+function mkRow(){ return {name:'',pdr_e:'',pdr_b:'',mt_e:'',mt_b:'',pt_e:'',pt_b:'',ds_e:'',ds_b:'',par_q:'',par_p:'',notes:''}; }
+
+function initRows(){
+  rows = [];
+  for(let i=0;i<6;i++) rows.push(mkRow());
+  renderInputs();
+}
+
+function addRow(){
+  if(rows.length>=MAX_ROWS){alert('最多'+MAX_ROWS+'行');return;}
+  rows.push(mkRow());
+  renderInputs();
+  sync();
+}
+
+function e(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function renderInputs(){
+  const c = document.getElementById('rowInputs');
+  c.innerHTML = '';
+  rows.forEach((r,i)=>{
+    const d = document.createElement('div');
+    d.className = 'ri';
+    d.innerHTML =
+      `<input class="tl" type="text"   value="${e(r.name)}"  placeholder="項目${i+1}"  oninput="rows[${i}].name=this.value;sync()">` +
+      `<input type="number" value="${r.pdr_e}" placeholder="0" oninput="rows[${i}].pdr_e=this.value;sync()">` +
+      `<input type="number" value="${r.pdr_b}" placeholder="0" oninput="rows[${i}].pdr_b=this.value;sync()">` +
+      `<input type="number" value="${r.mt_e}"  placeholder="0" oninput="rows[${i}].mt_e=this.value;sync()">` +
+      `<input type="number" value="${r.mt_b}"  placeholder="0" oninput="rows[${i}].mt_b=this.value;sync()">` +
+      `<input type="number" value="${r.pt_e}"  placeholder="0" oninput="rows[${i}].pt_e=this.value;sync()">` +
+      `<input type="number" value="${r.pt_b}"  placeholder="0" oninput="rows[${i}].pt_b=this.value;sync()">` +
+      `<input type="number" value="${r.ds_e}"  placeholder="0" oninput="rows[${i}].ds_e=this.value;sync()">` +
+      `<input type="number" value="${r.ds_b}"  placeholder="0" oninput="rows[${i}].ds_b=this.value;sync()">` +
+      `<input type="number" value="${r.par_q}" placeholder="0" oninput="rows[${i}].par_q=this.value;sync()">` +
+      `<input type="number" value="${r.par_p}" placeholder="0" oninput="rows[${i}].par_p=this.value;sync()">` +
+      `<input class="tl" type="text"   value="${e(r.notes)}" placeholder="備註"        oninput="rows[${i}].notes=this.value;sync()">`;
+    c.appendChild(d);
+  });
+}
+
+function v(id){ return (document.getElementById(id)||{}).value||''; }
+
+function n(x){ return parseFloat(x)||0; }
+
+function fmt(x){
+  const num = parseFloat(x)||0;
+  return num===0 ? '0' : num.toLocaleString('zh-TW');
+}
+
+function fmtD(s){
+  if(!s) return '';
+  const parts = s.split('-');
+  if(parts.length!==3) return s;
+  return `${parts[0]}/${parts[1]}/${parts[2]}`;
+}
+
+function set(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+
+function sync(){
+  set('p_owner',    v('i_owner'));
+  set('p_brand',    v('i_brand'));
+  set('p_phone',    v('i_phone'));
+  set('p_model',    v('i_model'));
+  set('p_plate',    v('i_plate'));
+  set('p_year',     v('i_year'));
+  set('p_vin',      v('i_vin'));
+  set('p_color',    v('i_color'));
+  set('p_est_date', fmtD(v('i_est_date')));
+  set('p_in_date',  fmtD(v('i_in_date')));
+  set('p_out_date', fmtD(v('i_out_date')));
+  set('p_insurer',  v('i_insurer'));
+  set('p_claim_no', v('i_claim_no'));
+  set('p_mileage',  v('i_mileage'));
+  set('p_estimator',v('i_estimator'));
+  set('p_handler',  v('i_handler'));
+  set('p_remarks',  v('i_remarks'));
+  set('p_record',   v('i_record'));
+  set('p_adjuster', v('i_adjuster'));
+
+  // Build table body
+  const tbody = document.getElementById('ef_body');
+  tbody.innerHTML = '';
+  let T = {pdr_e:0,pdr_b:0,mt_e:0,mt_b:0,pt_e:0,pt_b:0,ds_e:0,ds_b:0,par_b:0};
+
+  rows.forEach(r=>{
+    const par_b = n(r.par_q)*n(r.par_p);
+    T.pdr_e += n(r.pdr_e); T.pdr_b += n(r.pdr_b);
+    T.mt_e  += n(r.mt_e);  T.mt_b  += n(r.mt_b);
+    T.pt_e  += n(r.pt_e);  T.pt_b  += n(r.pt_b);
+    T.ds_e  += n(r.ds_e);  T.ds_b  += n(r.ds_b);
+    T.par_b += par_b;
+
+    const z = v => `class="${(!parseFloat(v)||parseFloat(v)===0)?'z':''}"`;
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td class="tn">${r.name||''}</td>`+
+      `<td ${z(r.pdr_e)}>${fmt(r.pdr_e)}</td><td ${z(r.pdr_b)}>${fmt(r.pdr_b)}</td>`+
+      `<td ${z(r.mt_e)}>${fmt(r.mt_e)}</td><td ${z(r.mt_b)}>${fmt(r.mt_b)}</td>`+
+      `<td ${z(r.pt_e)}>${fmt(r.pt_e)}</td><td ${z(r.pt_b)}>${fmt(r.pt_b)}</td>`+
+      `<td ${z(r.ds_e)}>${fmt(r.ds_e)}</td><td ${z(r.ds_b)}>${fmt(r.ds_b)}</td>`+
+      `<td ${z(r.par_q)}>${n(r.par_q)||''}</td><td ${z(r.par_p)}>${fmt(r.par_p)}</td><td ${z(par_b)}>${fmt(par_b)}</td>`+
+      `<td class="nc">${r.notes||''}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Totals
+  set('t_pdr_e', fmt(T.pdr_e)); set('t_pdr_b', fmt(T.pdr_b));
+  set('t_mt_e',  fmt(T.mt_e));  set('t_mt_b',  fmt(T.mt_b));
+  set('t_pt_e',  fmt(T.pt_e));  set('t_pt_b',  fmt(T.pt_b));
+  set('t_ds_e',  fmt(T.ds_e));  set('t_ds_b',  fmt(T.ds_b));
+  set('t_par_b', fmt(T.par_b));
+
+  // Summary
+  const labor = T.pdr_b + T.mt_b + T.pt_b + T.ds_b;
+  const parts = T.par_b;
+  const total = labor + parts;
+
+  document.getElementById('s_labor').textContent = '$'+fmt(labor);
+  document.getElementById('s_parts').textContent = '$'+fmt(parts);
+  document.getElementById('s_total').textContent = '$'+fmt(total);
+
+  set('p_labor', fmt(labor));
+  set('p_parts', fmt(parts));
+  set('p_total', fmt(total));
+
+  const fv = v('i_final');
+  set('p_final', fv ? fmt(fv) : '');
+}
+
+function clearAll(){
+  if(!confirm('確定要清除所有資料嗎？')) return;
+  document.querySelectorAll('.left input,.left textarea').forEach(el=>el.value='');
+  document.getElementById('i_est_date').value = new Date().toISOString().split('T')[0];
+  initRows();
+  sync();
+}
+
+window.onload = ()=>{
+  document.getElementById('i_est_date').value = new Date().toISOString().split('T')[0];
+  initRows();
+  sync();
+};
+</script>
+</body>
+</html>
