@@ -457,9 +457,38 @@ function clearAll(){
   sync();
 }
 
+function loadFromURL(){
+  try {
+    const raw = new URLSearchParams(window.location.search).get('data');
+    if(!raw) return;
+    const d = JSON.parse(decodeURIComponent(escape(atob(raw))));
+    const sf = (id, val) => { const el=document.getElementById(id); if(el&&val) el.value=val; };
+    sf('i_owner', d.owner);
+    sf('i_phone', d.phone);
+    sf('i_year',  d.year);
+    sf('i_brand', d.brand);
+    sf('i_model', d.model);
+    if(d.items && d.items.length){
+      while(rows.length < d.items.length) rows.push(mkRow());
+      d.items.forEach((item, i) => {
+        rows[i].name = item.name || '';
+        const p = item.price || 0;
+        const t = (item.type||'').toUpperCase();
+        if(t === 'PDR'){
+          rows[i].pdr_b = p;
+        } else if(t === 'PAINTING' || t === 'BUMPER'){
+          rows[i].mt_b = p;
+        }
+      });
+      renderInputs();
+    }
+  } catch(e){ console.warn('URL data parse error', e); }
+}
+
 window.onload = ()=>{
   document.getElementById('i_est_date').value = new Date().toISOString().split('T')[0];
   initRows();
+  loadFromURL();
   sync();
 };
 </script>

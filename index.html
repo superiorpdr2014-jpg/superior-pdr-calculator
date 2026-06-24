@@ -598,6 +598,9 @@
     .email-btn:hover:not(:disabled){background:#363b44;border-color:rgba(255,255,255,.4);}
     .dl-btn:disabled,.sms-btn:disabled,.email-btn:disabled{background:rgba(255,255,255,.12);color:#777;cursor:not-allowed;box-shadow:none;border-color:transparent;}
     .sms-btn.sent,.email-btn.sent{background:#2e9e4f;border-color:transparent;}
+    .ins-btn{width:100%;padding:14px;border:1px solid rgba(197,157,50,.45);border-radius:4px;background:rgba(197,157,50,.12);color:#f5c842;font-size:14px;font-weight:800;letter-spacing:.4px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .14s;font-family:inherit;margin-top:8px;}
+    .ins-btn:hover:not(:disabled){background:rgba(245,200,66,.22);border-color:#f5c842;}
+    .ins-btn:disabled{opacity:.45;cursor:not-allowed;}
 
     /* ── PREVIEW MODAL ── */
     .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto;}
@@ -1006,6 +1009,10 @@ window.SHOP_CONFIG = {
     </button>
   </div>
 
+  <button class="ins-btn" id="ins-btn" onclick="openInsuranceEstimate()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    保險估價單
+  </button>
   <button class="reset-btn" id="reset-btn" data-i18n="resetAll">Reset All</button>
 </div>
 
@@ -2705,6 +2712,29 @@ function shareOrDownloadCanvas(canvas, vehicle, done) {
     } catch(e) {}
     download(blob);
   }, 'image/png');
+}
+
+function openInsuranceEstimate() {
+  var owner = (document.getElementById('client-name').value || '').trim();
+  var phone = (document.getElementById('client-phone').value || '').trim();
+  var year  = (document.getElementById('veh-year').value  || '').trim();
+  var brand = (document.getElementById('veh-make').value  || '').trim();
+  var model = (document.getElementById('veh-model').value || '').trim();
+
+  var items = S.items.map(function(it) {
+    return { name: it.panel || '', type: it.service || '', price: it.subtotal || 0 };
+  });
+
+  if (!items.length) {
+    var r2 = collectRepairs();
+    items = r2.map(function(it) {
+      return { name: it.panel || '', type: it.service || '', price: it.subtotal || 0 };
+    });
+  }
+
+  var payload = { owner:owner, phone:phone, year:year, brand:brand, model:model, items:items };
+  var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  window.open('../insurance/?data=' + encoded, '_blank');
 }
 
 function downloadPNG() {
