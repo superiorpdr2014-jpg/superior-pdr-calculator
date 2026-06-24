@@ -2734,7 +2734,7 @@ function openInsuranceEstimate() {
 
   var payload = { owner:owner, phone:phone, year:year, brand:brand, model:model, items:items };
   var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  window.open('../insurance/?data=' + encoded, '_blank');
+  window.open('./insurance/?data=' + encoded, '_blank');
 }
 
 function downloadPNG() {
