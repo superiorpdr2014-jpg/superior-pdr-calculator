@@ -475,9 +475,9 @@ function loadFromURL(){
         const p = item.price || 0;
         const t = (item.type||'').toUpperCase();
         if(t === 'PDR'){
-          rows[i].pdr_b = p;
+          rows[i].pdr_e = p;
         } else if(t === 'PAINTING' || t === 'BUMPER'){
-          rows[i].mt_b = p;
+          rows[i].mt_e = p;
         }
       });
       renderInputs();
