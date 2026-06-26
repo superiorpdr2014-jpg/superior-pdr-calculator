@@ -184,7 +184,7 @@ body{font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;background:#1118
     </div>
 
     <div class="sec">費用匯總</div>
-    <div class="sumrow"><label>工資合計（凹痕＋板金＋烤漆＋拆裝 批價）</label><span class="val" id="s_labor">$0</span></div>
+    <div class="sumrow"><label>工資合計（凹痕＋板金＋烤漆＋拆裝 估價）</label><span class="val" id="s_labor">$0</span></div>
     <div class="sumrow"><label>零件合計</label><span class="val" id="s_parts">$0</span></div>
     <div class="sumrow"><label>總金額（未含稅）</label><span class="val" id="s_total">$0</span></div>
     <div class="sumrow"><label>實結金額</label><input id="i_final" type="number" placeholder="0" oninput="sync()"></div>
@@ -428,14 +428,18 @@ function sync(){
   set('t_ds_e',  fmt(T.ds_e));  set('t_ds_b',  '');
   set('t_par_b', '');
 
-  // Summary — 結算金額（工資／零件／總額）皆批價衍生，一律留白手填
-  document.getElementById('s_labor').textContent = '';
-  document.getElementById('s_parts').textContent = '';
-  document.getElementById('s_total').textContent = '';
+  // Summary — 工資合計＝所有工項估價加總（凹痕＋板金＋烤漆＋拆裝），零件合計＝數量×單價
+  const labor = T.pdr_e + T.mt_e + T.pt_e + T.ds_e;
+  const parts = T.par_b;
+  const total = labor + parts;
 
-  set('p_labor', '');
-  set('p_parts', '');
-  set('p_total', '');
+  document.getElementById('s_labor').textContent = '$'+fmt(labor);
+  document.getElementById('s_parts').textContent = '$'+fmt(parts);
+  document.getElementById('s_total').textContent = '$'+fmt(total);
+
+  set('p_labor', fmt(labor));
+  set('p_parts', fmt(parts));
+  set('p_total', fmt(total));
 
   const fv = v('i_final');
   set('p_final', fv ? fmt(fv) : '');
