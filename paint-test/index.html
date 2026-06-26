@@ -2242,7 +2242,7 @@ function recalc() {
     var bumpSum = bumpR.reduce(function(a,r){ return a+r.subtotal; }, 0);
     function section(title, list, sum) {
       rows.push('<div class="ssec">'+title+'</div>');
-      list.forEach(function(r){ var pn=paintNote(r); rows.push('<div class="brow"><span class="bn">'+r.panel+(pn?'（'+pn+'）':'')+'</span><span class="bp">'+money(r.subtotal)+'</span></div>'); });
+      list.forEach(function(r){ rows.push('<div class="brow"><span class="bn">'+r.panel+'</span><span class="bp">'+money(r.subtotal)+'</span></div>'); });
       rows.push('<div class="brow ssub"><span class="bn">'+title+' '+t('est_subtotal')+'</span><span class="bp">'+px(sum)+'</span></div>');
     }
     section(t('est_pdrSection'), pdrR, pdrSum);
@@ -2256,9 +2256,12 @@ function recalc() {
     lblEl.textContent = exact ? t('est_flatTotal') : t('est_estimatedRange');
     totalEl.textContent = px(tt.premium);
     reps.forEach(function(r,i){
-      var pn = paintNote(r);
-      rows.push('<div class="bsub">'+(i+1)+'. '+r.panel+(pn?'（'+pn+'）':'')+'</div>');
-      r.factors.forEach(function(f){ rows.push('<div class="brow"><span class="bn">'+f.label+'</span><span class="bp">'+money(f.price)+'</span></div>'); });
+      rows.push('<div class="bsub">'+(i+1)+'. '+r.panel+'</div>');
+      var flatNote = (r.service !== 'PDR' && !(r.paint>0)) ? '（'+t('paint_incFlat')+'）' : '';
+      r.factors.forEach(function(f,fi){
+        var lbl = f.label + ((flatNote && fi === r.factors.length-1) ? flatNote : '');
+        rows.push('<div class="brow"><span class="bn">'+lbl+'</span><span class="bp">'+money(f.price)+'</span></div>');
+      });
       if (r.paint>0) rows.push('<div class="brow"><span class="bn">'+t('est_triCoat')+'</span><span class="bp">'+money(r.paint)+'</span></div>');
     });
     rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_flatTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+px(tt.premium)+'</span></div>');
@@ -2560,12 +2563,13 @@ function buildEstimateHTML(o) {
     var priceStr = exact
       ? money(r.subtotal)
       : '<span style="font-size:.6em;font-weight:700;color:#999;letter-spacing:.3px;margin-right:3px">均價</span>'+money(r.subtotal);
-    var pn = paintNote(r);
+    var flatNote = (r.service !== 'PDR' && !(r.paint>0)) ? '（'+t('paint_incFlat')+'）' : '';
     var s = '<div class="rep">';
-    s += '<div class="rep-hd"><span class="n">'+n+'</span><span class="p">'+esc(r.panel)+(pn?'（'+pn+'）':'')+'</span>'+tag+'<span class="s">'+priceStr+'</span></div>';
+    s += '<div class="rep-hd"><span class="n">'+n+'</span><span class="p">'+esc(r.panel)+'</span>'+tag+'<span class="s">'+priceStr+'</span></div>';
     s += '<div class="rep-lines">';
-    r.factors.forEach(function(f){
-      s += '<div class="ln"><span>'+esc(f.label)+'</span><span class="lp">'+money(f.price)+'</span></div>';
+    r.factors.forEach(function(f,fi){
+      var lbl = esc(f.label) + ((flatNote && fi === r.factors.length-1) ? flatNote : '');
+      s += '<div class="ln"><span>'+lbl+'</span><span class="lp">'+money(f.price)+'</span></div>';
     });
     if (r.paint>0) s += '<div class="ln"><span>'+t('est_triCoat')+'</span><span class="lp">'+money(r.paint)+'</span></div>';
     s += '</div></div>';
@@ -2893,7 +2897,8 @@ function buildPitchMessage(channel) {
       var dmg = (r.factors||[]).map(function(fx){ return fx.label; }).join(', ');
       var svcLabel = r.service === 'PDR' ? '凹痕修復' : '鈑金烤漆';
       var pn = paintNote(r);
-      repairLines += (i+1) + '. ' + r.panel + '（' + svcLabel + (pn ? '，' + pn : '') + '）\n   ' + (dmg || 'Base repair') + '\n';
+      var dmgLine = (dmg || 'Base repair') + (pn ? '（' + pn + '）' : '');
+      repairLines += (i+1) + '. ' + r.panel + '（' + svcLabel + '）\n   ' + dmgLine + '\n';
     });
     repairLines += '\n';
     exact = plan.exact;
