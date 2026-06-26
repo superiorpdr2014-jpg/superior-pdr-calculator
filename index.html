@@ -1109,7 +1109,7 @@ var I18N = {
     bf_alu_body:'Aluminum Body Work', bf_alu_xl_body:'Aluminum XL Body Work',
     bf_punch:'Puncture / Hole', bf_crack:'Crack',
     bf_corner:'Dented Corner', bf_ri:'R&I (Removal & Install)', bf_custom:'Other / Custom',
-    paint_flat:'Flat', paint_flatSub:'No charge', paint_tricoat:'Tri Coat',
+    paint_flat:'Flat', paint_flatSub:'No charge', paint_tricoat:'Tri Coat', paint_incFlat:'paint included', paint_incTri:'Tri-Coat paint included',
     tier_premiumName:'Premium Repair', tier_practicalName:'Practical Repair', tier_improvementName:'Improvement Repair',
     tier_premiumDesc:'Refined to flawless, or as close to flawless as possible. Extra time and precision on the final details so it looks correct from every angle and lighting condition.',
     tier_practicalDesc:'A clean, well-corrected appearance under normal viewing distance and common angles. Looks natural and presentable — 30% reduced cost, not quality.',
@@ -1181,7 +1181,7 @@ var I18N = {
     bf_alu_body:'Carrocería de Aluminio', bf_alu_xl_body:'Carrocería XL de Aluminio',
     bf_punch:'Perforación / Agujero', bf_crack:'Grieta',
     bf_corner:'Esquina Abollada', bf_ri:'R&I (Desmontaje e Instalación)', bf_custom:'Otro / Personalizado',
-    paint_flat:'Plano', paint_flatSub:'Sin cargo', paint_tricoat:'Tricapa',
+    paint_flat:'Plano', paint_flatSub:'Sin cargo', paint_tricoat:'Tricapa', paint_incFlat:'pintura incluida', paint_incTri:'pintura tricapa incluida',
     tier_premiumName:'Reparación Premium', tier_practicalName:'Reparación Práctica', tier_improvementName:'Reparación de Mejora',
     tier_premiumDesc:'Refinada hasta quedar impecable, o lo más cerca posible. Tiempo y precisión adicionales en los detalles finales para que se vea correcta desde todo ángulo y condición de luz.',
     tier_practicalDesc:'Una apariencia limpia y bien corregida a distancia de visión normal y ángulos comunes. Se ve natural y presentable — 30% menos costo, no menos calidad.',
@@ -1253,7 +1253,7 @@ var I18N = {
     bf_alu_body:'鋁合金鈑金', bf_alu_xl_body:'大面積鋁合金鈑金',
     bf_punch:'穿孔', bf_crack:'裂縫',
     bf_corner:'凹角', bf_ri:'R&I（拆裝費）', bf_custom:'其他／自訂',
-    paint_flat:'素色', paint_flatSub:'不加價', paint_tricoat:'水晶珍珠漆',
+    paint_flat:'素色漆', paint_flatSub:'不加價', paint_tricoat:'水晶珍珠漆', paint_incFlat:'含烤漆', paint_incTri:'含特殊水晶珍珠漆烤漆',
     tier_premiumName:'精緻修復', tier_practicalName:'平整修復', tier_improvementName:'大概修復',
     tier_premiumDesc:'修復至近乎完美的狀態。投入額外時間與精準度於最終細節，確保在任何角度與光線下都呈現正確外觀。',
     tier_practicalDesc:'在正常觀看距離與常見角度下呈現乾淨、良好的修復效果。外觀自然且整潔——降低30%費用，符合市場平均修復品質。',
@@ -1262,7 +1262,7 @@ var I18N = {
     est_pdrSection:'PDR凹痕修復', est_bumperSection:'保險桿與鈑金烤漆', est_subtotal:'小計',
     est_estimatedRange:'估計範圍', est_combinedTotal:'合計總額', est_total:'總計',
     est_flatTotal:'固定總額', est_combinedRange:'合計範圍',
-    est_baseDent:'基礎鈑金修復', est_triCoat:'水晶珍珠漆',
+    est_baseDent:'基礎鈑金修復', est_triCoat:'特殊水晶珍珠漆烤漆',
     est_preliminary:'此為初步估價。最終費用需經現場檢查後確認。',
     est_questions:'有疑問？請致電或傳訊', est_validGood:'本估價有效期為', est_days:'天',
     est_validThrough:'有效至', est_covers:'本估價涵蓋：',
@@ -2174,7 +2174,8 @@ function renderItems() {
     : '';
   list.innerHTML = banner + S.items.map(function(it, i) {
     var dmg = it.factors.map(function(f){ return f.label; }).join(', ');
-    if (it.paint > 0) dmg += (dmg ? ' · ' : '') + 'Tri Coat';
+    var ipn = paintNote(it);
+    if (ipn) dmg += (dmg ? ' · ' : '') + ipn;
     if (multiVeh && it.vehicle && it.vehicle!=='Customer Vehicle') dmg += '  ·  🚗 '+it.vehicle;
     var tag = it.service ? '<span class="item-tag">'+it.service+'</span>' : '';
     var editing = (S.editIndex === i);
@@ -2263,8 +2264,12 @@ function recalc() {
     totalEl.textContent = px(tt.premium);
     reps.forEach(function(r,i){
       rows.push('<div class="bsub">'+(i+1)+'. '+r.panel+'</div>');
-      r.factors.forEach(function(f){ rows.push('<div class="brow"><span class="bn">'+f.label+'</span><span class="bp">'+money(f.price)+'</span></div>'); });
-      if (r.paint>0) rows.push('<div class="brow"><span class="bn">Tri Coat Paint</span><span class="bp">'+money(r.paint)+'</span></div>');
+      var flatNote = (r.service !== 'PDR' && !(r.paint>0)) ? '（'+t('paint_incFlat')+'）' : '';
+      r.factors.forEach(function(f,fi){
+        var lbl = f.label + ((flatNote && fi === r.factors.length-1) ? flatNote : '');
+        rows.push('<div class="brow"><span class="bn">'+lbl+'</span><span class="bp">'+money(f.price)+'</span></div>');
+      });
+      if (r.paint>0) rows.push('<div class="brow"><span class="bn">'+t('est_triCoat')+'</span><span class="bp">'+money(r.paint)+'</span></div>');
     });
     rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_flatTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+px(tt.premium)+'</span></div>');
 
@@ -2358,6 +2363,12 @@ function collectRepairs() {
     reps.push({ service:'PDR', vehicle:getVehicleInfo(), panel:pdrHeader(), factors:pdrLines(), paint:0, subtotal:pdrSubtotal(), tierBase:pdrTierBase(), tierFixed:pdrRiCost()+spExtraTotal() });
   }
   return reps;
+}
+
+// 烤漆說明：鈑金烤漆項目標註烤漆種類（PDR 不含烤漆）
+function paintNote(r){
+  if (!r || r.service === 'PDR') return '';
+  return (r.paint > 0) ? t('paint_incTri') : t('paint_incFlat');
 }
 
 // Tier totals across an estimate. tierBase is discounted by the mode; tierFixed (R&I, bumper) is always full.
@@ -2559,11 +2570,13 @@ function buildEstimateHTML(o) {
     var priceStr = exact
       ? money(r.subtotal)
       : '<span style="font-size:.6em;font-weight:700;color:#999;letter-spacing:.3px;margin-right:3px">均價</span>'+money(r.subtotal);
+    var flatNote = (r.service !== 'PDR' && !(r.paint>0)) ? '（'+t('paint_incFlat')+'）' : '';
     var s = '<div class="rep">';
     s += '<div class="rep-hd"><span class="n">'+n+'</span><span class="p">'+esc(r.panel)+'</span>'+tag+'<span class="s">'+priceStr+'</span></div>';
     s += '<div class="rep-lines">';
-    r.factors.forEach(function(f){
-      s += '<div class="ln"><span>'+esc(f.label)+'</span><span class="lp">'+money(f.price)+'</span></div>';
+    r.factors.forEach(function(f,fi){
+      var lbl = esc(f.label) + ((flatNote && fi === r.factors.length-1) ? flatNote : '');
+      s += '<div class="ln"><span>'+lbl+'</span><span class="lp">'+money(f.price)+'</span></div>';
     });
     if (r.paint>0) s += '<div class="ln"><span>'+t('est_triCoat')+'</span><span class="lp">'+money(r.paint)+'</span></div>';
     s += '</div></div>';
@@ -2913,7 +2926,9 @@ function buildPitchMessage(channel) {
     reps.forEach(function(r, i){
       var dmg = (r.factors||[]).map(function(fx){ return fx.label; }).join(', ');
       var svcLabel = r.service === 'PDR' ? '凹痕修復' : '鈑金烤漆';
-      repairLines += (i+1) + '. ' + r.panel + '（' + svcLabel + '）\n   ' + (dmg || 'Base repair') + '\n';
+      var pn = paintNote(r);
+      var dmgLine = (dmg || 'Base repair') + (pn ? '（' + pn + '）' : '');
+      repairLines += (i+1) + '. ' + r.panel + '（' + svcLabel + '）\n   ' + dmgLine + '\n';
     });
     repairLines += '\n';
     exact = plan.exact;
