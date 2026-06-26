@@ -38,10 +38,10 @@ body{font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;background:#1118
 /* row inputs */
 .rows-wrap{overflow-x:auto;margin-top:6px}
 .rows-inner{min-width:680px}
-.rh{display:grid;grid-template-columns:100px 52px 52px 52px 52px 52px 52px 52px 52px 44px 58px 72px;gap:3px;margin-bottom:2px}
+.rh{display:grid;grid-template-columns:100px 56px 56px 56px 56px 44px 58px 72px;gap:3px;margin-bottom:2px}
 .rh span{font-size:.6rem;color:#4a6a94;text-align:center;line-height:1.2}
 .rh span.grp{color:#8aaccc;font-size:.65rem;font-weight:700}
-.ri{display:grid;grid-template-columns:100px 52px 52px 52px 52px 52px 52px 52px 52px 44px 58px 72px;gap:3px;margin-bottom:2px;align-items:center}
+.ri{display:grid;grid-template-columns:100px 56px 56px 56px 56px 44px 58px 72px;gap:3px;margin-bottom:2px;align-items:center}
 .ri input{background:#0d1b2e;border:1px solid #263d60;color:#e5e7eb;border-radius:4px;padding:3px 5px;font-size:.75rem;font-family:inherit;width:100%;text-align:right}
 .ri input.tl{text-align:left}
 .ri input:focus{outline:none;border-color:#f5c842}
@@ -161,20 +161,20 @@ body{font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;background:#1118
         <!-- Header row 1 -->
         <div class="rh">
           <span></span>
-          <span class="grp" style="grid-column:span 2">凹痕修復</span>
-          <span class="grp" style="grid-column:span 2">板金校正</span>
-          <span class="grp" style="grid-column:span 2">烤漆</span>
-          <span class="grp" style="grid-column:span 2">拆裝</span>
+          <span class="grp">凹痕修復</span>
+          <span class="grp">板金校正</span>
+          <span class="grp">烤漆</span>
+          <span class="grp">拆裝</span>
           <span class="grp" style="grid-column:span 2">零件</span>
           <span></span>
         </div>
         <!-- Header row 2 -->
         <div class="rh">
           <span>修理項目</span>
-          <span>估價</span><span>批價</span>
-          <span>估價</span><span>批價</span>
-          <span>估價</span><span>批價</span>
-          <span>估價</span><span>批價</span>
+          <span>估價</span>
+          <span>估價</span>
+          <span>估價</span>
+          <span>估價</span>
           <span>數量</span><span>單價</span>
           <span>備註</span>
         </div>
@@ -346,13 +346,9 @@ function renderInputs(){
     d.innerHTML =
       `<input class="tl" type="text"   value="${e(r.name)}"  placeholder="項目${i+1}"  oninput="rows[${i}].name=this.value;sync()">` +
       `<input type="number" value="${r.pdr_e}" placeholder="0" oninput="rows[${i}].pdr_e=this.value;sync()">` +
-      `<input type="number" value="${r.pdr_b}" placeholder="0" oninput="rows[${i}].pdr_b=this.value;sync()">` +
       `<input type="number" value="${r.mt_e}"  placeholder="0" oninput="rows[${i}].mt_e=this.value;sync()">` +
-      `<input type="number" value="${r.mt_b}"  placeholder="0" oninput="rows[${i}].mt_b=this.value;sync()">` +
       `<input type="number" value="${r.pt_e}"  placeholder="0" oninput="rows[${i}].pt_e=this.value;sync()">` +
-      `<input type="number" value="${r.pt_b}"  placeholder="0" oninput="rows[${i}].pt_b=this.value;sync()">` +
       `<input type="number" value="${r.ds_e}"  placeholder="0" oninput="rows[${i}].ds_e=this.value;sync()">` +
-      `<input type="number" value="${r.ds_b}"  placeholder="0" oninput="rows[${i}].ds_b=this.value;sync()">` +
       `<input type="number" value="${r.par_q}" placeholder="0" oninput="rows[${i}].par_q=this.value;sync()">` +
       `<input type="number" value="${r.par_p}" placeholder="0" oninput="rows[${i}].par_p=this.value;sync()">` +
       `<input class="tl" type="text"   value="${e(r.notes)}" placeholder="備註"        oninput="rows[${i}].notes=this.value;sync()">`;
@@ -416,34 +412,30 @@ function sync(){
     const tr = document.createElement('tr');
     tr.innerHTML =
       `<td class="tn">${r.name||''}</td>`+
-      `<td ${z(r.pdr_e)}>${fmt(r.pdr_e)}</td><td ${z(r.pdr_b)}>${fmt(r.pdr_b)}</td>`+
-      `<td ${z(r.mt_e)}>${fmt(r.mt_e)}</td><td ${z(r.mt_b)}>${fmt(r.mt_b)}</td>`+
-      `<td ${z(r.pt_e)}>${fmt(r.pt_e)}</td><td ${z(r.pt_b)}>${fmt(r.pt_b)}</td>`+
-      `<td ${z(r.ds_e)}>${fmt(r.ds_e)}</td><td ${z(r.ds_b)}>${fmt(r.ds_b)}</td>`+
-      `<td ${z(r.par_q)}>${n(r.par_q)||''}</td><td ${z(r.par_p)}>${fmt(r.par_p)}</td><td ${z(par_b)}>${fmt(par_b)}</td>`+
+      `<td ${z(r.pdr_e)}>${fmt(r.pdr_e)}</td><td></td>`+
+      `<td ${z(r.mt_e)}>${fmt(r.mt_e)}</td><td></td>`+
+      `<td ${z(r.pt_e)}>${fmt(r.pt_e)}</td><td></td>`+
+      `<td ${z(r.ds_e)}>${fmt(r.ds_e)}</td><td></td>`+
+      `<td ${z(r.par_q)}>${n(r.par_q)||''}</td><td ${z(r.par_p)}>${fmt(r.par_p)}</td><td></td>`+
       `<td class="nc">${r.notes||''}</td>`;
     tbody.appendChild(tr);
   });
 
-  // Totals
-  set('t_pdr_e', fmt(T.pdr_e)); set('t_pdr_b', fmt(T.pdr_b));
-  set('t_mt_e',  fmt(T.mt_e));  set('t_mt_b',  fmt(T.mt_b));
-  set('t_pt_e',  fmt(T.pt_e));  set('t_pt_b',  fmt(T.pt_b));
-  set('t_ds_e',  fmt(T.ds_e));  set('t_ds_b',  fmt(T.ds_b));
-  set('t_par_b', fmt(T.par_b));
+  // Totals — 估價欄合計照算，批價欄一律留白（保險方手填）
+  set('t_pdr_e', fmt(T.pdr_e)); set('t_pdr_b', '');
+  set('t_mt_e',  fmt(T.mt_e));  set('t_mt_b',  '');
+  set('t_pt_e',  fmt(T.pt_e));  set('t_pt_b',  '');
+  set('t_ds_e',  fmt(T.ds_e));  set('t_ds_b',  '');
+  set('t_par_b', '');
 
-  // Summary
-  const labor = T.pdr_b + T.mt_b + T.pt_b + T.ds_b;
-  const parts = T.par_b;
-  const total = labor + parts;
+  // Summary — 結算金額（工資／零件／總額）皆批價衍生，一律留白手填
+  document.getElementById('s_labor').textContent = '';
+  document.getElementById('s_parts').textContent = '';
+  document.getElementById('s_total').textContent = '';
 
-  document.getElementById('s_labor').textContent = '$'+fmt(labor);
-  document.getElementById('s_parts').textContent = '$'+fmt(parts);
-  document.getElementById('s_total').textContent = '$'+fmt(total);
-
-  set('p_labor', fmt(labor));
-  set('p_parts', fmt(parts));
-  set('p_total', fmt(total));
+  set('p_labor', '');
+  set('p_parts', '');
+  set('p_total', '');
 
   const fv = v('i_final');
   set('p_final', fv ? fmt(fv) : '');
