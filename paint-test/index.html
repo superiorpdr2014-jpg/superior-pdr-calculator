@@ -160,6 +160,7 @@
       padding:0;
       max-width:380px;margin:0 auto;
       display:flex;align-items:center;justify-content:center;
+      position:relative;
     }
     .diag-wrap svg{width:100%;height:auto;display:block;}
     /* discrete reveal button + hidden panel button-list */
@@ -325,6 +326,15 @@
     /* flare strips on the diagram — dashed accent so they read as a pickable sliver */
     .diag-wrap svg .flare-zone{stroke-dasharray:3,2;stroke:rgba(255,120,120,.5);}
     .diag-wrap svg .pillar-zone{stroke-dasharray:2,2;stroke:rgba(130,190,255,.55);fill:rgba(130,190,255,.05);}
+    .diag-wrap svg .rocker-zone{stroke-dasharray:2,2;stroke:rgba(150,255,180,.6);fill:rgba(150,255,180,.06);}
+    .diag-wrap .rocker-chooser{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20;background:rgba(13,27,46,.97);border:1px solid #3a5f8f;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:7px;box-shadow:0 8px 30px rgba(0,0,0,.6);min-width:190px;}
+    .diag-wrap .rocker-chooser .rc-title{font-size:12px;color:#f5c842;font-weight:700;text-align:center;margin-bottom:2px;}
+    .diag-wrap .rocker-chooser .rc-opt{display:flex;flex-direction:column;gap:1px;align-items:center;background:#13243c;border:1px solid #2c466b;border-radius:6px;padding:7px 10px;cursor:pointer;font-family:inherit;color:#e5e7eb;transition:all .12s;}
+    .diag-wrap .rocker-chooser .rc-opt:hover:not(.rc-dis){border-color:#f5c842;background:#1a3050;}
+    .diag-wrap .rocker-chooser .rc-opt b{font-size:13px;font-weight:700;}
+    .diag-wrap .rocker-chooser .rc-opt span{font-size:10px;color:#7ca9e0;}
+    .diag-wrap .rocker-chooser .rc-opt.rc-dis{opacity:.4;cursor:not-allowed;}
+    .diag-wrap .rocker-chooser .rc-opt.rc-dis span{color:#c98;}
 
     input[type=range]{flex:1;-webkit-appearance:none;height:5px;background:rgba(255,255,255,.18);border-radius:3px;outline:none;cursor:pointer;}
     input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;cursor:pointer;border:2px solid var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.6);transition:transform .1s;}
@@ -1075,6 +1085,7 @@ var I18N = {
     step_panel:'Panel Location', noneSelected:'None selected', clear:'Clear',
     vehicleType:'Vehicle Type', sedan:'Sedan', suv:'SUV', truck:'Truck',
     tapPanel:'Tap the panel / dent location', pickFromList:'Pick from a list',
+    rocker_pick:'Select material', rocker_metal:'Rocker (Metal)', rocker_metalSub:'PDR + body & paint', rocker_skirt:'Side Skirt (Plastic)', rocker_skirtSub:'Body & paint only', rocker_skirtPdr:'N/A in PDR — switch to Bumper & Panel',
     step_damage:'Damage Type', selectAllApply:'select all that apply', step_paint:'Paint',
     step_size:'Dent Size', selectSize:'Select a size', step_factors:'Repair Factors',
     checkAllApply:'check all that apply', riLabel:'R&I (Removal & Install)', dentSubtotal:'Dent subtotal',
@@ -1147,6 +1158,7 @@ var I18N = {
     step_panel:'Ubicación del Panel', noneSelected:'Ninguno seleccionado', clear:'Borrar',
     vehicleType:'Tipo de Vehículo', sedan:'Sedán', suv:'SUV', truck:'Camioneta',
     tapPanel:'Toque el panel / ubicación de la abolladura', pickFromList:'Elegir de una lista',
+    rocker_pick:'Seleccionar material', rocker_metal:'Estribo (Metal)', rocker_metalSub:'PDR + carrocería y pintura', rocker_skirt:'Faldón (Plástico)', rocker_skirtSub:'Solo carrocería y pintura', rocker_skirtPdr:'No disponible en PDR — cambie a Defensa y Panel',
     step_damage:'Tipo de Daño', selectAllApply:'seleccione todo lo que aplique', step_paint:'Pintura',
     step_size:'Tamaño de Abolladura', selectSize:'Seleccione un tamaño', step_factors:'Factores de Reparación',
     checkAllApply:'marque todo lo que aplique', riLabel:'R&I (Desmontaje e Instalación)', dentSubtotal:'Subtotal de abolladura',
@@ -1219,6 +1231,7 @@ var I18N = {
     step_panel:'鈑件位置', noneSelected:'尚未選擇', clear:'清除',
     vehicleType:'車型類別', sedan:'轎車', suv:'休旅車', truck:'貨卡',
     tapPanel:'點選受損的鈑件', pickFromList:'從清單選擇',
+    rocker_pick:'選擇材質', rocker_metal:'戶定（金屬）', rocker_metalSub:'可凹痕修復＋鈑金烤漆', rocker_skirt:'側裙（塑膠）', rocker_skirtSub:'僅鈑金烤漆', rocker_skirtPdr:'PDR 不適用 — 請切換鈑金烤漆',
     step_damage:'損傷類型', selectAllApply:'選擇所有適用項目', step_paint:'烤漆',
     step_size:'損傷大小', selectSize:'選擇尺寸', step_factors:'修復因素',
     checkAllApply:'勾選所有適用項目', riLabel:'R&I（拆裝費）', dentSubtotal:'修復小計',
@@ -1297,6 +1310,7 @@ var PANEL_I18N = {
     'Driver Mirror':'Espejo Conductor','Pass Mirror':'Espejo Pasajero',
     'L Front Flare':'Moldura Del Izq','R Front Flare':'Moldura Del Der','L Rear Flare':'Moldura Tras Izq','R Rear Flare':'Moldura Tras Der',
     'Rocker Panel':'Estribo','Pillar Drv':'Pilar Conductor','Pillar Pass':'Pilar Pasajero',
+    'Left Rocker':'Estribo Izq','Right Rocker':'Estribo Der','Left Rocker Metal':'Estribo Izq (Metal)','Right Rocker Metal':'Estribo Der (Metal)','Left Rocker Skirt':'Faldón Izq (Plástico)','Right Rocker Skirt':'Faldón Der (Plástico)',
     'Bed Floor':'Piso de Caja','Bed L':'Caja Izq','Bed R':'Caja Der',
     'Front Bumper — DRV':'Defensa Delantera — Conductor','Front Bumper — MID':'Defensa Delantera — Centro','Front Bumper — PASS':'Defensa Delantera — Pasajero',
     'Rear Bumper — DRV':'Defensa Trasera — Conductor','Rear Bumper — MID':'Defensa Trasera — Centro','Rear Bumper — PASS':'Defensa Trasera — Pasajero',
@@ -1320,6 +1334,7 @@ var PANEL_I18N = {
     'Driver Mirror':'駕駛側後視鏡','Pass Mirror':'副駕側後視鏡',
     'L Front Flare':'左前輪拱','R Front Flare':'右前輪拱','L Rear Flare':'左後輪拱','R Rear Flare':'右後輪拱',
     'Rocker Panel':'側裙','Pillar Drv':'駕駛側柱','Pillar Pass':'副駕側柱',
+    'Left Rocker':'左門檻／側裙','Right Rocker':'右門檻／側裙','Left Rocker Metal':'左戶定（金屬）','Right Rocker Metal':'右戶定（金屬）','Left Rocker Skirt':'左側裙（塑膠）','Right Rocker Skirt':'右側裙（塑膠）',
     'Bed Floor':'貨斗底板','Bed L':'貨斗左側','Bed R':'貨斗右側',
     'Front Bumper — DRV':'前保險桿 — 駕駛側','Front Bumper — MID':'前保險桿 — 整支','Front Bumper — PASS':'前保險桿 — 副駕側',
     'Rear Bumper — DRV':'後保險桿 — 駕駛側','Rear Bumper — MID':'後保險桿 — 整支','Rear Bumper — PASS':'後保險桿 — 副駕側',
@@ -1443,7 +1458,6 @@ var PANEL_GROUPS = {
       { id:'fl-rr', label:'R Rear Flare',  diag:'Right Rear Flare' },
     ]},
     { label:'Other', items:[
-      { id:'rocker', label:'Rocker Panel', diag:null },
       { id:'p-drv',  label:'Pillar Drv',   diag:'Driver Pillar' },
       { id:'p-pass', label:'Pillar Pass',  diag:'Passenger Pillar' },
     ]},
@@ -1483,7 +1497,6 @@ var PANEL_GROUPS = {
       { id:'fl-rr', label:'R Rear Flare',  diag:'Right Rear Flare' },
     ]},
     { label:'Other', items:[
-      { id:'rocker', label:'Rocker Panel', diag:null },
       { id:'p-drv',  label:'Pillar Drv',   diag:'Driver Pillar' },
       { id:'p-pass', label:'Pillar Pass',  diag:'Passenger Pillar' },
     ]},
@@ -1524,7 +1537,6 @@ var PANEL_GROUPS = {
       { id:'fl-rf', label:'R Front Flare', diag:'Right Front Flare' },
     ]},
     { label:'Other', items:[
-      { id:'rocker', label:'Rocker Panel', diag:null },
       { id:'p-drv',  label:'Pillar Drv',   diag:'Driver Pillar' },
       { id:'p-pass', label:'Pillar Pass',  diag:'Passenger Pillar' },
     ]},
@@ -1693,6 +1705,7 @@ function loadDiagram(type) {
     makeMirrorsClickable(svgEl);
     addFlareZones(svgEl);
     addPillarZones(svgEl);  // pillars between roof and doors, left + right
+    addRockerZones(svgEl);  // door-sill strips → 戶定(metal)/側裙(plastic) chooser
     if (S.panelDiag) highlightDiag(S.panelDiag);
   });
 }
@@ -1805,13 +1818,78 @@ function addFlareZones(svgEl) {
   });
 }
 
+// ─── ROCKER / SIDE-SKIRT (門檻/側裙) ─────────────────────────────────────────
+// One clickable strip per side at the door sill. Clicking opens a material chooser:
+//   戶定（金屬）→ allows PDR + 鈑金烤漆   |   側裙（塑膠）→ 鈑金烤漆 only (disabled in PDR mode)
+function addRockerZones(svgEl) {
+  var ns = 'http://www.w3.org/2000/svg';
+  var sides = [
+    { fd:'Left Front Door',  rd:'Left Rear Door',  side:'L', base:'Left Rocker'  },
+    { fd:'Right Front Door', rd:'Right Rear Door', side:'R', base:'Right Rocker' }
+  ];
+  sides.forEach(function(cfg){
+    var fd = svgEl.querySelector('.panel-shape[data-panel="'+cfg.fd+'"]');
+    var rd = svgEl.querySelector('.panel-shape[data-panel="'+cfg.rd+'"]');
+    if (!fd || !rd) return;
+    var a, b; try { a = fd.getBBox(); b = rd.getBBox(); } catch(e){ return; }
+    var y0 = Math.min(a.y, b.y), y1 = Math.max(a.y + a.height, b.y + b.height);
+    var W = 9;
+    var x = (cfg.side === 'L') ? Math.min(a.x, b.x)
+                               : (Math.max(a.x + a.width, b.x + b.width) - W);
+    var rect = document.createElementNS(ns, 'rect');
+    rect.setAttribute('x', x);
+    rect.setAttribute('y', y0 + (y1 - y0) * 0.08);
+    rect.setAttribute('width', W);
+    rect.setAttribute('height', (y1 - y0) * 0.84);
+    rect.setAttribute('rx', '3');
+    rect.setAttribute('class', 'panel-shape rocker-zone');
+    rect.setAttribute('data-panel', cfg.base);
+    rect.addEventListener('click', function(e){ e.stopPropagation(); onRockerClick(cfg.base, rect); });
+    svgEl.appendChild(rect);
+  });
+}
+
+function onRockerClick(baseName, shapeEl) {
+  removeRockerChooser();
+  clearDiagSel(); shapeEl.classList.add('sel');
+  var side = (baseName.indexOf('Right') >= 0) ? 'Right' : 'Left';
+  var pdrMode = (S.service === 'pdr');
+  var metal = side + ' Rocker Metal';
+  var skirt = side + ' Rocker Skirt';
+  var div = document.createElement('div');
+  div.className = 'rocker-chooser'; div.id = 'rocker-chooser';
+  div.innerHTML =
+    '<div class="rc-title">'+t('rocker_pick')+'</div>'
+    + '<button type="button" class="rc-opt" onclick="pickRockerMaterial(\''+metal+'\')">'
+    +   '<b>'+t('rocker_metal')+'</b><span>'+t('rocker_metalSub')+'</span></button>'
+    + '<button type="button" class="rc-opt'+(pdrMode?' rc-dis':'')+'"'+(pdrMode?' disabled':'')
+    +   ' onclick="pickRockerMaterial(\''+skirt+'\')">'
+    +   '<b>'+t('rocker_skirt')+'</b><span>'+(pdrMode?t('rocker_skirtPdr'):t('rocker_skirtSub'))+'</span></button>';
+  document.getElementById('diag').appendChild(div);
+}
+
+function pickRockerMaterial(name) {
+  removeRockerChooser();
+  selectPanel(name, name);
+  highlightDiag(name);
+}
+
+function removeRockerChooser() {
+  var c = document.getElementById('rocker-chooser');
+  if (c && c.parentNode) c.parentNode.removeChild(c);
+}
+
 function onDiagClick(panelName, shapeEl) {
+  removeRockerChooser();
   clearDiagSel(); shapeEl.classList.add('sel');
   selectPanel(panelName, panelName);
 }
 function highlightDiag(name) {
   clearDiagSel();
   var s = document.querySelector('#diag .panel-shape[data-panel="'+name+'"]');
+  if (!s && / Rocker (Metal|Skirt)$/.test(name)) {
+    s = document.querySelector('#diag .panel-shape[data-panel="'+name.replace(/ (Metal|Skirt)$/, '')+'"]');
+  }
   if (s) s.classList.add('sel');
 }
 function clearDiagSel() {
@@ -3062,6 +3140,9 @@ function switchService(svc) {
 
 function setService(svc) {
   S.service = svc;
+  removeRockerChooser();
+  // 側裙（塑膠）只能鈑金烤漆：切到 PDR 時若已選側裙，清除選擇
+  if (svc === 'pdr' && / Rocker Skirt$/.test(S.panelDiag || '')) clearPanel();
   document.querySelectorAll('.svc-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.svc===svc); });
   document.getElementById('svc-bumper').style.display = (svc==='bumper') ? '' : 'none';
   document.getElementById('svc-pdr').style.display    = (svc==='pdr')    ? '' : 'none';
