@@ -2866,6 +2866,9 @@ function saveEstimateImage(btn) {
 var LINE_USER_ID = (function(){
   try { return new URLSearchParams(location.search).get('line_id') || ''; } catch(e) { return ''; }
 })();
+var LINE_TOKEN_PARAM = (function(){
+  try { return new URLSearchParams(location.search).get('token') || ''; } catch(e) { return ''; }
+})();
 
 (function(){
   if (LINE_USER_ID) {
@@ -2893,7 +2896,7 @@ function sendToLineUser(btn) {
     fetch('https://echo.pdrsuperior.com/echo/send-line-estimate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lineUserId: LINE_USER_ID, imageBase64: base64, priceText: priceText })
+      body: JSON.stringify({ lineUserId: LINE_USER_ID, imageBase64: base64, priceText: priceText, token: LINE_TOKEN_PARAM })
     }).then(function(r){ return r.json(); }).then(function(j){
       done(!!j.ok);
     }).catch(function(e){ console.error(e); done(false); });

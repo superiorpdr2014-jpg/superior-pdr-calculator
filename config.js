@@ -91,6 +91,7 @@ window.SHOP_CONFIG = {
 (function () {
   var LINE_ENDPOINT = 'https://echo.pdrsuperior.com/echo/send-line-estimate';
   var LINE_ID = new URLSearchParams(window.location.search).get('line_id') || null;
+  var LINE_TOKEN = new URLSearchParams(window.location.search).get('token') || '';
 
   // 定義全域函數（index.html 按鈕的 onclick 直接呼叫）
   window.sendToLineUser = function (btn) {
@@ -119,7 +120,8 @@ window.SHOP_CONFIG = {
         body: JSON.stringify({
           lineUserId:  LINE_ID,
           imageBase64: canvas.toDataURL('image/jpeg', 0.88),
-          priceText:   priceText
+          priceText:   priceText,
+          token:       LINE_TOKEN
         })
       })
         .then(function (r) { return r.json(); })
