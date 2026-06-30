@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>汽車美容｜車體維美中心 — SUPERIOR PDR 卓越凹痕修復</title>
+<meta name="description" content="卓越 SUPERIOR PDR 車體維美中心 — 汽車美容複合式服務：車體泡沫清潔、棕櫚手作打蠟、漆面拋光研磨、德國 SF／英國 GT 鍍膜塗層、高溫蒸氣殺菌消毒。台北士林專業汽車美容與鍍膜。">
+<meta name="keywords" content="汽車美容,台北汽車美容,士林汽車美容,鍍膜,SF鍍膜,GT鍍膜,打蠟,棕櫚蠟,漆面拋光,水痕,太陽紋,高溫蒸氣殺菌,卓越凹痕修復">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="汽車美容｜車體維美中心 — SUPERIOR PDR">
+<meta property="og:description" content="清潔・打蠟・拋光・鍍膜・蒸氣殺菌 —— 卓越車體維美中心，讓愛車煥然一新。">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  /* ============ AUTO DETAILING — page-specific ============ */
+  /* --- video hero --- */
+  .beauty-hero{position:relative;min-height:92vh;display:flex;align-items:center;overflow:hidden;background:var(--bg)}
+  .beauty-hero .bhero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  .beauty-hero .bhero-scrim{position:absolute;inset:0;z-index:1;
+    background:linear-gradient(90deg,rgba(6,7,10,.92) 0%,rgba(6,7,10,.72) 42%,rgba(6,7,10,.4) 70%,rgba(6,7,10,.55) 100%);}
+  @media(max-width:760px){.beauty-hero .bhero-scrim{background:linear-gradient(180deg,rgba(6,7,10,.66) 0%,rgba(6,7,10,.78) 55%,var(--bg) 100%)}}
+  .beauty-hero .container{position:relative;z-index:2}
+  .beauty-hero .hero-kicker{color:var(--ink-mute);font-family:'JetBrains Mono';font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-top:22px;display:flex;gap:10px;align-items:center}
+  .beauty-hero .hero-kicker::before{content:"";width:30px;height:1px;background:var(--accent)}
+
+  /* --- service quick chips --- */
+  .svc-chips{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:44px}
+  .svc-chips a{display:inline-flex;flex-direction:column;align-items:center;gap:3px;padding:14px 22px;border:1px solid var(--line);border-radius:8px;background:var(--bg-elev);text-decoration:none;transition:border-color .25s,transform .25s}
+  .svc-chips a:hover{border-color:var(--accent);transform:translateY(-3px)}
+  .svc-chips .cz{font-size:15px;color:var(--ink);font-weight:600}
+  .svc-chips .ce{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase}
+
+  /* --- full-bleed photo statement band --- */
+  .bg-band{position:relative;padding:120px 24px;background:
+      linear-gradient(90deg,rgba(6,7,10,.9) 0%,rgba(6,7,10,.6) 55%,rgba(6,7,10,.78) 100%),
+      url("media/bg-polish.webp") center 30% / cover no-repeat,var(--bg);}
+  .bg-band-inner{max-width:1200px;margin:0 auto}
+  .bg-band h2{font-family:'Bebas Neue';font-size:clamp(38px,6vw,72px);line-height:1.02;color:#fff;letter-spacing:.02em;margin:14px 0 16px;max-width:16ch}
+  .bg-band h2 .accent{color:var(--accent)}
+  .bg-band p{max-width:560px;color:var(--ink-dim);font-size:16px;line-height:1.9}
+
+  /* --- service blocks --- */
+  .svc{border-top:1px solid var(--line)}
+  .svc .svc-time{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono';font-size:12px;letter-spacing:.08em;color:var(--accent);border:1px solid rgba(255,42,61,.4);background:var(--accent-soft);border-radius:30px;padding:6px 14px;margin-top:18px}
+  .svc .svc-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .svc .svc-tags span{font-size:13px;color:var(--ink-dim);border:1px solid var(--line-bright);border-radius:5px;padding:6px 12px;background:var(--bg-elev)}
+  .svc .col-img .ph{border:1px solid var(--line)}
+  .svc .col-img img{width:100%;height:100%;min-height:300px;object-fit:cover;display:block}
+
+  /* --- before / after --- */
+  .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:44px}
+  @media(max-width:760px){.ba-grid{grid-template-columns:1fr}}
+  .ba-pair{display:grid;grid-template-columns:1fr 1fr;gap:6px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg-elev)}
+  .ba-im{position:relative;aspect-ratio:3/2;overflow:hidden}
+  .ba-im img{width:100%;height:100%;object-fit:cover;display:block}
+  .ba-tag{position:absolute;left:10px;bottom:10px;font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:5px 10px;border-radius:4px;color:#fff}
+  .ba-tag.before{background:rgba(7,8,11,.7);border:1px solid var(--line-bright)}
+  .ba-tag.after{background:var(--accent)}
+
+  /* --- video embed --- */
+  .vid-wrap{max-width:1000px;margin:40px auto 0;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  .vid-wrap iframe{width:100%;aspect-ratio:16/9;height:auto;display:block;border:0}
+
+  /* --- phone dropdown (shared pattern) --- */
+  .phone-dropdown{position:fixed;background:rgba(11,14,18,.97);border:1px solid var(--line-bright);border-radius:6px;padding:8px 0;min-width:210px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s,visibility .2s;box-shadow:0 12px 36px rgba(0,0,0,.6);z-index:9999}
+  .phone-dropdown.visible{opacity:1;visibility:visible;pointer-events:auto}
+  .phone-dropdown-title{font-family:'JetBrains Mono';font-size:9px;letter-spacing:.22em;color:var(--accent);text-transform:uppercase;padding:6px 16px 8px;border-bottom:1px solid var(--line);margin-bottom:4px}
+  .phone-row{display:flex;justify-content:space-between;align-items:center;padding:7px 16px;gap:16px;transition:background .15s}
+  .phone-row:hover{background:var(--accent-soft)}
+  .phone-row .ph-nm{font-size:12px;color:var(--ink-dim);white-space:nowrap}
+  .phone-row .ph-num{font-family:'JetBrains Mono';font-size:11px;color:var(--ink);letter-spacing:.06em;text-decoration:none}
+  .phone-row .ph-num:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<nav class="top" id="topnav" data-current="beauty"></nav>
+
+<!-- ============ VIDEO HERO ============ -->
+<header class="beauty-hero">
+  <video class="bhero-video" autoplay muted loop playsinline preload="auto" poster="media/hero-detailing-poster.jpg" src="media/hero-detailing.mp4"></video>
+  <div class="bhero-scrim"></div>
+  <div class="container">
+    <nav class="crumb">
+      <a href="https://tar-tw.com/" data-en="Home" data-zh="首頁">首頁</a>
+      <span class="sep">/</span>
+      <span data-en="Auto Detailing" data-zh="汽車美容">汽車美容</span>
+    </nav>
+    <h1 data-title>汽車美容<span class="accent">｜</span>車體維美中心</h1>
+    <p class="lead">清潔 · 打蠟 · 拋光 · 鍍膜 · 蒸氣殺菌 —— 卓越結合汽車美容的複合式經營，讓來到卓越的你，修完凹痕也能把愛車徹底煥然一新。</p>
+    <div class="hero-kicker">SUPERIOR DETAILING · WAXING · COATING · 台北士林</div>
+    <div class="hero-ctas" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:30px">
+      <a class="cta" href="https://lin.ee/7ijf0fu" target="_blank" rel="noopener"><span>LINE 預約美容</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg></a>
+      <a class="cta ghost" href="#services">查看服務項目</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ INTRO + SERVICE CHIPS ============ -->
+<section class="block" id="services">
+  <div class="block-inner" style="text-align:center">
+    <div class="section-eyebrow reveal" style="justify-content:center" data-en="COMPLEX SERVICE" data-zh="複合式服務">複合式服務</div>
+    <h2 class="section-title reveal" data-en="From dent to detail — all in one place." data-zh="修凹痕，也把車變漂亮。">修凹痕，也把車變漂亮。</h2>
+    <p class="section-sub reveal" style="margin-left:auto;margin-right:auto">為了提供車友更好更多的服務，卓越結合汽車美容的複合式經營，讓來到卓越的你有更多便利的選擇 —— 這也是卓越致力於汽車服務整合的目標。</p>
+    <div class="svc-chips reveal">
+      <a href="#detailing"><span class="ce">Detailing</span><span class="cz">車體清潔</span></a>
+      <a href="#waxing"><span class="ce">Waxing</span><span class="cz">漆面護理</span></a>
+      <a href="#beauty"><span class="ce">Beauty</span><span class="cz">漆面維美</span></a>
+      <a href="#coating"><span class="ce">Coating</span><span class="cz">車體鍍膜</span></a>
+      <a href="#other"><span class="ce">Other</span><span class="cz">蒸氣殺菌</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHOTO STATEMENT BAND ============ -->
+<section class="bg-band reveal">
+  <div class="bg-band-inner">
+    <div class="section-eyebrow" data-en="MASTER FINISH" data-zh="職人手作">職人手作</div>
+    <h2>不只修復凹痕<br>更<span class="accent">還原</span>愛車的光澤</h2>
+    <p>每一道拋光、每一層鍍膜，都由卓越技師親手施作。從泡沫清潔到鏡面研磨，我們用對待競賽作品的標準，對待你的每一台車。</p>
+  </div>
+</section>
+
+<!-- ============ 1. DETAILING ============ -->
+<section class="block svc" id="detailing">
+  <div class="block-inner two-col">
+    <div class="col-text reveal">
+      <div class="section-eyebrow" data-en="01 · AUTO DETAILING" data-zh="01 · 車體清潔系列">01 · 車體清潔系列</div>
+      <h2 class="section-title" data-en="Auto Detailing" data-zh="車體泡沫清潔・抗膜清潔護理">車體泡沫清潔・抗膜清潔護理</h2>
+      <div class="body-copy">
+        <p>用專門洗劑清洗，分解不同類型的髒汙 —— 不只是表面污漬，還包含柏油、鐵粉及鈑件縫隙清潔的標準清洗程序，將車體內外做徹底的清潔。</p>
+      </div>
+      <div class="svc-tags"><span>泡沫清潔</span><span>柏油鐵粉</span><span>縫隙清潔</span><span>內外徹底</span></div>
+      <div class="svc-time">⏱ 作業時間 1.5 – 2 小時</div>
+    </div>
+    <div class="col-img reveal delay-1"><div class="ph"><img src="media/svc-detailing.webp" alt="車體泡沫清潔 Auto Detailing"></div></div>
+  </div>
+</section>
+
+<!-- ============ 2. WAXING ============ -->
+<section class="block svc" id="waxing">
+  <div class="block-inner two-col flip">
+    <div class="col-text reveal delay-1">
+      <div class="section-eyebrow" data-en="02 · AUTO WAXING" data-zh="02 · 車體漆面護理系列">02 · 車體漆面護理系列</div>
+      <h2 class="section-title" data-en="Auto Waxing" data-zh="棕櫚手作護理・深層手作護理">棕櫚手作護理・深層手作護理</h2>
+      <div class="body-copy">
+        <p>車體內外徹底清潔後，依客戶需求提供基礎、進階及頂級棕櫚蠟的手作護理 —— <strong>SWISSVAX、ZYMOL、德國天使蠟</strong>多樣化選擇，進行車體外部的護理作業。</p>
+      </div>
+      <div class="svc-tags"><span>SWISSVAX</span><span>ZYMOL</span><span>德國天使蠟</span><span>手作護理</span></div>
+      <div class="svc-time">⏱ 作業時間 2 – 3 小時（視車況不同）</div>
+    </div>
+    <div class="col-img reveal"><div class="ph"><img src="media/gal-1.webp" alt="棕櫚手作打蠟 Auto Waxing"></div></div>
+  </div>
+</section>
+
+<!-- ============ 3. BEAUTY ============ -->
+<section class="block svc" id="beauty">
+  <div class="block-inner two-col">
+    <div class="col-text reveal">
+      <div class="section-eyebrow" data-en="03 · AUTO BEAUTY" data-zh="03 · 車體漆面維美系列">03 · 車體漆面維美系列</div>
+      <h2 class="section-title" data-en="Auto Beauty" data-zh="微拋光・淺層・深層漆作護理">微拋光・淺層・深層漆作護理</h2>
+      <div class="body-copy">
+        <p>用專用洗劑徹底清潔漆面後，依美容方式進行拋光、研磨、鏡面處理，消除<strong>水痕、太陽紋、車漆細紋</strong>，提升車漆亮度；最後以手作賦予頂級棕櫚塗層，鎖住漆面美麗的光澤。</p>
+      </div>
+      <div class="svc-tags"><span>拋光研磨</span><span>鏡面處理</span><span>水痕／太陽紋</span><span>棕櫚塗層</span></div>
+      <div class="svc-time">⏱ 作業時間 4 – 7 小時（視車況不同）</div>
+    </div>
+    <div class="col-img reveal delay-1"><div class="ph"><img src="media/bg-detail.webp" alt="漆面拋光鏡面處理 Auto Beauty"></div></div>
+  </div>
+</section>
+
+<!-- ============ 4. COATING ============ -->
+<section class="block svc" id="coating">
+  <div class="block-inner two-col flip">
+    <div class="col-text reveal delay-1">
+      <div class="section-eyebrow" data-en="04 · AUTO COATING" data-zh="04 · 車體鍍膜系列">04 · 車體鍍膜系列</div>
+      <h2 class="section-title" data-en="Auto Coating" data-zh="德國 SF・英國 GT 鍍膜塗層">德國 SF・英國 GT 鍍膜塗層</h2>
+      <div class="body-copy">
+        <p>全車車況評估後，以藥水、泡沫做全車清潔，接著進行拋光美容前置作業，最後以<strong>德國 SF 或英國 GT 鍍膜劑</strong>塗層，保護煥然一新的漆面光澤並提升亮度。</p>
+      </div>
+      <div class="svc-tags"><span>SF 終極性能塗層</span><span>英國 GT 強效鍍膜</span><span>SF 玻璃塗層</span><span>SF 鋁圈塗層</span></div>
+      <div class="svc-time">⏱ 作業時間 8 小時，並留車靜置</div>
+    </div>
+    <div class="col-img reveal"><div class="ph"><img src="media/gal-2.webp" alt="車體鍍膜塗層 Auto Coating"></div></div>
+  </div>
+</section>
+
+<!-- ============ 5. OTHER ============ -->
+<section class="block svc" id="other">
+  <div class="block-inner two-col">
+    <div class="col-text reveal">
+      <div class="section-eyebrow" data-en="05 · OTHER" data-zh="05 · 其他車體清潔系列">05 · 其他車體清潔系列</div>
+      <h2 class="section-title" data-en="Steam Sterilization" data-zh="高溫蒸氣殺菌消毒">高溫蒸氣殺菌消毒</h2>
+      <div class="body-copy">
+        <p>有效去除塵螨、老舊汙漬、油漬，使車內煥然一新。高溫蒸氣搭配臭氧除臭與絨布深層清潔，連嬰幼兒座椅都能安心。</p>
+      </div>
+      <div class="svc-tags"><span>高壓蒸氣殺菌</span><span>室內空調殺菌</span><span>嬰幼兒座椅殺菌</span><span>臭氧除臭</span><span>絨布深層清潔</span></div>
+      <div class="svc-time">⏱ 作業時間 1 – 2 小時</div>
+    </div>
+    <div class="col-img reveal delay-1"><div class="ph"><img src="media/gal-3.webp" alt="高溫蒸氣殺菌消毒"></div></div>
+  </div>
+</section>
+
+<!-- ============ BEFORE / AFTER ============ -->
+<section class="block">
+  <div class="block-inner">
+    <div class="section-eyebrow reveal" data-en="BEFORE / AFTER" data-zh="施作前後對比">施作前後對比</div>
+    <h2 class="section-title reveal" data-en="See the difference." data-zh="看得見的差別。">看得見的差別。</h2>
+    <p class="section-sub reveal" data-en="Water marks, swirl marks and dull paint — restored to a deep, even shine." data-zh="水痕、太陽紋、霧化漆面 —— 還原成深邃、均勻的鏡面光澤。">水痕、太陽紋、霧化漆面 —— 還原成深邃、均勻的鏡面光澤。</p>
+    <div class="ba-grid">
+      <div class="ba-pair reveal">
+        <div class="ba-im"><img src="media/ba-a1.webp" alt="施作前"><span class="ba-tag before">施作前</span></div>
+        <div class="ba-im"><img src="media/ba-b1.webp" alt="施作後"><span class="ba-tag after">施作後</span></div>
+      </div>
+      <div class="ba-pair reveal delay-1">
+        <div class="ba-im"><img src="media/ba-a2.webp" alt="施作前"><span class="ba-tag before">施作前</span></div>
+        <div class="ba-im"><img src="media/ba-b2.webp" alt="施作後"><span class="ba-tag after">施作後</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VIDEO ============ -->
+<section class="block">
+  <div class="block-inner" style="text-align:center">
+    <div class="section-eyebrow reveal" style="justify-content:center" data-en="ON VIDEO" data-zh="影片紀錄">影片紀錄</div>
+    <h2 class="section-title reveal" data-en="Mercedes E63S — full detail & steam clean" data-zh="Mercedes E63S 清潔打蠟＋全車高溫蒸氣殺菌">Mercedes E63S 清潔打蠟＋全車高溫蒸氣殺菌</h2>
+    <div class="vid-wrap reveal">
+      <iframe src="https://www.youtube.com/embed/ZA9WTAP4aUY" title="Mercedes E63S 汽車清潔打蠟紀錄" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA BAND ============ -->
+<section class="cta-band reveal">
+  <div class="ct">
+    <div class="s" data-en="BOOK · AUTO DETAILING" data-zh="預約 · 汽車美容">預約 · 汽車美容</div>
+    <div class="t" data-en="Let's make it shine." data-zh="讓愛車煥然一新。">讓愛車煥然一新。</div>
+  </div>
+  <div class="ct-actions">
+    <a class="cta" href="https://lin.ee/7ijf0fu" target="_blank" rel="noopener"><span data-en="Book via LINE" data-zh="LINE 預約">LINE 預約</span></a>
+    <a class="cta ghost" id="callTrigger" href="javascript:void(0)" role="button"><span data-en="Call Us" data-zh="電話聯絡">電話聯絡</span></a>
+  </div>
+  <div class="phone-dropdown" id="phoneDropdown">
+    <div class="phone-dropdown-title">士林旗艦店</div>
+    <div class="phone-row"><span class="ph-nm">士林旗艦店</span><a class="ph-num" href="tel:+886978016802">0978-016-802</a></div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="foot-inner">
+    <div class="foot-links">
+      <a href="https://tar-tw.com/">Home</a>
+      <a href="https://tar-tw.com/pdr.html">Services</a>
+      <a href="https://tar-tw.com/case-video.html">Showcase</a>
+      <a href="https://tar-tw.com/contact.html">Locations</a>
+      <a href="https://tar-tw.com/contact.html">Contact</a>
+    </div>
+    <a href="https://tar-tw.com/" class="logo">
+      <img class="logo-circle" src="media/logo-circle.png" alt="Superior PDR">
+      <div class="logo-text">
+        <div class="top-line">SUPERIOR PDR</div>
+        <div class="bot-line">© 2026 SUPERIOR PDR · 車體維美中心</div>
+      </div>
+    </a>
+    <div class="foot-social">
+      <a href="https://www.instagram.com/superior_shilin/" target="_blank" rel="noopener" aria-label="Instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17" cy="7" r="1" fill="currentColor"></circle></svg></a>
+      <a href="https://www.youtube.com/channel/UC8mXr_dYrD6Or-jA91W1irw" target="_blank" rel="noopener" aria-label="YouTube"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22 8s-.2-1.4-.8-2c-.8-.8-1.6-.8-2-.9C16.2 5 12 5 12 5s-4.2 0-7.2.1c-.4 0-1.2.1-2 .9C2.2 6.6 2 8 2 8s-.2 1.6-.2 3.2v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.3.9 1.7.2 7 .2 7 .2s4.2 0 7.2-.2c.4 0 1.2-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5C22.2 9.6 22 8 22 8z"></path></svg></a>
+      <a href="https://www.facebook.com/PdrSuperior/" target="_blank" rel="noopener" aria-label="Facebook"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path></svg></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  window.PAGE_T = [
+    ['.beauty-hero h1','Auto Detailing<span class="accent"> · </span>Body Refinement Center','汽車美容<span class="accent">｜</span>車體維美中心','html'],
+    ['.beauty-hero .lead',
+      'Wash · Wax · Polish · Coating · Steam sterilization — Superior brings full auto detailing under one roof, so after the dent is gone, your car leaves looking brand new.',
+      '清潔 · 打蠟 · 拋光 · 鍍膜 · 蒸氣殺菌 —— 卓越結合汽車美容的複合式經營，讓來到卓越的你，修完凹痕也能把愛車徹底煥然一新。','text']
+  ];
+</script>
+<script src="assets/site.js"></script>
+<script>
+(function(){
+  var trigger=document.getElementById('callTrigger'),dd=document.getElementById('phoneDropdown');
+  if(!trigger||!dd)return; document.body.appendChild(dd);
+  function pos(){var r=trigger.getBoundingClientRect(),w=210,l=r.left+r.width/2-w/2;l=Math.max(8,Math.min(l,window.innerWidth-w-8));dd.style.left=l+'px';dd.style.top='auto';dd.style.bottom=(window.innerHeight-r.top+12)+'px';}
+  function tog(e){if(e){e.preventDefault();e.stopPropagation();}if(dd.classList.contains('visible')){dd.classList.remove('visible');return;}pos();dd.classList.add('visible');}
+  trigger.addEventListener('click',tog);
+  document.addEventListener('click',function(e){if(dd.classList.contains('visible')&&!dd.contains(e.target)&&e.target!==trigger)dd.classList.remove('visible');});
+  window.addEventListener('scroll',function(){dd.classList.remove('visible');},{passive:true});
+})();
+</script>
+</body>
+</html>
