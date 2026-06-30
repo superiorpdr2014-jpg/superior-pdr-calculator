@@ -92,6 +92,10 @@
   .svc .col-img .ph{border:1px solid var(--line)}
   .svc .col-img img{width:100%;height:100%;min-height:300px;object-fit:cover;display:block}
   .svc .col-img video{width:100%;height:100%;min-height:300px;object-fit:cover;display:block}
+  /* svc-tall：直式照放右半邊 */
+  .svc-tall .two-col{align-items:center}
+  .svc-tall .col-img .ph{aspect-ratio:3/4;max-height:620px;overflow:hidden}
+  .svc-tall .col-img img{min-height:0;height:100%;object-position:center}
 
   /* --- before / after --- */
   .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:44px}
@@ -294,9 +298,9 @@
 </section>
 
 <!-- ============ 4. COATING ============ -->
-<section class="block svc" id="coating">
-  <div class="block-inner two-col flip">
-    <div class="col-text reveal delay-1">
+<section class="block svc svc-tall" id="coating">
+  <div class="block-inner two-col">
+    <div class="col-text reveal">
       <div class="section-eyebrow" data-en="04 · AUTO COATING" data-zh="04 · 車體鍍膜系列">04 · 車體鍍膜系列</div>
       <h2 class="section-title" data-en="Auto Coating" data-zh="德國 SF・英國 GT 鍍膜塗層">德國 SF・英國 GT 鍍膜塗層</h2>
       <div class="body-copy">
@@ -306,7 +310,7 @@
       <div class="svc-tags"><span>德國 SF 終極性能塗層</span><span>英國 GT 強效鍍膜</span><span>玻璃撥水鍍膜</span><span>鋁圈高溫鍍膜</span><span>抗UV／酸雨／鳥糞</span></div>
       <div class="svc-time">⏱ 作業時間 8 小時，並留車靜置</div>
     </div>
-    <div class="col-img reveal"><div class="ph"><img src="media/gal-2.webp" alt="車體鍍膜塗層 Auto Coating"></div></div>
+    <div class="col-img reveal delay-1"><div class="ph"><img src="media/svc-coating-tall.webp" alt="德國 SF 車體鍍膜塗層 Auto Coating"></div></div>
   </div>
 </section>
 
