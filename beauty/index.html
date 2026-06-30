@@ -65,6 +65,14 @@
     background:linear-gradient(90deg,rgba(6,7,10,.92) 0%,rgba(6,7,10,.72) 42%,rgba(6,7,10,.4) 70%,rgba(6,7,10,.55) 100%);}
   @media(max-width:760px){.beauty-hero .bhero-scrim{background:linear-gradient(180deg,rgba(6,7,10,.66) 0%,rgba(6,7,10,.78) 55%,var(--bg) 100%)}}
   .beauty-hero .container{position:relative;z-index:2}
+  /* hero 文字統一成與其他頁面 page-hero 相同樣式 */
+  .beauty-hero .crumb{font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.18em;color:var(--ink-mute);text-transform:uppercase;display:flex;gap:10px;align-items:center;margin-bottom:22px}
+  .beauty-hero .crumb a:hover{color:var(--accent)}
+  .beauty-hero .crumb .sep{color:var(--line-bright)}
+  .beauty-hero h1{font-family:'Bebas Neue';font-size:clamp(54px,8vw,108px);line-height:.94;letter-spacing:0.01em;margin:0 0 20px;color:var(--ink)}
+  .beauty-hero h1 .accent{color:var(--accent)}
+  .beauty-hero .lead{color:var(--ink-dim);font-size:clamp(16px,1.6vw,19px);line-height:1.7;max-width:680px}
+  @media(max-width:760px){.beauty-hero h1{font-size:clamp(40px,12vw,72px)}}
   .beauty-hero .hero-kicker{color:var(--ink-mute);font-family:'JetBrains Mono';font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-top:22px;display:flex;gap:10px;align-items:center}
   .beauty-hero .hero-kicker::before{content:"";width:30px;height:1px;background:var(--accent)}
 
