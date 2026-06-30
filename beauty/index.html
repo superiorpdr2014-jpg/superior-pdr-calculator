@@ -158,6 +158,16 @@
   .reel-embed .reel-ig .ig-ico{width:24px;height:24px;flex:0 0 auto;border-radius:7px;background:linear-gradient(135deg,#f9ce34,#ee2a7b,#6228d7);display:flex;align-items:center;justify-content:center}
   .reel-embed .reel-ig .ig-nm{font-size:13px;font-weight:600;letter-spacing:.02em}
   .reel-embed .reel-ig .ig-go{margin-left:auto;font-family:'JetBrains Mono';font-size:11px;color:var(--accent)}
+  /* intro 2-col：文字在左、Reel 在右，縮短上下空間 */
+  .intro-2col{display:grid;grid-template-columns:1.25fr .75fr;gap:48px;align-items:center;text-align:left}
+  @media(max-width:860px){.intro-2col{grid-template-columns:1fr;gap:30px;text-align:center}}
+  .intro-2col .section-eyebrow{justify-content:flex-start}
+  @media(max-width:860px){.intro-2col .section-eyebrow{justify-content:center}}
+  .intro-2col .section-sub{margin:0}
+  .intro-2col .svc-chips{justify-content:flex-start;margin-top:28px}
+  @media(max-width:860px){.intro-2col .svc-chips{justify-content:center}}
+  .intro-2col .reel-embed{margin:0 0 0 auto}
+  @media(max-width:860px){.intro-2col .reel-embed{margin:8px auto 0}}
 
   /* --- phone dropdown (shared pattern) --- */
   .phone-dropdown{position:fixed;background:rgba(11,14,18,.97);border:1px solid var(--line-bright);border-radius:6px;padding:8px 0;min-width:210px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s,visibility .2s;box-shadow:0 12px 36px rgba(0,0,0,.6);z-index:9999}
@@ -197,10 +207,11 @@
 
 <!-- ============ INTRO + SERVICE CHIPS ============ -->
 <section class="block" id="services">
-  <div class="block-inner" style="text-align:center">
-    <div class="section-eyebrow reveal" style="justify-content:center" data-en="COMPLEX SERVICE" data-zh="複合式服務">複合式服務</div>
+  <div class="block-inner intro-2col">
+    <div class="intro-text">
+    <div class="section-eyebrow reveal" data-en="COMPLEX SERVICE" data-zh="複合式服務">複合式服務</div>
     <h2 class="section-title reveal" data-en="From dent to detail — all in one place." data-zh="修凹痕，也把車變漂亮。">修凹痕，也把車變漂亮。</h2>
-    <p class="section-sub reveal" style="margin-left:auto;margin-right:auto">凹痕修復、汽車美容、車體鍍膜、犀牛皮、改色膜 —— 在卓越<strong>一站式完成</strong>。不必為了不同施工項目到處奔波，後續保固與售後也由同一團隊負責，讓你省下時間、減少麻煩，讓愛車變成一件簡單的事。</p>
+    <p class="section-sub reveal">凹痕修復、汽車美容、車體鍍膜、犀牛皮、改色膜 —— 在卓越<strong>一站式完成</strong>。不必為了不同施工項目到處奔波，後續保固與售後也由同一團隊負責，讓你省下時間、減少麻煩，讓愛車變成一件簡單的事。</p>
     <div class="svc-chips reveal">
       <a href="#detailing"><span class="ce">Detailing</span><span class="cz">車體清潔</span></a>
       <a href="#waxing"><span class="ce">Waxing</span><span class="cz">漆面護理</span></a>
@@ -210,7 +221,8 @@
       <a href="#wrap"><span class="ce">Wrap</span><span class="cz">改色膜</span></a>
       <a href="#other"><span class="ce">Other</span><span class="cz">蒸氣殺菌</span></a>
     </div>
-    <a class="reel-embed reveal" href="https://www.instagram.com/superior_shilin/" target="_blank" rel="noopener" aria-label="前往士林旗艦店 Instagram @superior_shilin">
+    </div>
+    <a class="reel-embed reveal delay-1" href="https://www.instagram.com/superior_shilin/" target="_blank" rel="noopener" aria-label="前往士林旗艦店 Instagram @superior_shilin">
       <div class="reel-ph">
         <video src="media/svc-onestop.mp4" poster="media/svc-wrap.webp" autoplay muted loop playsinline preload="metadata"></video>
         <div class="reel-ig">
