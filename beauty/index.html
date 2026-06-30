@@ -120,6 +120,26 @@
   .faq-item .fa{padding:0 24px 20px 58px;color:var(--ink-dim);font-size:15px;line-height:1.9}
   .faq-item .fa b{color:var(--ink)}
 
+  /* --- works gallery --- */
+  .works-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:44px}
+  @media(max-width:900px){.works-grid{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:600px){.works-grid{grid-template-columns:1fr 1fr}}
+  .works-grid .wph{position:relative;border-radius:9px;overflow:hidden;border:1px solid var(--line);aspect-ratio:3/2;background:var(--bg-elev)}
+  .works-grid .wph img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+  .works-grid .wph:hover img{transform:scale(1.06)}
+
+  /* --- IG latest cards --- */
+  .ig-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:44px}
+  @media(max-width:760px){.ig-grid{grid-template-columns:1fr}}
+  .ig-card{display:block;border:1px solid var(--line);border-radius:11px;background:var(--bg-elev);padding:24px 26px;text-decoration:none;transition:border-color .25s,transform .25s}
+  .ig-card:hover{border-color:var(--accent);transform:translateY(-3px)}
+  .ig-card .ig-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .ig-card .ig-ico{width:26px;height:26px;flex:0 0 auto;border-radius:7px;background:linear-gradient(135deg,#f9ce34,#ee2a7b,#6228d7);display:flex;align-items:center;justify-content:center}
+  .ig-card .ig-h{font-size:16px;font-weight:600;color:var(--ink)}
+  .ig-card .ig-date{margin-left:auto;font-family:'JetBrains Mono';font-size:11px;color:var(--ink-mute)}
+  .ig-card .ig-body{color:var(--ink-dim);font-size:14.5px;line-height:1.85}
+  .ig-card .ig-tags{margin-top:12px;font-family:'JetBrains Mono';font-size:12px;color:var(--accent)}
+
   /* --- video embed --- */
   .vid-wrap{max-width:1000px;margin:40px auto 0;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
   .vid-wrap iframe{width:100%;aspect-ratio:16/9;height:auto;display:block;border:0}
@@ -291,6 +311,64 @@
         <div class="ba-im"><img src="media/ba-b2.webp" alt="施作後"><span class="ba-tag after">施作後</span></div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ============ WORKS GALLERY ============ -->
+<section class="block" id="works">
+  <div class="block-inner">
+    <div class="section-eyebrow reveal" data-en="OUR WORK" data-zh="作品集">作品集</div>
+    <h2 class="section-title reveal" data-en="Real cars, real shine." data-zh="真實作品，真實光澤。">真實作品，真實光澤。</h2>
+    <p class="section-sub reveal">士林旗艦店 —— 從超跑到日常座駕，清潔、拋光、打蠟、鍍膜的真實施作紀錄。</p>
+    <div class="works-grid">
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-01.webp" alt="卓越士林汽車美容作品 Audi"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-02.webp" alt="Ferrari 法拉利手作打蠟"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-03.webp" alt="Mazda6 汽車美容"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-04.webp" alt="Mazda3 漆面護理"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-05.webp" alt="RAYS 鋁圈鍍膜"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-06.webp" alt="Mercedes 漆面鏡面"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-07.webp" alt="VW 輪圈清潔"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-08.webp" alt="車內深層清潔"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-09.webp" alt="泡沫清潔施作"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-10.webp" alt="Mercedes GLC 鍍膜"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-11.webp" alt="Mercedes 藍色鍍膜"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-12.webp" alt="VW Touareg 鍍膜"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-13.webp" alt="漆面拋光"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-14.webp" alt="細節美容施作"></div>
+      <div class="wph reveal"><img loading="lazy" decoding="async" src="media/work-15.webp" alt="Mercedes AMG A45 美容"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ IG 最新分享 ============ -->
+<section class="block" id="ig">
+  <div class="block-inner">
+    <div class="section-eyebrow reveal" data-en="LATEST ON IG" data-zh="IG 最新分享">IG 最新分享</div>
+    <h2 class="section-title reveal" data-en="Fresh from @superior_shilin" data-zh="@superior_shilin 的近期作品">@superior_shilin 的近期作品</h2>
+    <p class="section-sub reveal">追蹤士林旗艦店 Instagram，看最新鍍膜、美容與一站式施作。</p>
+    <div class="ig-grid">
+      <a class="ig-card reveal" href="https://www.instagram.com/superior_shilin/reel/DYZGEbdtNQL/" target="_blank" rel="noopener">
+        <div class="ig-top"><span class="ig-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff" stroke="none"/></svg></span><span class="ig-h">Lexus NX200t · 一站式服務</span><span class="ig-date">2026.05</span></div>
+        <div class="ig-body">凹痕修復、車體貼膜、車體鍍膜一次完成 —— 真正的一站式服務，讓車主不用再為不同施工項目到處奔波，後續保固也不用互相推託。</div>
+        <div class="ig-tags">#汽車美容 #凹痕修復 #車體包膜 #士林 #一站式服務</div>
+      </a>
+      <a class="ig-card reveal delay-1" href="https://www.instagram.com/superior_shilin/reel/DYH9dIbvGVa/" target="_blank" rel="noopener">
+        <div class="ig-top"><span class="ig-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff" stroke="none"/></svg></span><span class="ig-h">BMW 120i · 德國 SF 鍍膜</span><span class="ig-date">2026.05</span></div>
+        <div class="ig-body">全車施作德國 SF 車漆鍍膜：✅ 抗氧防護、延緩漆面老化 ✅ 強效增艷、超越原廠光澤 ✅ 超強撥水、極易清洗。給新車最好的投資，就是最專業的防護。</div>
+        <div class="ig-tags">#SF鍍膜 #新車鍍膜 #士林卓越車體唯美中心</div>
+      </a>
+      <a class="ig-card reveal" href="https://www.instagram.com/superior_shilin/reel/DWlyZnKCSNi/" target="_blank" rel="noopener">
+        <div class="ig-top"><span class="ig-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff" stroke="none"/></svg></span><span class="ig-h">BMW X6 · 全車三重鍍膜</span><span class="ig-date">2026.04</span></div>
+        <div class="ig-body">新車落地進廠升級：全車鍍膜提升光澤抗污、鋁圈鍍膜防煞車粉塵、玻璃鍍膜強化撥水提升行車安全。交車即巔峰，從第一天就與眾不同。</div>
+        <div class="ig-tags">#BMW #X6 #汽車美容 #鍍膜 #士林</div>
+      </a>
+      <a class="ig-card reveal delay-1" href="https://www.instagram.com/superior_shilin/reel/DWf4uH0ElCl/" target="_blank" rel="noopener">
+        <div class="ig-top"><span class="ig-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff" stroke="none"/></svg></span><span class="ig-h">BMW 335i 旅行車 · 頂級棕櫚蠟</span><span class="ig-date">2026.03</span></div>
+        <div class="ig-body">施作限量 10 罐的 BMD 頂級棕櫚蠟，亮度拉滿、光澤深邃有層次，撥水漂亮；輪胎再用日本神風 6 號封體蠟，從漆面到輪胎都做到極致。</div>
+        <div class="ig-tags">#BMW335i #旅行車 #汽車美容 #士林 #車體鍍膜</div>
+      </a>
+    </div>
+    <div style="margin-top:30px" class="reveal"><a class="cta ghost" href="https://www.instagram.com/superior_shilin/" target="_blank" rel="noopener"><span>追蹤 @superior_shilin</span></a></div>
   </div>
 </section>
 
