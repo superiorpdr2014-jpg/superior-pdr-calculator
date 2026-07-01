@@ -715,7 +715,7 @@ window.SHOP_CONFIG = {
     pdrSizeLabels: [3,5,8,10,13,15,18,20,23,25,28,30,33,35,38,40,43,45,48,50,53,55,58,60],
 
     pdrGroups: [
-      { id:'access',   factors:[ {id:'braced',pct:25}, {id:'edge',pct:25}, {id:'obstructed',pct:25}, {id:'bodyline',pct:50} ] },
+      { id:'access',   factors:[ {id:'braced',pct:25}, {id:'edge',pct:25}, {id:'obstructed',pct:25}, {id:'bodyline',pct:50}, {id:'curvature',pct:15} ] },
       { id:'severity', factors:[ {id:'shallow',pct:0}, {id:'medium',pct:15}, {id:'deep',pct:30}, {id:'crease',pct:25} ] },
       { id:'material', factors:[ {id:'aluminum',pct:50}, {id:'classic',pct:30}, {id:'exotic',pct:40}, {id:'glue',pct:50}, {id:'structural',pct:35}, {id:'lateral',pct:25}, {id:'laminated',pct:25}, {id:'sound',pct:25} ] }
     ],
@@ -1110,7 +1110,7 @@ var I18N = {
     shownByService:'PDR + Bumper shown by service',
     cancel:'Cancel', dentWord:'Dent', unspecified:'Unspecified panel',
     pgroup_access:'Location & Access', pgroup_severity:'Damage Severity', pgroup_material:'Material & Special',
-    pf_braced:'Braced Panel', pf_edge:'Panel Edge', pf_obstructed:'Obstructed Access', pf_bodyline:'On Body Line',
+    pf_braced:'Braced Panel', pf_edge:'Panel Edge', pf_obstructed:'Obstructed Access', pf_bodyline:'On Body Line', pf_curvature:'Concave Curvature Layering',
     pf_shallow:'Shallow Depth', pf_medium:'Medium Depth', pf_deep:'Deep Depth', pf_crease:'Crease',
     pf_aluminum:'Aluminum / HSS', pf_classic:'Classic / Vintage Metal', pf_exotic:'Exotic Vehicle',
     pf_glue:'Glue Pull Required', pf_structural:'Structural Panel Conditioning', pf_lateral:'Lateral Tension',
@@ -1183,7 +1183,7 @@ var I18N = {
     shownByService:'PDR + Defensa mostrados por servicio',
     cancel:'Cancelar', dentWord:'Abolladura', unspecified:'Panel sin especificar',
     pgroup_access:'Ubicación y Acceso', pgroup_severity:'Severidad del Daño', pgroup_material:'Material y Especial',
-    pf_braced:'Panel Reforzado', pf_edge:'Borde del Panel', pf_obstructed:'Acceso Obstruido', pf_bodyline:'En la Línea de Carrocería',
+    pf_braced:'Panel Reforzado', pf_edge:'Borde del Panel', pf_obstructed:'Acceso Obstruido', pf_bodyline:'En la Línea de Carrocería', pf_curvature:'Capa de Curvatura Cóncava',
     pf_shallow:'Profundidad Leve', pf_medium:'Profundidad Media', pf_deep:'Profundidad Profunda', pf_crease:'Pliegue',
     pf_aluminum:'Aluminio / HSS', pf_classic:'Metal Clásico / Antiguo', pf_exotic:'Vehículo Exótico',
     pf_glue:'Requiere Extracción con Pegamento', pf_structural:'Acondicionamiento Estructural del Panel', pf_lateral:'Tensión Lateral',
@@ -1256,7 +1256,7 @@ var I18N = {
     shownByService:'鈑金 + 保險桿依服務分類顯示',
     cancel:'取消', dentWord:'損傷', unspecified:'未指定鈑件',
     pgroup_access:'位置與通道', pgroup_severity:'損傷程度', pgroup_material:'材質與特殊',
-    pf_braced:'加固鈑件', pf_edge:'鈑件邊緣', pf_obstructed:'受阻通道', pf_bodyline:'車身折線上',
+    pf_braced:'加固鈑件', pf_edge:'鈑件邊緣', pf_obstructed:'受阻通道', pf_bodyline:'車身折線上', pf_curvature:'內凹弧度加層',
     pf_shallow:'淺層凹痕', pf_medium:'中度凹痕', pf_deep:'深層凹痕', pf_crease:'摺痕',
     pf_aluminum:'鋁合金／高強度鋼', pf_classic:'經典／古董車金屬', pf_exotic:'稀有車款',
     pf_glue:'需膠拉修復', pf_structural:'結構鈑件調整', pf_lateral:'側向張力',
