@@ -1699,6 +1699,7 @@ var EXPLODE_MAG_Y = 24;  // up-down drift
 var PILLAR_MAG_X  = 22;  // pillars go ~half the door X-drift → sit in the roof↔door gap
 var PILLAR_MAG_Y  = 12;
 var CALLOUT_MAG_X = 70;  // rocker(側裙,綠) + flare(葉子板飾,紅) pushed further out left-right
+var FLARE_MAG_Y   = 64;  // flare(輪拱飾板,紅) fixed vertical shift → front up, rear down (clears the mirror)
 function spreadDashedZones(svgEl) {
   var ns = 'http://www.w3.org/2000/svg';
   var roof = svgEl.querySelector('.panel-shape[data-panel="Roof"]');
@@ -1724,10 +1725,19 @@ function spreadDashedZones(svgEl) {
     var len = Math.hypot(vx, vy);
     if (len < 4) { track(bb.x, bb.y, bb.x + bb.width, bb.y + bb.height); return; }  // roof / centre → stay
     var isPillar = el.classList && el.classList.contains('pillar-zone');
-    var isCallout = el.classList && (el.classList.contains('rocker-zone') || el.classList.contains('flare-zone'));
-    var magX = isPillar ? PILLAR_MAG_X : (isCallout ? CALLOUT_MAG_X : EXPLODE_MAG_X);
-    var magY = isPillar ? PILLAR_MAG_Y : EXPLODE_MAG_Y;
-    var dx = vx / len * magX, dy = vy / len * magY;
+    var isFlare = el.classList && el.classList.contains('flare-zone');
+    var isRocker = el.classList && el.classList.contains('rocker-zone');
+    var dx, dy;
+    if (isFlare) {
+      // flare(輪拱飾板): straight out sideways + front→up / rear→down (fixed, so it always clears the mirror)
+      var pf = el.dataset.panel || '';
+      dx = (vx < 0 ? -1 : 1) * CALLOUT_MAG_X;
+      dy = (pf.indexOf('Front') >= 0 ? -1 : 1) * FLARE_MAG_Y;
+    } else {
+      var magX = isPillar ? PILLAR_MAG_X : (isRocker ? CALLOUT_MAG_X : EXPLODE_MAG_X);
+      var magY = isPillar ? PILLAR_MAG_Y : EXPLODE_MAG_Y;
+      dx = vx / len * magX; dy = vy / len * magY;
+    }
     el.setAttribute('transform', 'translate(' + dx.toFixed(1) + ',' + dy.toFixed(1) + ')');
     if (isPillar) {   // (ABC柱) label rides along, printed vertically in the strip
       var lx = cx + dx, ly = cy + dy;
