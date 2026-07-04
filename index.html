@@ -184,6 +184,11 @@
     .diag-wrap svg .panel-count{display:none;}
     .diag-wrap svg .bz-divider{stroke:rgba(255,255,255,.38);stroke-width:1;stroke-dasharray:4,3;pointer-events:none;}
     .diag-wrap svg .bz-label{fill:rgba(220,220,220,.6);font-size:9px;text-anchor:middle;pointer-events:none;font-family:Arial,sans-serif;font-weight:700;}
+    /* ── radial exploded diagram (分解圖) — panels drift out from the roof ── */
+    .diag-wrap svg .panel-group,
+    .diag-wrap svg .flare-zone,
+    .diag-wrap svg .pillar-zone,
+    .diag-wrap svg .rocker-zone{transition:transform .25s cubic-bezier(.2,.7,.2,1);}
 
     /* ── RIGHT SIDE: cards ── */
     .r-card{
@@ -1689,6 +1694,79 @@ function splitBumper(svgEl, panelName) {
   svgEl.appendChild(zg);
 }
 
+// ─── RADIAL EXPLODED DIAGRAM (分解圖) ─────────────────────────────────────────
+// Roof = centre, stays put. Every other panel drifts a little straight outward
+// from the roof centre: side blocks (doors 車門 / rocker 戶定 / pillar ABC柱 /
+// fenders 前後葉) slide left-right, top & bottom blocks (hood 引擎蓋 / bumpers 保
+//險桿 / trunk-tailgate 尾門) slide up-down, corners go diagonally. Pillars ride
+// halfway so they stay in the roof↔door gap, each keeping an (ABC柱) label. The
+// car-outline line-art stays as a centre reference. Runs LAST; all 3 vehicles.
+var EXPLODE_MAG_X = 44;  // left-right drift (side blocks move further out)
+var EXPLODE_MAG_Y = 24;  // up-down drift
+var PILLAR_MAG_X  = 22;  // pillars go ~half the door X-drift → sit in the roof↔door gap
+var PILLAR_MAG_Y  = 12;
+var CALLOUT_MAG_X = 70;  // rocker(側裙,綠) + flare(葉子板飾,紅) pushed further out left-right
+var FLARE_MAG_Y   = 64;  // flare(輪拱飾板,紅) fixed vertical shift → front up, rear down (clears the mirror)
+function spreadDashedZones(svgEl) {
+  var ns = 'http://www.w3.org/2000/svg';
+  var roof = svgEl.querySelector('.panel-shape[data-panel="Roof"]');
+  if (!roof) return;
+  var rb; try { rb = roof.getBBox(); } catch(e){ return; }
+  var Ox = rb.x + rb.width / 2, Oy = rb.y + rb.height / 2;
+
+  // collect every top-level clickable piece (panel groups + appended zones)
+  var pieces = [];
+  Array.prototype.forEach.call(svgEl.children, function(el){
+    if (el.classList && el.classList.contains('panel-shape')) pieces.push(el);
+    else if (el.querySelector && el.querySelector('.panel-shape')) pieces.push(el);
+  });
+
+  var minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+  var track = function(x0,y0,x1,y1){ if(x0<minX)minX=x0; if(y0<minY)minY=y0; if(x1>maxX)maxX=x1; if(y1>maxY)maxY=y1; };
+
+  pieces.forEach(function(el){
+    var bb; try { bb = el.getBBox(); } catch(e){ return; }
+    if (!bb.width && !bb.height) return;
+    var cx = bb.x + bb.width / 2, cy = bb.y + bb.height / 2;
+    var vx = cx - Ox, vy = cy - Oy;
+    var len = Math.hypot(vx, vy);
+    if (len < 4) { track(bb.x, bb.y, bb.x + bb.width, bb.y + bb.height); return; }  // roof / centre → stay
+    var isPillar = el.classList && el.classList.contains('pillar-zone');
+    var isFlare = el.classList && el.classList.contains('flare-zone');
+    var isRocker = el.classList && el.classList.contains('rocker-zone');
+    var dx, dy;
+    if (isFlare) {
+      // flare(輪拱飾板): straight out sideways + front→up / rear→down (fixed, so it always clears the mirror)
+      var pf = el.dataset.panel || '';
+      dx = (vx < 0 ? -1 : 1) * CALLOUT_MAG_X;
+      dy = (pf.indexOf('Front') >= 0 ? -1 : 1) * FLARE_MAG_Y;
+    } else {
+      var magX = isPillar ? PILLAR_MAG_X : (isRocker ? CALLOUT_MAG_X : EXPLODE_MAG_X);
+      var magY = isPillar ? PILLAR_MAG_Y : EXPLODE_MAG_Y;
+      dx = vx / len * magX; dy = vy / len * magY;
+    }
+    el.setAttribute('transform', 'translate(' + dx.toFixed(1) + ',' + dy.toFixed(1) + ')');
+    if (isPillar) {   // (ABC柱) label rides along, printed vertically in the strip
+      var lx = cx + dx, ly = cy + dy;
+      var lbl = document.createElementNS(ns, 'text');
+      lbl.setAttribute('x', lx.toFixed(1)); lbl.setAttribute('y', ly.toFixed(1));
+      lbl.setAttribute('class', 'bz-label');
+      lbl.setAttribute('transform', 'rotate(-90 ' + lx.toFixed(1) + ' ' + ly.toFixed(1) + ')');
+      lbl.textContent = 'ABC';
+      svgEl.appendChild(lbl);
+    }
+    track(bb.x + dx, bb.y + dy, bb.x + bb.width + dx, bb.y + bb.height + dy);
+  });
+
+  // refit viewBox (both axes) so the drifted panels never clip
+  if (minX < maxX) {
+    var pad = 14;
+    svgEl.setAttribute('viewBox',
+      (minX - pad).toFixed(1) + ' ' + (minY - pad).toFixed(1) + ' ' +
+      (maxX - minX + pad * 2).toFixed(1) + ' ' + (maxY - minY + pad * 2).toFixed(1));
+  }
+}
+
 // ─── DIAGRAM ─────────────────────────────────────────────────────────────────
 
 function loadDiagram(type) {
@@ -1713,6 +1791,7 @@ function loadDiagram(type) {
     addFlareZones(svgEl);
     addPillarZones(svgEl);  // pillars between roof and doors, left + right
     addRockerZones(svgEl);  // door-sill strips → 戶定(metal)/側裙(plastic) chooser
+    spreadDashedZones(svgEl);  // radial exploded diagram (分解圖) from the roof centre
     if (S.panelDiag) highlightDiag(S.panelDiag);
   });
 }
