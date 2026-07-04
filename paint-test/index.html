@@ -184,6 +184,13 @@
     .diag-wrap svg .panel-count{display:none;}
     .diag-wrap svg .bz-divider{stroke:rgba(255,255,255,.38);stroke-width:1;stroke-dasharray:4,3;pointer-events:none;}
     .diag-wrap svg .bz-label{fill:rgba(220,220,220,.6);font-size:9px;text-anchor:middle;pointer-events:none;font-family:Arial,sans-serif;font-weight:700;}
+    /* ── EXPLODED VIEW (爆炸圖) — panels spread apart for easier tapping ── */
+    .diag-wrap svg .panel-group,
+    .diag-wrap svg .panel-shape{transition:transform .28s cubic-bezier(.2,.7,.2,1);}
+    .diag-wrap.exploded svg .panel-shape{fill:rgba(255,255,255,.055);stroke:rgba(255,255,255,.36);stroke-width:1.3;}
+    .diag-wrap.exploded svg .panel-shape:hover{fill:rgba(255,255,255,.16);stroke:rgba(255,255,255,.75);}
+    .diag-wrap.exploded svg .panel-label{fill:rgba(232,232,232,.78);font-size:11px;font-weight:600;}
+    .diag-wrap.exploded svg .bz-label{fill:rgba(232,232,232,.82);}
 
     /* ── RIGHT SIDE: cards ── */
     .r-card{
@@ -1682,6 +1689,58 @@ function splitBumper(svgEl, panelName) {
   svgEl.appendChild(zg);
 }
 
+// ─── EXPLODED VIEW (爆炸圖) ───────────────────────────────────────────────────
+// Post-process the assembled diagram: hide the decorative car-outline line-art,
+// then pull every clickable panel apart (shrink about its own centre + push it
+// outward from the car centre) so managers get clear gaps to tap. Runs LAST, so
+// it never disturbs the getBBox-based overlay maths above. Works for all 3 vehicles.
+var EXPLODE_PUSH = 0.17;    // outward shift, proportional to distance from car centre
+var EXPLODE_SHRINK = 0.88;  // per-panel scale-down that opens the seams
+function explodeDiagram(svgEl) {
+  var vb = svgEl.viewBox && svgEl.viewBox.baseVal;
+  if (!vb || !vb.width) return;
+  var Cx = vb.x + vb.width / 2, Cy = vb.y + vb.height / 2;
+
+  // 1) hide non-clickable line-art (outline / wheels / glass / bed ridges); keep mirrors (they're pickable)
+  svgEl.querySelectorAll('.schematic-outline,.schematic-wheel,.schematic-glass,.schematic-bedline').forEach(function(d){
+    if (!d.classList.contains('panel-shape')) d.style.display = 'none';
+  });
+
+  // 2) collect every top-level clickable piece (original panel-groups + appended zones)
+  var pieces = [];
+  Array.prototype.forEach.call(svgEl.children, function(el){
+    if (el.classList && el.classList.contains('panel-shape')) pieces.push(el);
+    else if (el.querySelector && el.querySelector('.panel-shape')) pieces.push(el);
+  });
+
+  // 3) explode each piece; track resulting extents so we can refit the viewBox
+  var minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+  pieces.forEach(function(el){
+    var bb; try { bb = el.getBBox(); } catch(e){ return; }
+    if (!bb.width && !bb.height) return;
+    var px = bb.x + bb.width / 2, py = bb.y + bb.height / 2;
+    var dx = (px - Cx) * EXPLODE_PUSH, dy = (py - Cy) * EXPLODE_PUSH;
+    var s = EXPLODE_SHRINK;
+    el.setAttribute('transform',
+      'translate(' + dx.toFixed(1) + ',' + dy.toFixed(1) + ') ' +
+      'translate(' + px.toFixed(1) + ',' + py.toFixed(1) + ') ' +
+      'scale(' + s + ') ' +
+      'translate(' + (-px).toFixed(1) + ',' + (-py).toFixed(1) + ')');
+    var ex0 = px - (bb.width / 2) * s + dx, ey0 = py - (bb.height / 2) * s + dy;
+    var ex1 = ex0 + bb.width * s,           ey1 = ey0 + bb.height * s;
+    if (ex0 < minX) minX = ex0; if (ey0 < minY) minY = ey0;
+    if (ex1 > maxX) maxX = ex1; if (ey1 > maxY) maxY = ey1;
+  });
+
+  // 4) refit viewBox with padding so pushed-out panels never clip
+  if (minX < maxX) {
+    var pad = 16;
+    svgEl.setAttribute('viewBox',
+      (minX - pad).toFixed(1) + ' ' + (minY - pad).toFixed(1) + ' ' +
+      (maxX - minX + pad * 2).toFixed(1) + ' ' + (maxY - minY + pad * 2).toFixed(1));
+  }
+}
+
 // ─── DIAGRAM ─────────────────────────────────────────────────────────────────
 
 function loadDiagram(type) {
@@ -1706,6 +1765,8 @@ function loadDiagram(type) {
     addFlareZones(svgEl);
     addPillarZones(svgEl);  // pillars between roof and doors, left + right
     addRockerZones(svgEl);  // door-sill strips → 戶定(metal)/側裙(plastic) chooser
+    explodeDiagram(svgEl);  // spread every panel apart (爆炸圖) for easier tapping
+    wrap.classList.add('exploded');
     if (S.panelDiag) highlightDiag(S.panelDiag);
   });
 }
