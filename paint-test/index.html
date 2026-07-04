@@ -1694,8 +1694,8 @@ function splitBumper(svgEl, panelName) {
 // then pull every clickable panel apart (shrink about its own centre + push it
 // outward from the car centre) so managers get clear gaps to tap. Runs LAST, so
 // it never disturbs the getBBox-based overlay maths above. Works for all 3 vehicles.
-var EXPLODE_PUSH = 0.17;    // outward shift, proportional to distance from car centre
-var EXPLODE_SHRINK = 0.88;  // per-panel scale-down that opens the seams
+var EXPLODE_PUSH = 0.03;    // outward shift, proportional to distance from car centre (small = stays tight/compact)
+var EXPLODE_SHRINK = 0.955; // per-panel scale-down that opens the seams (near 1 = minimal gaps)
 function explodeDiagram(svgEl) {
   var vb = svgEl.viewBox && svgEl.viewBox.baseVal;
   if (!vb || !vb.width) return;
