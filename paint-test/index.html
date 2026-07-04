@@ -1694,8 +1694,10 @@ function splitBumper(svgEl, panelName) {
 //險桿 / trunk-tailgate 尾門) slide up-down, corners go diagonally. Pillars ride
 // halfway so they stay in the roof↔door gap, each keeping an (ABC柱) label. The
 // car-outline line-art stays as a centre reference. Runs LAST; all 3 vehicles.
-var EXPLODE_MAG = 24;   // how far each panel drifts out from the roof (px) — "移動一點"
-var PILLAR_MAG  = 12;   // pillars only go halfway → sit in the roof↔door gap
+var EXPLODE_MAG_X = 44;  // left-right drift (side blocks move further out)
+var EXPLODE_MAG_Y = 24;  // up-down drift
+var PILLAR_MAG_X  = 22;  // pillars go ~half the door X-drift → sit in the roof↔door gap
+var PILLAR_MAG_Y  = 12;
 function spreadDashedZones(svgEl) {
   var ns = 'http://www.w3.org/2000/svg';
   var roof = svgEl.querySelector('.panel-shape[data-panel="Roof"]');
@@ -1721,8 +1723,9 @@ function spreadDashedZones(svgEl) {
     var len = Math.hypot(vx, vy);
     if (len < 4) { track(bb.x, bb.y, bb.x + bb.width, bb.y + bb.height); return; }  // roof / centre → stay
     var isPillar = el.classList && el.classList.contains('pillar-zone');
-    var mag = isPillar ? PILLAR_MAG : EXPLODE_MAG;
-    var dx = vx / len * mag, dy = vy / len * mag;
+    var magX = isPillar ? PILLAR_MAG_X : EXPLODE_MAG_X;
+    var magY = isPillar ? PILLAR_MAG_Y : EXPLODE_MAG_Y;
+    var dx = vx / len * magX, dy = vy / len * magY;
     el.setAttribute('transform', 'translate(' + dx.toFixed(1) + ',' + dy.toFixed(1) + ')');
     if (isPillar) {   // (ABC柱) label rides along, printed vertically in the strip
       var lx = cx + dx, ly = cy + dy;
