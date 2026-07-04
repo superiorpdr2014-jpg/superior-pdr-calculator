@@ -1686,24 +1686,57 @@ function splitBumper(svgEl, panelName) {
   svgEl.appendChild(zg);
 }
 
-// ─── DASHED CALLOUT STRIPS → 分解圖 ───────────────────────────────────────────
-// Keep the original tight car diagram fully intact (outline + panels untouched).
-// ONLY the thin dashed selectable strips — pillar 柱 / rocker 側裙 / flare 葉子板飾 —
-// are hard to tap because they hug the body, so push just those OUTWARD from the
-// car so they detach into an easy-to-tap exploded callout. Runs LAST; all 3 vehicles.
-var CALLOUT_OUT = 26;  // px each dashed strip is pushed away from the body
+// ─── DOOR / PILLAR EXPLODED LAYOUT → 分解圖 ───────────────────────────────────
+// Roof + body stay put. Slide both sides' DOORS outward so a gap opens between
+// roof and doors, drop each PILLAR (柱) into the middle of that gap with an
+// "(ABC柱)" label, and float rocker(側裙)/flare(葉子板飾) just outside the doors
+// so they stay easy to tap. Runs LAST; works for all 3 vehicles.
+var DOOR_OUT = 28;   // doors slide outward this many px
 function spreadDashedZones(svgEl) {
+  var ns = 'http://www.w3.org/2000/svg';
   var vb = svgEl.viewBox && svgEl.viewBox.baseVal;
   if (!vb || !vb.width) return;
   var Cx = vb.x + vb.width / 2;
-  svgEl.querySelectorAll('.flare-zone,.pillar-zone,.rocker-zone').forEach(function(el){
-    var bb; try { bb = el.getBBox(); } catch(e){ return; }
-    var cx = bb.x + bb.width / 2;
-    var dx = (cx < Cx) ? -CALLOUT_OUT : CALLOUT_OUT;   // left strips go left, right strips go right
-    el.setAttribute('transform', 'translate(' + dx + ',0)');
+  var sideOf = function(el){ var bb; try{ bb = el.getBBox(); }catch(e){ return 0; } return ((bb.x + bb.width/2) < Cx) ? -1 : 1; };
+
+  // 1) DOORS (+ truck cab-side base) slide outward; roof stays put
+  var doorGroups = [];
+  svgEl.querySelectorAll('.panel-shape[data-panel]').forEach(function(sh){
+    var p = sh.dataset.panel || '';
+    if (p.indexOf('Door') < 0 && p.indexOf('Cab') < 0) return;
+    var g = sh.parentNode || sh;
+    if (doorGroups.indexOf(g) < 0) doorGroups.push(g);
   });
-  // widen the viewBox horizontally so the pushed-out strips never clip
-  var pad = CALLOUT_OUT + 8;
+  doorGroups.forEach(function(g){
+    var s = sideOf(g);
+    if (s) g.setAttribute('transform', 'translate(' + (s * DOOR_OUT) + ',0)');
+  });
+
+  // 2) PILLARS drop into the middle of the roof↔door gap, each labelled (ABC柱)
+  svgEl.querySelectorAll('.pillar-zone').forEach(function(el){
+    var bb; try { bb = el.getBBox(); } catch(e){ return; }
+    var s = ((bb.x + bb.width/2) < Cx) ? -1 : 1;
+    var dx = s * (DOOR_OUT / 2);
+    el.setAttribute('transform', 'translate(' + dx + ',0)');
+    var lx = bb.x + bb.width/2 + dx, ly = bb.y + bb.height/2;
+    var lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', lx); lbl.setAttribute('y', ly);
+    lbl.setAttribute('class', 'bz-label');
+    lbl.setAttribute('transform', 'rotate(-90 ' + lx + ' ' + ly + ')');
+    lbl.textContent = '(ABC柱)';
+    svgEl.appendChild(lbl);
+  });
+
+  // 3) rocker(側裙) sits just outside the moved doors; flare(葉子板飾) off the fenders/quarters
+  svgEl.querySelectorAll('.rocker-zone').forEach(function(el){
+    var s = sideOf(el); if (s) el.setAttribute('transform', 'translate(' + (s * (DOOR_OUT + 12)) + ',0)');
+  });
+  svgEl.querySelectorAll('.flare-zone').forEach(function(el){
+    var s = sideOf(el); if (s) el.setAttribute('transform', 'translate(' + (s * 26) + ',0)');
+  });
+
+  // widen viewBox horizontally so nothing clips
+  var pad = DOOR_OUT + 46;
   svgEl.setAttribute('viewBox',
     (vb.x - pad) + ' ' + vb.y + ' ' + (vb.width + pad * 2) + ' ' + vb.height);
 }
