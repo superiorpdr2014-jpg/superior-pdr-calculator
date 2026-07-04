@@ -184,7 +184,8 @@
     .diag-wrap svg .panel-count{display:none;}
     .diag-wrap svg .bz-divider{stroke:rgba(255,255,255,.38);stroke-width:1;stroke-dasharray:4,3;pointer-events:none;}
     .diag-wrap svg .bz-label{fill:rgba(220,220,220,.6);font-size:9px;text-anchor:middle;pointer-events:none;font-family:Arial,sans-serif;font-weight:700;}
-    /* ── dashed callout strips (柱/側裙/葉子板飾) pushed outward = 分解圖 ── */
+    /* ── radial exploded diagram (分解圖) — panels drift out from the roof ── */
+    .diag-wrap svg .panel-group,
     .diag-wrap svg .flare-zone,
     .diag-wrap svg .pillar-zone,
     .diag-wrap svg .rocker-zone{transition:transform .25s cubic-bezier(.2,.7,.2,1);}
@@ -1686,59 +1687,62 @@ function splitBumper(svgEl, panelName) {
   svgEl.appendChild(zg);
 }
 
-// ─── DOOR / PILLAR EXPLODED LAYOUT → 分解圖 ───────────────────────────────────
-// Roof + body stay put. Slide both sides' DOORS outward so a gap opens between
-// roof and doors, drop each PILLAR (柱) into the middle of that gap with an
-// "(ABC柱)" label, and float rocker(側裙)/flare(葉子板飾) just outside the doors
-// so they stay easy to tap. Runs LAST; works for all 3 vehicles.
-var DOOR_OUT = 28;   // doors slide outward this many px
+// ─── RADIAL EXPLODED DIAGRAM (分解圖) ─────────────────────────────────────────
+// Roof = centre, stays put. Every other panel drifts a little straight outward
+// from the roof centre: side blocks (doors 車門 / rocker 戶定 / pillar ABC柱 /
+// fenders 前後葉) slide left-right, top & bottom blocks (hood 引擎蓋 / bumpers 保
+//險桿 / trunk-tailgate 尾門) slide up-down, corners go diagonally. Pillars ride
+// halfway so they stay in the roof↔door gap, each keeping an (ABC柱) label. The
+// car-outline line-art stays as a centre reference. Runs LAST; all 3 vehicles.
+var EXPLODE_MAG = 24;   // how far each panel drifts out from the roof (px) — "移動一點"
+var PILLAR_MAG  = 12;   // pillars only go halfway → sit in the roof↔door gap
 function spreadDashedZones(svgEl) {
   var ns = 'http://www.w3.org/2000/svg';
-  var vb = svgEl.viewBox && svgEl.viewBox.baseVal;
-  if (!vb || !vb.width) return;
-  var Cx = vb.x + vb.width / 2;
-  var sideOf = function(el){ var bb; try{ bb = el.getBBox(); }catch(e){ return 0; } return ((bb.x + bb.width/2) < Cx) ? -1 : 1; };
+  var roof = svgEl.querySelector('.panel-shape[data-panel="Roof"]');
+  if (!roof) return;
+  var rb; try { rb = roof.getBBox(); } catch(e){ return; }
+  var Ox = rb.x + rb.width / 2, Oy = rb.y + rb.height / 2;
 
-  // 1) DOORS (+ truck cab-side base) slide outward; roof stays put
-  var doorGroups = [];
-  svgEl.querySelectorAll('.panel-shape[data-panel]').forEach(function(sh){
-    var p = sh.dataset.panel || '';
-    if (p.indexOf('Door') < 0 && p.indexOf('Cab') < 0) return;
-    var g = sh.parentNode || sh;
-    if (doorGroups.indexOf(g) < 0) doorGroups.push(g);
-  });
-  doorGroups.forEach(function(g){
-    var s = sideOf(g);
-    if (s) g.setAttribute('transform', 'translate(' + (s * DOOR_OUT) + ',0)');
+  // collect every top-level clickable piece (panel groups + appended zones)
+  var pieces = [];
+  Array.prototype.forEach.call(svgEl.children, function(el){
+    if (el.classList && el.classList.contains('panel-shape')) pieces.push(el);
+    else if (el.querySelector && el.querySelector('.panel-shape')) pieces.push(el);
   });
 
-  // 2) PILLARS drop into the middle of the roof↔door gap, each labelled (ABC柱)
-  svgEl.querySelectorAll('.pillar-zone').forEach(function(el){
+  var minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+  var track = function(x0,y0,x1,y1){ if(x0<minX)minX=x0; if(y0<minY)minY=y0; if(x1>maxX)maxX=x1; if(y1>maxY)maxY=y1; };
+
+  pieces.forEach(function(el){
     var bb; try { bb = el.getBBox(); } catch(e){ return; }
-    var s = ((bb.x + bb.width/2) < Cx) ? -1 : 1;
-    var dx = s * (DOOR_OUT / 2);
-    el.setAttribute('transform', 'translate(' + dx + ',0)');
-    var lx = bb.x + bb.width/2 + dx, ly = bb.y + bb.height/2;
-    var lbl = document.createElementNS(ns, 'text');
-    lbl.setAttribute('x', lx); lbl.setAttribute('y', ly);
-    lbl.setAttribute('class', 'bz-label');
-    lbl.setAttribute('transform', 'rotate(-90 ' + lx + ' ' + ly + ')');
-    lbl.textContent = '(ABC柱)';
-    svgEl.appendChild(lbl);
+    if (!bb.width && !bb.height) return;
+    var cx = bb.x + bb.width / 2, cy = bb.y + bb.height / 2;
+    var vx = cx - Ox, vy = cy - Oy;
+    var len = Math.hypot(vx, vy);
+    if (len < 4) { track(bb.x, bb.y, bb.x + bb.width, bb.y + bb.height); return; }  // roof / centre → stay
+    var isPillar = el.classList && el.classList.contains('pillar-zone');
+    var mag = isPillar ? PILLAR_MAG : EXPLODE_MAG;
+    var dx = vx / len * mag, dy = vy / len * mag;
+    el.setAttribute('transform', 'translate(' + dx.toFixed(1) + ',' + dy.toFixed(1) + ')');
+    if (isPillar) {   // (ABC柱) label rides along, printed vertically in the strip
+      var lx = cx + dx, ly = cy + dy;
+      var lbl = document.createElementNS(ns, 'text');
+      lbl.setAttribute('x', lx.toFixed(1)); lbl.setAttribute('y', ly.toFixed(1));
+      lbl.setAttribute('class', 'bz-label');
+      lbl.setAttribute('transform', 'rotate(-90 ' + lx.toFixed(1) + ' ' + ly.toFixed(1) + ')');
+      lbl.textContent = '(ABC柱)';
+      svgEl.appendChild(lbl);
+    }
+    track(bb.x + dx, bb.y + dy, bb.x + bb.width + dx, bb.y + bb.height + dy);
   });
 
-  // 3) rocker(側裙) sits just outside the moved doors; flare(葉子板飾) off the fenders/quarters
-  svgEl.querySelectorAll('.rocker-zone').forEach(function(el){
-    var s = sideOf(el); if (s) el.setAttribute('transform', 'translate(' + (s * (DOOR_OUT + 12)) + ',0)');
-  });
-  svgEl.querySelectorAll('.flare-zone').forEach(function(el){
-    var s = sideOf(el); if (s) el.setAttribute('transform', 'translate(' + (s * 26) + ',0)');
-  });
-
-  // widen viewBox horizontally so nothing clips
-  var pad = DOOR_OUT + 46;
-  svgEl.setAttribute('viewBox',
-    (vb.x - pad) + ' ' + vb.y + ' ' + (vb.width + pad * 2) + ' ' + vb.height);
+  // refit viewBox (both axes) so the drifted panels never clip
+  if (minX < maxX) {
+    var pad = 14;
+    svgEl.setAttribute('viewBox',
+      (minX - pad).toFixed(1) + ' ' + (minY - pad).toFixed(1) + ' ' +
+      (maxX - minX + pad * 2).toFixed(1) + ' ' + (maxY - minY + pad * 2).toFixed(1));
+  }
 }
 
 // ─── DIAGRAM ─────────────────────────────────────────────────────────────────
