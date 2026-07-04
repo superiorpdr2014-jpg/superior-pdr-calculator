@@ -1745,7 +1745,7 @@ function spreadDashedZones(svgEl) {
       lbl.setAttribute('x', lx.toFixed(1)); lbl.setAttribute('y', ly.toFixed(1));
       lbl.setAttribute('class', 'bz-label');
       lbl.setAttribute('transform', 'rotate(-90 ' + lx.toFixed(1) + ' ' + ly.toFixed(1) + ')');
-      lbl.textContent = '(ABC柱)';
+      lbl.textContent = 'ABC';
       svgEl.appendChild(lbl);
     }
     track(bb.x + dx, bb.y + dy, bb.x + bb.width + dx, bb.y + bb.height + dy);
