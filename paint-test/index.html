@@ -1698,6 +1698,7 @@ var EXPLODE_MAG_X = 44;  // left-right drift (side blocks move further out)
 var EXPLODE_MAG_Y = 24;  // up-down drift
 var PILLAR_MAG_X  = 22;  // pillars go ~half the door X-drift → sit in the roof↔door gap
 var PILLAR_MAG_Y  = 12;
+var CALLOUT_MAG_X = 70;  // rocker(側裙,綠) + flare(葉子板飾,紅) pushed further out left-right
 function spreadDashedZones(svgEl) {
   var ns = 'http://www.w3.org/2000/svg';
   var roof = svgEl.querySelector('.panel-shape[data-panel="Roof"]');
@@ -1723,7 +1724,8 @@ function spreadDashedZones(svgEl) {
     var len = Math.hypot(vx, vy);
     if (len < 4) { track(bb.x, bb.y, bb.x + bb.width, bb.y + bb.height); return; }  // roof / centre → stay
     var isPillar = el.classList && el.classList.contains('pillar-zone');
-    var magX = isPillar ? PILLAR_MAG_X : EXPLODE_MAG_X;
+    var isCallout = el.classList && (el.classList.contains('rocker-zone') || el.classList.contains('flare-zone'));
+    var magX = isPillar ? PILLAR_MAG_X : (isCallout ? CALLOUT_MAG_X : EXPLODE_MAG_X);
     var magY = isPillar ? PILLAR_MAG_Y : EXPLODE_MAG_Y;
     var dx = vx / len * magX, dy = vy / len * magY;
     el.setAttribute('transform', 'translate(' + dx.toFixed(1) + ',' + dy.toFixed(1) + ')');
