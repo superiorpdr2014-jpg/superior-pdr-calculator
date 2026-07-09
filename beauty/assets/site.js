@@ -346,7 +346,6 @@
       + '<div class="echo-msg">嗨，我是卓越 PDR 的 AI 助理 <b>ECHO</b> 👋<br>有什麼想了解的都可以問我。想估價或預約，加官方 LINE 傳照片讓技師<b>免費評估</b>最快喔。</div>'
       + '<div class="echo-chips" id="echoChips"></div>'
       + '<div class="echo-quick">'
-      + '<a href="' + LINE + '" target="_blank" rel="noopener">📷 傳照片免費估價</a>'
       + '<a href="/contact.html">📍 找最近的據點</a>'
       + '</div></div>'
       + '<div class="echo-input-row"><input class="echo-input" id="echoInput" type="text" placeholder="輸入問題，ECHO 為您解答…" maxlength="300" autocomplete="off"><button class="echo-send" id="echoSend" aria-label="送出">➤</button></div>'
