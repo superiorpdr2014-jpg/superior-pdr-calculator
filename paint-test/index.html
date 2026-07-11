@@ -2722,6 +2722,10 @@ function updateRepairTimeField() {
       hours += 1;   // 車牌維修工時固定 1 小時
     }
     days += Math.floor(hours / 8); hours = hours % 8;   // 進位：滿 8 小時算 1 天
+    // MPDR 上架費用：工時 3 天起跳
+    if (reps.some(function(r){ return r.hasRack; }) && (days*8 + hours) < MOTO_RACK_MIN_DAYS*8) {
+      days = MOTO_RACK_MIN_DAYS; hours = 0;
+    }
     dEl.value = days;
     hEl.value = hours;
   }
@@ -3650,6 +3654,8 @@ function scrollToTopCard(svcId){ var el=document.getElementById(svcId); if(el){ 
 var MOTO_PRICE_MULT = 2;      // 價格為汽車的 2 倍
 var MOTO_MAX_CM = 40;         // 大小只顯示到 40 公分
 var MOTO_MATERIAL_KEEP = { aluminum:1, glue:1, lateral:1 };  // 材質與特殊：只保留勾選的三項
+var MOTO_RACK_FEE = 2500;     // 上架費用（固定金額）
+var MOTO_RACK_MIN_DAYS = 3;   // 勾選上架費用 → 維修工時 3 天起跳
 
 var MOTO_SVG_TANK = '<svg viewBox="0 0 120 96" fill="none" stroke="#cfcfcf" stroke-width="2" stroke-linejoin="round">'
   +'<path d="M60 8 C84 8 98 26 98 48 C98 74 80 88 60 88 C40 88 22 74 22 48 C22 26 36 8 60 8 Z"/>'
@@ -3668,12 +3674,14 @@ var MOTO_PARTS = [
   { id:'fender', name:'土除',     sub:'FENDER',    svg:MOTO_SVG_FENDER }
 ];
 
-// 只保留勾選的修復因素（位置與通道 5 項 + 損傷程度 4 項 + 材質特殊 3 項）
+// 只保留勾選的修復因素（位置與通道 5 項 + 損傷程度 4 項 + 材質特殊 3 項 + 上架費用固定金額）
 var MOTO_GROUPS = PDR_GROUPS.map(function(g, gi){
   var srcId = ((PRICING.pdrGroups||[])[gi]||{}).id;
   var factors = g.factors.filter(function(f){ return (srcId === 'material') ? MOTO_MATERIAL_KEEP[f.id] : true; });
+  if (srcId === 'material') factors = factors.concat([{ id:'rack', pct:0, label:'上架費用', fixed:MOTO_RACK_FEE }]);
   return { title:g.title, factors:factors };
 });
+function motoFactorDef(id){ var r=null; MOTO_GROUPS.forEach(function(g){ g.factors.forEach(function(f){ if(f.id===id) r=f; }); }); return r; }
 
 function motoSizeIdxs(){
   var out=[];
@@ -3734,8 +3742,8 @@ function buildMotoFactors(){
   var wrap=document.getElementById('moto-factors'); if(!wrap) return;
   wrap.innerHTML = MOTO_GROUPS.map(function(g){
     var items=g.factors.map(function(f){
-      var badge=(f.pct>0)?('+'+f.pct+'%'):'不加價';
-      return '<div class="pdr-f" data-fid="'+f.id+'" onclick="motoToggleFactor(\''+f.id+'\','+f.pct+')">'
+      var badge = (f.fixed!=null) ? (CS+f.fixed.toLocaleString()) : ((f.pct>0)?('+'+f.pct+'%'):'不加價');
+      return '<div class="pdr-f" data-fid="'+f.id+'" onclick="motoToggleFactor(\''+f.id+'\')">'
         +'<div class="pdr-f-row"><div class="pdr-chk"></div><div class="pdr-fname">'+f.label+'</div><div class="pdr-badge">'+badge+'</div></div>'
         +'<div class="pdr-f-slider" onclick="event.stopPropagation()"><div class="pdr-sl-row">'
         +'<span class="pdr-adj-edge">'+CS+'0</span>'
@@ -3746,21 +3754,26 @@ function buildMotoFactors(){
     return '<div class="pdr-group"><div class="pdr-group-t">'+g.title+'</div><div class="pdr-fitems">'+items+'</div></div>';
   }).join('');
 }
-function motoFactorDefault(pct){ var base=S.motoSize?S.motoSize.price:0; return Math.round(base*pct/100); }
-function configMotoSlider(id){
-  var f=S.motoFactors[id]; if(!f) return;
-  var mx=Math.max(200, Math.round(motoFactorDefault(f.pct)*2/5)*5);
-  var sl=document.getElementById('motosl-'+id); if(sl){ sl.max=mx; sl.value=f.amount; }
-  var mxEl=document.getElementById('motomax-'+id); if(mxEl) mxEl.textContent=CS+mx;
-  var curEl=document.getElementById('motocur-'+id); if(curEl) curEl.textContent=CS+f.amount;
+// 固定金額因素（如上架費用）回傳固定值；其餘依大小的百分比計
+function motoFactorDefault(id){
+  var f=motoFactorDef(id); if(!f) return 0;
+  if(f.fixed!=null) return f.fixed;
+  var base=S.motoSize?S.motoSize.price:0; return Math.round(base*(f.pct||0)/100);
 }
-function motoToggleFactor(id,pct){
+function configMotoSlider(id){
+  var st=S.motoFactors[id]; if(!st) return;
+  var mx=Math.max(200, Math.round(motoFactorDefault(id)*2/5)*5);
+  var sl=document.getElementById('motosl-'+id); if(sl){ sl.max=mx; sl.value=st.amount; }
+  var mxEl=document.getElementById('motomax-'+id); if(mxEl) mxEl.textContent=CS+mx;
+  var curEl=document.getElementById('motocur-'+id); if(curEl) curEl.textContent=CS+st.amount;
+}
+function motoToggleFactor(id){
   var el=document.querySelector('#moto-factors .pdr-f[data-fid="'+id+'"]');
   if(S.motoFactors[id]){ delete S.motoFactors[id]; if(el) el.classList.remove('on'); }
-  else { S.motoFactors[id]={pct:pct,amount:motoFactorDefault(pct)}; if(el) el.classList.add('on'); configMotoSlider(id); }
+  else { S.motoFactors[id]={amount:motoFactorDefault(id)}; if(el) el.classList.add('on'); configMotoSlider(id); }
   motoRecalc();
 }
-function recomputeMotoFactors(){ Object.keys(S.motoFactors).forEach(function(id){ S.motoFactors[id].amount=motoFactorDefault(S.motoFactors[id].pct); configMotoSlider(id); }); }
+function recomputeMotoFactors(){ Object.keys(S.motoFactors).forEach(function(id){ S.motoFactors[id].amount=motoFactorDefault(id); configMotoSlider(id); }); }
 function slideMotoFactor(id,val){ if(!S.motoFactors[id])return; S.motoFactors[id].amount=parseInt(val,10)||0; var c=document.getElementById('motocur-'+id); if(c) c.textContent=CS+S.motoFactors[id].amount; motoRecalc(); }
 
 function motoFactorLabel(id){ var lbl=id; MOTO_GROUPS.forEach(function(g){ g.factors.forEach(function(f){ if(f.id===id) lbl=f.label; }); }); return lbl; }
@@ -3776,7 +3789,7 @@ function motoSubtotal(){ return motoLines().reduce(function(a,l){return a+l.pric
 function motoHeader(){ return motoPartName()+' — '+(S.motoSize?S.motoSize.label:''); }
 function motoWorkingItem(){
   return { service:'重機', vehicle:getVehicleInfo(), panel:motoHeader(), factors:motoLines(), paint:0,
-           subtotal:motoSubtotal(), tierBase:0, tierFixed:motoSubtotal() };
+           subtotal:motoSubtotal(), tierBase:0, tierFixed:motoSubtotal(), hasRack: !!S.motoFactors['rack'] };
 }
 function updateMotoAddBtn(){
   var btn=document.getElementById('moto-add-btn'); if(!btn) return;
