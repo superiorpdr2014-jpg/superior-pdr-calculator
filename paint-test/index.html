@@ -522,6 +522,23 @@
     .svc-btn:hover{border-color:rgba(255,255,255,.35);color:#ccc;}
     .svc-btn{border-radius:4px;background:rgba(40,12,12,.4);}
     .svc-btn.on{background:rgba(255,30,30,.2);border-color:rgba(255,68,68,.6);color:#fff;box-shadow:0 0 30px rgba(255,68,68,.2);animation:pulseGlow 4s ease-in-out infinite;}
+    .svc-toggle{flex-wrap:wrap;}
+    @media(max-width:600px){ .svc-btn{min-width:46%;font-size:13px;padding:11px 6px;letter-spacing:0;} }
+
+    /* ── 新分類：部位/車牌圖片選擇磚（上下排列，橫向圖＋文字）── */
+    .part-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+    .part-tile{background:var(--tile);border:1.5px solid var(--line);border-radius:10px;padding:12px 18px;cursor:pointer;transition:all .13s;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:20px;}
+    .part-tile:hover{border-color:rgba(255,255,255,.35);background:var(--tile-hi);}
+    .part-tile.on{background:var(--on-bg);border-color:var(--on-bd);border-width:2px;}
+    .part-tile-img{flex:0 0 150px;height:84px;display:flex;align-items:center;justify-content:center;}
+    .part-tile-img svg{max-height:82px;max-width:100%;}
+    .part-tile-txt{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:104px;}
+    .part-tile-name{font-size:15px;font-weight:800;color:#fff;}
+    .part-tile-sub{font-size:10px;font-weight:700;letter-spacing:1px;color:#ff8585;}
+    /* 車牌樣式 */
+    .lp{display:inline-flex;align-items:center;justify-content:center;background:#f4f4f4;color:#111;border:3px solid #1a1a1a;border-radius:8px;font-family:'JetBrains Mono',monospace;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.4);}
+    .lp-car{width:172px;height:60px;font-size:28px;letter-spacing:2px;}
+    .lp-moto{width:112px;height:52px;font-size:19px;letter-spacing:1px;}
 
     .service{padding-top:6px;}
     .svc-opts{display:flex;flex-direction:column;gap:16px;}
@@ -848,6 +865,8 @@ window.SHOP_CONFIG = {
     <div class="svc-toggle">
       <button class="svc-btn on" data-svc="pdr"    onclick="switchService('pdr')" data-i18n="svc_pdr">PDR Dent Repair</button>
       <button class="svc-btn"    data-svc="bumper" onclick="switchService('bumper')" data-i18n="svc_bumper">Bumper &amp; Panel</button>
+      <button class="svc-btn"    data-svc="moto"   onclick="switchService('moto')">重機油箱/土除</button>
+      <button class="svc-btn"    data-svc="plate"  onclick="switchService('plate')">汽機車車牌</button>
     </div>
 
     <!-- Step 1: Panel Location — the diagram IS the picker, open by default -->
@@ -949,6 +968,76 @@ window.SHOP_CONFIG = {
       </div>
       <button class="add-btn" id="pdr-add-btn" disabled onclick="pdrAddItem()">
         <span class="plus">+</span><span id="pdr-add-label" data-i18n="addDentRepair">Add Dent Repair to Estimate</span>
+      </button>
+    </div>
+
+    <!-- ─── 重機油箱/土除 OPTIONS ─── -->
+    <div id="svc-moto" class="svc-opts" style="display:none;">
+      <div class="r-card open" id="moto-part-card">
+        <div class="drawer-head" onclick="toggleDrawerId('moto-part-card')">
+          <span class="step">1</span><span>修復部位</span>
+          <span class="drawer-sel none" id="moto-part-sel">尚未選擇</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="drawer-body">
+          <div class="part-grid" id="moto-part-grid"></div>
+        </div>
+      </div>
+      <div class="r-card open" id="moto-size-card">
+        <div class="drawer-head" onclick="toggleDrawerId('moto-size-card')">
+          <span class="step">2</span><span>凹痕大小</span>
+          <span class="drawer-sel none" id="moto-size-sel">選擇大小</span>
+          <span class="pl-clear" id="moto-size-clear" style="display:none" onclick="event.stopPropagation();clearMotoSize();">清除</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="drawer-body">
+          <div class="size-grid" id="moto-size-grid"></div>
+        </div>
+      </div>
+      <div class="r-card" id="moto-factors-card">
+        <div class="drawer-head" onclick="toggleDrawerId('moto-factors-card')">
+          <span class="step">3</span><span>修復因素</span>
+          <span class="head-note" style="margin-left:auto">勾選所有適用項目</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="drawer-body">
+          <div id="moto-factors"></div>
+          <div class="ri-row">
+            <span class="ri-label">R&amp;I（拆裝費）</span>
+            <div class="ri-wrap"><span>$</span><input type="number" id="moto-ri" min="0" step="100" value="0" oninput="motoRecalc()"></div>
+          </div>
+          <div class="pdr-sub" id="moto-sub" style="display:none;">
+            <span>小計</span><span id="moto-sub-amt">$0</span>
+          </div>
+        </div>
+      </div>
+      <button class="add-btn" id="moto-add-btn" disabled onclick="motoAddItem()">
+        <span class="plus">+</span><span id="moto-add-label">加入估價</span>
+      </button>
+    </div>
+
+    <!-- ─── 汽機車車牌 OPTIONS ─── -->
+    <div id="svc-plate" class="svc-opts" style="display:none;">
+      <div class="r-card open" id="plate-type-card">
+        <div class="drawer-head" onclick="toggleDrawerId('plate-type-card')">
+          <span class="step">1</span><span>車牌類型</span>
+          <span class="drawer-sel none" id="plate-type-sel">尚未選擇</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="drawer-body">
+          <div class="part-grid" id="plate-type-grid"></div>
+        </div>
+      </div>
+      <div class="r-card">
+        <div class="r-card-head"><span class="step">2</span><span>損傷類型</span><span class="head-note">選擇所有適用項目</span></div>
+        <div class="factor-grid" id="plate-dmg-grid"></div>
+      </div>
+      <div class="r-card">
+        <div class="r-card-head"><span class="step">3</span><span>烤漆</span></div>
+        <div class="paint-row" id="plate-paint-row"></div>
+      </div>
+      <button class="add-btn" id="plate-add-btn" disabled onclick="plateAddItem()">
+        <span class="plus">+</span><span id="plate-add-label">加入估價</span>
       </button>
     </div>
 
@@ -1554,6 +1643,8 @@ var S = { service:'pdr', vehicle:'sedan', panelDiag:null, factors:{}, customName
           pdrView:'itemized', exact:false, items:[],
           pdrSize:null, pdrFactors:{}, pdrRI:0,
           samePanelItems:[],
+          motoPart:null, motoSize:null, motoFactors:{},
+          plateType:null, plateDmg:{}, platePaint:{id:'flat',price:0},
           editIndex:null, editKind:null };
 
 // Repair-tier descriptions (PDR pitch)
@@ -1574,8 +1665,9 @@ function renderModeButtons() {
   // When the estimate spans BOTH services we always group by service, so the
   // PDR tier presentation picker doesn't apply — show only Range / Exact.
   var both = serviceCounts(collectRepairs()).both;
+  var itemizedSvc = (S.service === 'bumper' || S.service === 'moto' || S.service === 'plate');
 
-  if (S.service === 'bumper' || both) {
+  if (itemizedSvc || both) {
     row.className = 'mode-row';
     row.innerHTML = (both ? '<span class="mode-note">'+t('shownByService')+'</span>' : '') + toggle;
   } else {
@@ -1604,7 +1696,7 @@ function isSplit(reps) { return serviceCounts(reps).both; }
 // What the estimate should render. Tier views need PDR work; otherwise itemized.
 function presentationPlan(reps) {
   var tier = hasTierWork(reps);
-  var view = (S.service === 'bumper' || !tier) ? 'itemized' : S.pdrView;
+  var view = (S.service === 'bumper' || S.service === 'moto' || S.service === 'plate' || !tier) ? 'itemized' : S.pdrView;
   return { view: view, exact: !!S.exact };
 }
 
@@ -2414,12 +2506,13 @@ function recalc() {
     totalEl.textContent = px(tt.premium);
     reps.forEach(function(r,i){
       rows.push('<div class="bsub">'+(i+1)+'. '+r.panel+'</div>');
-      var flatNote = (r.service !== 'PDR' && !(r.paint>0)) ? '（'+t('paint_incFlat')+'）' : '';
+      var isPaintSvc = (r.service === 'Painting' || r.service === 'Bumper');
+      var flatNote = (isPaintSvc && !(r.paint>0)) ? '（'+t('paint_incFlat')+'）' : '';
       r.factors.forEach(function(f,fi){
         var lbl = f.label + ((flatNote && fi === r.factors.length-1) ? flatNote : '');
         rows.push('<div class="brow"><span class="bn">'+lbl+'</span><span class="bp">'+money(f.price)+'</span></div>');
       });
-      if (r.paint>0) rows.push('<div class="brow"><span class="bn">'+t('est_triCoat')+'</span><span class="bp">'+money(r.paint)+'</span></div>');
+      if (r.paint>0) rows.push('<div class="brow"><span class="bn">'+(r.service==='車牌'?'烤漆加價':t('est_triCoat'))+'</span><span class="bp">'+money(r.paint)+'</span></div>');
     });
     rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_flatTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+px(tt.premium)+'</span></div>');
 
@@ -2487,6 +2580,8 @@ function resetAll() {
   renderItems();
   clearWorking();
   clearPdrWorking();
+  if (typeof clearMotoWorking === 'function') clearMotoWorking();
+  if (typeof clearPlateWorking === 'function') clearPlateWorking();
   recalc();
 }
 
@@ -2511,13 +2606,19 @@ function collectRepairs() {
     reps.push({ service:'Painting', vehicle:getVehicleInfo(), panel:tp(S.panelDiag)||t('unspecified'), factors:fs, paint:(S.paint.price>0?S.paint.price:0), subtotal:bsub, tierBase:0, tierFixed:bsub });
   } else if (S.service === 'pdr' && S.pdrSize) {
     reps.push({ service:'PDR', vehicle:getVehicleInfo(), panel:pdrHeader(), factors:pdrLines(), paint:0, subtotal:pdrSubtotal(), tierBase:pdrTierBase(), tierFixed:pdrRiCost()+spExtraTotal() });
+  } else if (S.service === 'moto' && S.motoPart && S.motoSize) {
+    reps.push(motoWorkingItem());
+  } else if (S.service === 'plate' && plateHasDmg()) {
+    reps.push(plateWorkingItem());
   }
   return reps;
 }
 
 // 烤漆說明：鈑金烤漆項目標註烤漆種類（PDR 不含烤漆）
 function paintNote(r){
-  if (!r || r.service === 'PDR') return '';
+  if (!r) return '';
+  if (r.service === '車牌') return (r.paint > 0) ? '烤漆加價' : '不烤漆';
+  if (r.service === 'PDR' || r.service === '重機') return '';
   return (r.paint > 0) ? t('paint_incTri') : t('paint_incFlat');
 }
 
@@ -2720,7 +2821,8 @@ function buildEstimateHTML(o) {
     var priceStr = exact
       ? money(r.subtotal)
       : '<span style="font-size:.6em;font-weight:700;color:#999;letter-spacing:.3px;margin-right:3px">均價</span>'+money(r.subtotal);
-    var flatNote = (r.service !== 'PDR' && !(r.paint>0)) ? '（'+t('paint_incFlat')+'）' : '';
+    var isPaintSvc = (r.service === 'Painting' || r.service === 'Bumper');
+    var flatNote = (isPaintSvc && !(r.paint>0)) ? '（'+t('paint_incFlat')+'）' : '';
     var s = '<div class="rep">';
     s += '<div class="rep-hd"><span class="n">'+n+'</span><span class="p">'+esc(r.panel)+'</span>'+tag+'<span class="s">'+priceStr+'</span></div>';
     s += '<div class="rep-lines">';
@@ -2728,7 +2830,7 @@ function buildEstimateHTML(o) {
       var lbl = esc(f.label) + ((flatNote && fi === r.factors.length-1) ? flatNote : '');
       s += '<div class="ln"><span>'+lbl+'</span><span class="lp">'+money(f.price)+'</span></div>';
     });
-    if (r.paint>0) s += '<div class="ln"><span>'+t('est_triCoat')+'</span><span class="lp">'+money(r.paint)+'</span></div>';
+    if (r.paint>0) s += '<div class="ln"><span>'+(r.service==='車牌'?'烤漆加價':t('est_triCoat'))+'</span><span class="lp">'+money(r.paint)+'</span></div>';
     s += '</div></div>';
     return s;
   }
@@ -3225,6 +3327,10 @@ function setService(svc) {
   document.querySelectorAll('.svc-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.svc===svc); });
   document.getElementById('svc-bumper').style.display = (svc==='bumper') ? '' : 'none';
   document.getElementById('svc-pdr').style.display    = (svc==='pdr')    ? '' : 'none';
+  document.getElementById('svc-moto').style.display   = (svc==='moto')   ? '' : 'none';
+  document.getElementById('svc-plate').style.display  = (svc==='plate')  ? '' : 'none';
+  // 重機/車牌有自己的圖片選擇器，隱藏共用的車身圖（車型類別）
+  var _plc = document.getElementById('pl-card'); if (_plc) _plc.style.display = (svc==='pdr' || svc==='bumper') ? '' : 'none';
   renderModeButtons();   // Bumper shows Range/Flat; PDR shows the Presentation picker + Range/Exact
   recalc();
 }
@@ -3509,6 +3615,272 @@ function clearPdrWorking() {
   var ssr = document.getElementById('sp-subtotal-row'); if(ssr) ssr.style.display = 'none';
   clearPanel();
   updatePdrAddBtn();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  新分類 A：重機油箱 / 土除（PDR 式：部位 + 大小 + 修復因素；價格為汽車 2 倍）
+// ═══════════════════════════════════════════════════════════════════════════
+function toggleDrawerId(id){ var el=document.getElementById(id); if(el) el.classList.toggle('open'); }
+function scrollToTopCard(svcId){ var el=document.getElementById(svcId); if(el){ try{ el.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){} } }
+
+var MOTO_PRICE_MULT = 2;      // 價格為汽車的 2 倍
+var MOTO_MAX_CM = 40;         // 大小只顯示到 40 公分
+var MOTO_MATERIAL_KEEP = { aluminum:1, glue:1, lateral:1 };  // 材質與特殊：只保留勾選的三項
+
+var MOTO_SVG_TANK = '<svg viewBox="0 0 120 96" fill="none" stroke="#cfcfcf" stroke-width="2" stroke-linejoin="round">'
+  +'<path d="M60 8 C84 8 98 26 98 48 C98 74 80 88 60 88 C40 88 22 74 22 48 C22 26 36 8 60 8 Z"/>'
+  +'<path d="M60 22 L60 74" stroke-width="1.5" opacity=".55"/>'
+  +'<ellipse cx="60" cy="30" rx="10" ry="6.5" stroke-width="1.8"/>'
+  +'<path d="M34 52 Q60 44 86 52" stroke-width="1.3" opacity=".45"/>'
+  +'</svg>';
+var MOTO_SVG_FENDER = '<svg viewBox="0 0 120 96" fill="none" stroke="#cfcfcf" stroke-width="2" stroke-linejoin="round">'
+  +'<path d="M12 86 Q12 34 60 16 Q108 34 108 86 L92 86 Q92 44 60 32 Q28 44 28 86 Z"/>'
+  +'<path d="M60 24 Q86 40 90 74" stroke-width="1.2" opacity=".4"/>'
+  +'<path d="M60 24 Q34 40 30 74" stroke-width="1.2" opacity=".4"/>'
+  +'</svg>';
+
+var MOTO_PARTS = [
+  { id:'tank',   name:'重機油箱', sub:'FUEL TANK', svg:MOTO_SVG_TANK },
+  { id:'fender', name:'土除',     sub:'FENDER',    svg:MOTO_SVG_FENDER }
+];
+
+// 只保留勾選的修復因素（位置與通道 5 項 + 損傷程度 4 項 + 材質特殊 3 項）
+var MOTO_GROUPS = PDR_GROUPS.map(function(g, gi){
+  var srcId = ((PRICING.pdrGroups||[])[gi]||{}).id;
+  var factors = g.factors.filter(function(f){ return (srcId === 'material') ? MOTO_MATERIAL_KEEP[f.id] : true; });
+  return { title:g.title, factors:factors };
+});
+
+function motoSizeIdxs(){
+  var out=[];
+  for (var i=0;i<PDR_SIZES.length;i++){ if ((PDR_SIZE_LABELS[i]||0) <= MOTO_MAX_CM) out.push(i); }
+  return out;
+}
+function motoLabel(i){ return (PDR_SIZE_LABELS[i]||(i+1))+'cm'; }
+function motoPartName(){ var p=MOTO_PARTS.find(function(x){return x.id===S.motoPart;}); return p?p.name:'重機'; }
+
+function buildMotoParts(){
+  var el=document.getElementById('moto-part-grid'); if(!el) return;
+  el.innerHTML = MOTO_PARTS.map(function(p){
+    return '<div class="part-tile" data-pid="'+p.id+'" onclick="motoSelectPart(\''+p.id+'\')">'
+      +'<div class="part-tile-img">'+p.svg+'</div>'
+      +'<div class="part-tile-txt"><div class="part-tile-name">'+p.name+'</div>'
+      +'<div class="part-tile-sub">'+p.sub+'</div></div></div>';
+  }).join('');
+}
+function motoSelectPart(id){
+  S.motoPart=id;
+  document.querySelectorAll('#moto-part-grid .part-tile').forEach(function(t){ t.classList.toggle('on', t.dataset.pid===id); });
+  var sel=document.getElementById('moto-part-sel'); sel.textContent=motoPartName(); sel.classList.remove('none');
+  document.getElementById('moto-part-card').classList.remove('open');
+  document.getElementById('moto-size-card').classList.add('open');
+  motoRecalc();
+}
+
+function buildMotoSizes(){
+  var grid=document.getElementById('moto-size-grid'); if(!grid) return;
+  grid.innerHTML = motoSizeIdxs().map(function(i){
+    var price=PDR_SIZES[i]*MOTO_PRICE_MULT;
+    return '<div class="size-btn" data-size="'+i+'" onclick="motoSelectSize('+i+')">'
+      +'<div class="size-n">'+motoLabel(i)+'</div><div class="size-p">'+CS+price+'</div></div>';
+  }).join('');
+}
+function motoSelectSize(i){
+  var price=PDR_SIZES[i]*MOTO_PRICE_MULT;
+  S.motoSize={ idx:i, label:motoLabel(i), price:price };
+  document.querySelectorAll('#moto-size-grid .size-btn').forEach(function(b){ b.classList.toggle('on', parseInt(b.dataset.size,10)===i); });
+  var sel=document.getElementById('moto-size-sel'); sel.textContent=S.motoSize.label+'  —  '+CS+price; sel.classList.remove('none');
+  document.getElementById('moto-size-clear').style.display='';
+  document.getElementById('moto-size-card').classList.remove('open');
+  document.getElementById('moto-factors-card').classList.add('open');
+  recomputeMotoFactors();
+  motoRecalc();
+}
+function clearMotoSize(){
+  S.motoSize=null;
+  document.querySelectorAll('#moto-size-grid .size-btn').forEach(function(b){ b.classList.remove('on'); });
+  var sel=document.getElementById('moto-size-sel'); sel.textContent='選擇大小'; sel.classList.add('none');
+  document.getElementById('moto-size-clear').style.display='none';
+  document.getElementById('moto-size-card').classList.add('open');
+  recomputeMotoFactors();
+  motoRecalc();
+}
+
+function buildMotoFactors(){
+  var wrap=document.getElementById('moto-factors'); if(!wrap) return;
+  wrap.innerHTML = MOTO_GROUPS.map(function(g){
+    var items=g.factors.map(function(f){
+      var badge=(f.pct>0)?('+'+f.pct+'%'):'不加價';
+      return '<div class="pdr-f" data-fid="'+f.id+'" onclick="motoToggleFactor(\''+f.id+'\','+f.pct+')">'
+        +'<div class="pdr-f-row"><div class="pdr-chk"></div><div class="pdr-fname">'+f.label+'</div><div class="pdr-badge">'+badge+'</div></div>'
+        +'<div class="pdr-f-slider" onclick="event.stopPropagation()"><div class="pdr-sl-row">'
+        +'<span class="pdr-adj-edge">'+CS+'0</span>'
+        +'<input type="range" id="motosl-'+f.id+'" min="0" max="200" step="5" value="0" oninput="slideMotoFactor(\''+f.id+'\',this.value)">'
+        +'<span class="pdr-adj-edge" id="motomax-'+f.id+'">'+CS+'200</span></div>'
+        +'<div class="pdr-sl-cur" id="motocur-'+f.id+'">'+CS+'0</div></div></div>';
+    }).join('');
+    return '<div class="pdr-group"><div class="pdr-group-t">'+g.title+'</div><div class="pdr-fitems">'+items+'</div></div>';
+  }).join('');
+}
+function motoFactorDefault(pct){ var base=S.motoSize?S.motoSize.price:0; return Math.round(base*pct/100); }
+function configMotoSlider(id){
+  var f=S.motoFactors[id]; if(!f) return;
+  var mx=Math.max(200, Math.round(motoFactorDefault(f.pct)*2/5)*5);
+  var sl=document.getElementById('motosl-'+id); if(sl){ sl.max=mx; sl.value=f.amount; }
+  var mxEl=document.getElementById('motomax-'+id); if(mxEl) mxEl.textContent=CS+mx;
+  var curEl=document.getElementById('motocur-'+id); if(curEl) curEl.textContent=CS+f.amount;
+}
+function motoToggleFactor(id,pct){
+  var el=document.querySelector('#moto-factors .pdr-f[data-fid="'+id+'"]');
+  if(S.motoFactors[id]){ delete S.motoFactors[id]; if(el) el.classList.remove('on'); }
+  else { S.motoFactors[id]={pct:pct,amount:motoFactorDefault(pct)}; if(el) el.classList.add('on'); configMotoSlider(id); }
+  motoRecalc();
+}
+function recomputeMotoFactors(){ Object.keys(S.motoFactors).forEach(function(id){ S.motoFactors[id].amount=motoFactorDefault(S.motoFactors[id].pct); configMotoSlider(id); }); }
+function slideMotoFactor(id,val){ if(!S.motoFactors[id])return; S.motoFactors[id].amount=parseInt(val,10)||0; var c=document.getElementById('motocur-'+id); if(c) c.textContent=CS+S.motoFactors[id].amount; motoRecalc(); }
+
+function motoFactorLabel(id){ var lbl=id; MOTO_GROUPS.forEach(function(g){ g.factors.forEach(function(f){ if(f.id===id) lbl=f.label; }); }); return lbl; }
+function motoRiCost(){ return parseInt((document.getElementById('moto-ri')||{}).value,10)||0; }
+function motoLines(){
+  if(!S.motoSize) return [];
+  var lines=[{ label:motoPartName()+' 基礎修復 ('+S.motoSize.label+')', price:S.motoSize.price }];
+  Object.keys(S.motoFactors).forEach(function(id){ var a=S.motoFactors[id].amount; if(a>0) lines.push({label:motoFactorLabel(id), price:a}); });
+  var ri=motoRiCost(); if(ri>0) lines.push({label:'R&I（拆裝費）', price:ri});
+  return lines;
+}
+function motoSubtotal(){ return motoLines().reduce(function(a,l){return a+l.price;},0); }
+function motoHeader(){ return motoPartName()+' — '+(S.motoSize?S.motoSize.label:''); }
+function motoWorkingItem(){
+  return { service:'重機', vehicle:getVehicleInfo(), panel:motoHeader(), factors:motoLines(), paint:0,
+           subtotal:motoSubtotal(), tierBase:0, tierFixed:motoSubtotal() };
+}
+function updateMotoAddBtn(){
+  var btn=document.getElementById('moto-add-btn'); if(!btn) return;
+  btn.disabled = !(S.motoPart && S.motoSize);
+  var lbl=document.getElementById('moto-add-label'); if(lbl) lbl.textContent = S.items.length?'加入下一項修復':'加入估價';
+  var sub=document.getElementById('moto-sub'), amt=document.getElementById('moto-sub-amt');
+  if(sub&&amt){ if(S.motoSize){ sub.style.display='flex'; amt.textContent=CS+motoSubtotal().toLocaleString(); } else sub.style.display='none'; }
+}
+function motoRecalc(){ updateMotoAddBtn(); recalc(); }
+function motoAddItem(){
+  if(!(S.motoPart&&S.motoSize)) return;
+  S.items.push(motoWorkingItem());
+  clearMotoWorking();
+  renderItems(); recalc(); renderModeButtons(); scrollToTopCard('svc-moto');
+}
+function clearMotoWorking(){
+  S.motoPart=null; S.motoSize=null; S.motoFactors={};
+  document.querySelectorAll('#moto-part-grid .part-tile').forEach(function(t){ t.classList.remove('on'); });
+  var ps=document.getElementById('moto-part-sel'); if(ps){ ps.textContent='尚未選擇'; ps.classList.add('none'); }
+  document.querySelectorAll('#moto-size-grid .size-btn').forEach(function(b){ b.classList.remove('on'); });
+  var ss=document.getElementById('moto-size-sel'); if(ss){ ss.textContent='選擇大小'; ss.classList.add('none'); }
+  var sc=document.getElementById('moto-size-clear'); if(sc) sc.style.display='none';
+  document.querySelectorAll('#moto-factors .pdr-f').forEach(function(f){ f.classList.remove('on'); });
+  var ri=document.getElementById('moto-ri'); if(ri) ri.value=0;
+  var pc=document.getElementById('moto-part-card'); if(pc) pc.classList.add('open');
+  var szc=document.getElementById('moto-size-card'); if(szc) szc.classList.add('open');
+  var fc=document.getElementById('moto-factors-card'); if(fc) fc.classList.remove('open');
+  var sub=document.getElementById('moto-sub'); if(sub) sub.style.display='none';
+  updateMotoAddBtn();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  新分類 B：汽機車車牌（鈑金烤漆式：無公分；損傷類型 + 烤漆）
+// ═══════════════════════════════════════════════════════════════════════════
+var PLATE_TYPES = [
+  { id:'car',  name:'汽車車牌', sub:'CAR',        html:'<div class="lp lp-car">ABC-1234</div>' },
+  { id:'moto', name:'機車車牌', sub:'MOTORCYCLE', html:'<div class="lp lp-moto">ABC-1234</div>' }
+];
+var PLATE_DMG = [
+  { id:'partial', label:'局部損傷', price:800  },
+  { id:'full',    label:'整片損傷', price:1500 },
+  { id:'crease',  label:'摺痕損傷', price:2000 }
+];
+var PLATE_PAINT = [
+  { id:'flat',  label:'不烤漆',   price:0    },
+  { id:'paint', label:'烤漆加價', price:1500 }
+];
+
+function plateTypeName(){ var p=PLATE_TYPES.find(function(x){return x.id===S.plateType;}); return p?p.name:'車牌'; }
+function buildPlateTypes(){
+  var el=document.getElementById('plate-type-grid'); if(!el) return;
+  el.innerHTML = PLATE_TYPES.map(function(p){
+    return '<div class="part-tile" data-pid="'+p.id+'" onclick="plateSelectType(\''+p.id+'\')">'
+      +'<div class="part-tile-img">'+p.html+'</div>'
+      +'<div class="part-tile-txt"><div class="part-tile-name">'+p.name+'</div>'
+      +'<div class="part-tile-sub">'+p.sub+'</div></div></div>';
+  }).join('');
+}
+function plateSelectType(id){
+  S.plateType=id;
+  document.querySelectorAll('#plate-type-grid .part-tile').forEach(function(t){ t.classList.toggle('on', t.dataset.pid===id); });
+  var sel=document.getElementById('plate-type-sel'); sel.textContent=plateTypeName(); sel.classList.remove('none');
+  document.getElementById('plate-type-card').classList.remove('open');
+  plateRecalc();
+}
+function buildPlateDmg(){
+  var el=document.getElementById('plate-dmg-grid'); if(!el) return;
+  el.innerHTML = PLATE_DMG.map(function(d){
+    return '<div class="ftile" data-fid="'+d.id+'" onclick="plateToggleDmg(\''+d.id+'\')">'
+      +'<div class="ftile-top"><div class="ftile-name">'+d.label+'</div><div class="ftile-price">'+CS+d.price+'</div></div></div>';
+  }).join('');
+}
+function plateToggleDmg(id){
+  var tile=document.querySelector('#plate-dmg-grid .ftile[data-fid="'+id+'"]');
+  if(S.plateDmg[id]){ delete S.plateDmg[id]; if(tile) tile.classList.remove('on'); }
+  else { var d=PLATE_DMG.find(function(x){return x.id===id;}); S.plateDmg[id]=d.price; if(tile) tile.classList.add('on'); }
+  plateRecalc();
+}
+function buildPlatePaint(){
+  var el=document.getElementById('plate-paint-row'); if(!el) return;
+  el.innerHTML = PLATE_PAINT.map(function(p){
+    var priceLbl = p.price>0 ? ('+'+CS+p.price) : '不加價';
+    return '<div class="paint-tile'+(p.id==='flat'?' on':'')+'" data-pid="'+p.id+'" onclick="platePickPaint(\''+p.id+'\')">'
+      +'<span class="paint-tile-name">'+p.label+'</span><span class="paint-tile-price">'+priceLbl+'</span></div>';
+  }).join('');
+}
+function platePickPaint(id){
+  var p=PLATE_PAINT.find(function(x){return x.id===id;});
+  S.platePaint={ id:id, price:p?p.price:0 };
+  document.querySelectorAll('#plate-paint-row .paint-tile').forEach(function(t){ t.classList.toggle('on', t.dataset.pid===id); });
+  plateRecalc();
+}
+function plateHasDmg(){ return Object.keys(S.plateDmg).length>0; }
+function plateLines(){
+  var lines=[];
+  PLATE_DMG.forEach(function(d){ if(S.plateDmg[d.id]) lines.push({label:d.label, price:d.price}); });
+  return lines;
+}
+function plateSubtotal(){
+  var s=plateLines().reduce(function(a,l){return a+l.price;},0);
+  if(S.platePaint && S.platePaint.price>0) s+=S.platePaint.price;
+  return s;
+}
+function plateWorkingItem(){
+  return { service:'車牌', vehicle:getVehicleInfo(), panel:plateTypeName(), factors:plateLines(),
+           paint:(S.platePaint&&S.platePaint.price>0?S.platePaint.price:0),
+           subtotal:plateSubtotal(), tierBase:0, tierFixed:plateSubtotal() };
+}
+function updatePlateAddBtn(){
+  var btn=document.getElementById('plate-add-btn'); if(!btn) return;
+  btn.disabled = !(S.plateType && plateHasDmg());
+  var lbl=document.getElementById('plate-add-label'); if(lbl) lbl.textContent = S.items.length?'加入下一項修復':'加入估價';
+}
+function plateRecalc(){ updatePlateAddBtn(); recalc(); }
+function plateAddItem(){
+  if(!(S.plateType && plateHasDmg())) return;
+  S.items.push(plateWorkingItem());
+  clearPlateWorking();
+  renderItems(); recalc(); renderModeButtons(); scrollToTopCard('svc-plate');
+}
+function clearPlateWorking(){
+  S.plateType=null; S.plateDmg={}; S.platePaint={id:'flat',price:0};
+  document.querySelectorAll('#plate-type-grid .part-tile').forEach(function(t){ t.classList.remove('on'); });
+  var ts=document.getElementById('plate-type-sel'); if(ts){ ts.textContent='尚未選擇'; ts.classList.add('none'); }
+  document.querySelectorAll('#plate-dmg-grid .ftile').forEach(function(t){ t.classList.remove('on'); });
+  document.querySelectorAll('#plate-paint-row .paint-tile').forEach(function(t){ t.classList.toggle('on', t.dataset.pid==='flat'); });
+  var tc=document.getElementById('plate-type-card'); if(tc) tc.classList.add('open');
+  updatePlateAddBtn();
 }
 
 // ─── ALUMINUM AUTO-CHECK (Supabase) ──────────────────────────────────────────
@@ -3958,6 +4330,12 @@ buildPanelList();
 loadDiagram('sedan');
 buildPdrSizes();
 buildPdrFactors();
+buildMotoParts();
+buildMotoSizes();
+buildMotoFactors();
+buildPlateTypes();
+buildPlateDmg();
+buildPlatePaint();
 renderModeButtons();
 initFloatObserver();
 applyConfig();   // sets logo/accent/title + runs localizeDOM()
