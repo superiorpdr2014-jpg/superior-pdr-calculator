@@ -539,6 +539,8 @@
     .lp{display:inline-flex;align-items:center;justify-content:center;background:#f4f4f4;color:#111;border:3px solid #1a1a1a;border-radius:8px;font-family:'JetBrains Mono',monospace;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.4);}
     .lp-car{width:172px;height:60px;font-size:28px;letter-spacing:2px;}
     .lp-moto{width:112px;height:52px;font-size:19px;letter-spacing:1px;}
+    /* 損傷類型磚：價格下方的區間 */
+    .ftile-range{margin-top:6px;font-size:12px;font-weight:700;color:#ff8585;font-family:'JetBrains Mono',monospace;text-align:right;}
 
     .service{padding-top:6px;}
     .svc-opts{display:flex;flex-direction:column;gap:16px;}
@@ -2511,18 +2513,20 @@ function recalc() {
     function section(title, list, sum) {
       rows.push('<div class="ssec">'+title+'</div>');
       list.forEach(function(r){ rows.push('<div class="brow"><span class="bn">'+r.panel+'</span><span class="bp">'+money(r.subtotal)+'</span></div>'); });
-      rows.push('<div class="brow ssub"><span class="bn">'+title+' '+t('est_subtotal')+'</span><span class="bp">'+px(sum)+'</span></div>');
+      rows.push('<div class="brow ssub"><span class="bn">'+title+' '+t('est_subtotal')+'</span><span class="bp">'+(exact?money(sum):rngRepsDash(list))+'</span></div>');
     }
     section(t('est_pdrSection'), pdrR, pdrSum);
     section(bumpSectionTitle(bumpR), bumpR, bumpSum);
     var grand = pdrSum + bumpSum;
-    totalEl.textContent = px(grand);
-    rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_combinedTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+px(grand)+'</span></div>');
+    var grandRange = exact ? money(grand) : rngRepsDash(reps);
+    totalEl.textContent = grandRange;
+    rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_combinedTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+grandRange+'</span></div>');
 
   } else if (plan.view === 'itemized') {
+    var itemizedTot = exact ? money(tt.premium) : rngRepsDash(reps);
     totalEl.style.display = '';
     lblEl.textContent = exact ? t('est_flatTotal') : t('est_estimatedRange');
-    totalEl.textContent = px(tt.premium);
+    totalEl.textContent = itemizedTot;
     reps.forEach(function(r,i){
       rows.push('<div class="bsub">'+(i+1)+'. '+r.panel+'</div>');
       var isPaintSvc = (r.service === 'Painting' || r.service === 'Bumper');
@@ -2533,7 +2537,7 @@ function recalc() {
       });
       if (r.paint>0) rows.push('<div class="brow"><span class="bn">'+(r.service==='車牌'?'烤漆加價':t('est_triCoat'))+'</span><span class="bp">'+money(r.paint)+'</span></div>');
     });
-    rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_flatTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+px(tt.premium)+'</span></div>');
+    rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_flatTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+itemizedTot+'</span></div>');
 
   } else if (plan.view === '3tier') {
     totalEl.style.display = 'none';                 // show the option comparison instead of one big number
@@ -2670,6 +2674,20 @@ function rngDash(n){
   return money(lo) + ' – ' + money(hi);
 }
 
+// 每個項目可帶自己的區間(rangeMin/rangeMax，如車牌損傷)；沒帶的沿用 ±8%。
+// 加總後即為整張估價單的範圍——非車牌項目結果與原本 rng() 完全一致。
+function itemRangeLoHi(r){
+  if (r && r.rangeMin != null && r.rangeMax != null && r.rangeMax > r.rangeMin) return [r.rangeMin, r.rangeMax];
+  var s = Number(r && r.subtotal) || 0; return [s*0.92, s*1.08];
+}
+function repsRangeBand(reps){
+  var lo=0, hi=0;
+  (reps||[]).forEach(function(r){ var b=itemRangeLoHi(r); lo+=b[0]; hi+=b[1]; });
+  return { lo: Math.max(0, fl100(lo) - _rangeOffset), hi: fl100(hi) + _rangeOffset };
+}
+function rngReps(reps){ var b=repsRangeBand(reps); return money(b.lo) + ' &ndash; ' + money(b.hi); }
+function rngRepsDash(reps){ var b=repsRangeBand(reps); return money(b.lo) + ' – ' + money(b.hi); }
+
 function onRangeSlider(slider) {
   _rangeOffset = parseInt(slider.value) / 2;
   var lbl = document.getElementById('range-slider-val');
@@ -2761,7 +2779,7 @@ function buildEstimateHTML(o) {
   var plan = presentationPlan(reps);
   var view = plan.view, exact = plan.exact;
   var pxR = function(n){ return exact ? money(n) : rng(n); };   // price (uses &ndash; for HTML)
-  var totalStr = pxR(tt.premium);
+  var totalStr = exact ? money(tt.premium) : rngReps(reps);
   var totalLbl = exact ? t('est_total') : t('est_estimatedRange');
 
   // Validity window — creates urgency. Defaults to 7 days from today if not supplied.
@@ -2871,7 +2889,7 @@ function buildEstimateHTML(o) {
       var sum = list.reduce(function(a,r){ return a+r.subtotal; }, 0);
       h += '<div class="vh">'+title+'</div>';
       list.forEach(function(r){ sn++; h += renderRep(r, sn); });
-      h += '<div class="svc-sub"><span>'+title+' '+t('est_subtotal')+'</span><span>'+(exact?money(sum):rng(sum))+'</span></div>';
+      h += '<div class="svc-sub"><span>'+title+' '+t('est_subtotal')+'</span><span>'+(exact?money(sum):rngReps(list))+'</span></div>';
     }
     svcSection(t('est_pdrSection'), reps.filter(function(r){ return isPdrCategory(r.service); }));
     svcSection(bumpSectionTitle(reps.filter(function(r){ return !isPdrCategory(r.service); })), reps.filter(function(r){ return !isPdrCategory(r.service); }));
@@ -3200,7 +3218,7 @@ function buildPitchMessage(channel) {
         repairLines += '\n' + t('est_improvementRepair') + ': ' + rngDash(tt.improvement);
       }
     } else if (plan.view === 'itemized') {
-      repairLines += '\n' + t('est_estimatedRange') + ': ' + (exact ? money(tt.premium) : rngDash(tt.premium));
+      repairLines += '\n' + t('est_estimatedRange') + ': ' + (exact ? money(tt.premium) : rngRepsDash(reps));
     } else {
       if (exact) {
         repairLines += '\n' + t('est_premiumRepair') + ': ' + money(tt.premium);
@@ -3829,8 +3847,8 @@ var PLATE_TYPES = [
   { id:'moto', name:'機車車牌', sub:'MOTORCYCLE', html:'<div class="lp lp-moto">ABC-1234</div>' }
 ];
 var PLATE_DMG = [
-  { id:'partial', label:'局部損傷', price:800  },
-  { id:'full',    label:'整片損傷', price:1500 },
+  { id:'partial', label:'局部損傷', price:1000, min:800,  max:1200 },
+  { id:'full',    label:'整片損傷', price:1300, min:1000, max:1500 },
   { id:'crease',  label:'摺痕損傷', price:2000 }
 ];
 var PLATE_PAINT = [
@@ -3858,8 +3876,11 @@ function plateSelectType(id){
 function buildPlateDmg(){
   var el=document.getElementById('plate-dmg-grid'); if(!el) return;
   el.innerHTML = PLATE_DMG.map(function(d){
+    var range = (d.min!=null && d.max!=null)
+      ? '<div class="ftile-range">'+CS+d.min.toLocaleString()+' – '+CS+d.max.toLocaleString()+'</div>' : '';
     return '<div class="ftile" data-fid="'+d.id+'" onclick="plateToggleDmg(\''+d.id+'\')">'
-      +'<div class="ftile-top"><div class="ftile-name">'+d.label+'</div><div class="ftile-price">'+CS+d.price+'</div></div></div>';
+      +'<div class="ftile-top"><div class="ftile-name">'+d.label+'</div><div class="ftile-price">'+CS+d.price.toLocaleString()+'</div></div>'
+      + range +'</div>';
   }).join('');
 }
 function plateToggleDmg(id){
@@ -3894,9 +3915,14 @@ function plateSubtotal(){
   return s;
 }
 function plateWorkingItem(){
+  // 每個損傷類型帶自己的區間(局部800-1200/整片1000-1500);未設區間者(摺痕)以單價計
+  var lo=0, hi=0;
+  PLATE_DMG.forEach(function(d){ if(S.plateDmg[d.id]){ lo += (d.min!=null?d.min:d.price); hi += (d.max!=null?d.max:d.price); } });
+  var pp=(S.platePaint&&S.platePaint.price>0?S.platePaint.price:0);
+  lo+=pp; hi+=pp;
   return { service:'車牌', vehicle:getVehicleInfo(), panel:plateTypeName(), factors:plateLines(),
-           paint:(S.platePaint&&S.platePaint.price>0?S.platePaint.price:0),
-           subtotal:plateSubtotal(), tierBase:0, tierFixed:plateSubtotal() };
+           paint:pp, subtotal:plateSubtotal(), tierBase:0, tierFixed:plateSubtotal(),
+           rangeMin:lo, rangeMax:hi };
 }
 function updatePlateAddBtn(){
   var btn=document.getElementById('plate-add-btn'); if(!btn) return;
