@@ -1690,6 +1690,12 @@ function svcLabelText(service){
   if (service === '車牌') return '板金修復';
   return '鈑金烤漆';
 }
+// 項目標籤顯示：重機油箱/土除→MPDR（重機PDR）；車牌→PLATE；其餘照原服務名
+function svcTag(service){
+  if (service === '重機') return 'MPDR';
+  if (service === '車牌') return 'PLATE';
+  return service;
+}
 // 非PDR區塊標題：若全是車牌則標「板金修復」，否則沿用保險桿與鈑金烤漆
 function bumpSectionTitle(list){
   if (list && list.length && list.every(function(r){ return r.service === '車牌'; })) return '板金修復';
@@ -2432,7 +2438,7 @@ function renderItems() {
     var ipn = paintNote(it);
     if (ipn) dmg += (dmg ? ' · ' : '') + ipn;
     if (multiVeh && it.vehicle && it.vehicle!=='Customer Vehicle') dmg += '  ·  🚗 '+it.vehicle;
-    var tag = it.service ? '<span class="item-tag">'+it.service+'</span>' : '';
+    var tag = it.service ? '<span class="item-tag">'+svcTag(it.service)+'</span>' : '';
     var editing = (S.editIndex === i);
     var editBtn = it._edit ? '<button class="item-edit" title="Edit" onclick="editItem('+i+')">✎</button>' : '';
     return '<div class="item'+(editing?' editing':'')+'">'
@@ -2699,8 +2705,9 @@ function updateRepairTimeField() {
   }
   if (card) card.style.display = '';
   if (!_rtUserEdited) {
-    var bumpReps = reps.filter(function(r){ return !isPdrCategory(r.service); });
-    var pdrReps  = reps.filter(function(r){ return isPdrCategory(r.service); });
+    var plateReps = reps.filter(function(r){ return r.service === '車牌'; });
+    var bumpReps  = reps.filter(function(r){ return !isPdrCategory(r.service) && r.service !== '車牌'; });
+    var pdrReps   = reps.filter(function(r){ return isPdrCategory(r.service); });
     var days = 0, hours = 0;
     if (bumpReps.length > 0) {
       days += calcPaintingDays(bumpReps.length);
@@ -2711,6 +2718,10 @@ function updateRepairTimeField() {
       days += pdrRT.days;
       hours += pdrRT.hours;
     }
+    if (plateReps.length > 0) {
+      hours += 1;   // 車牌維修工時固定 1 小時
+    }
+    days += Math.floor(hours / 8); hours = hours % 8;   // 進位：滿 8 小時算 1 天
     dEl.value = days;
     hEl.value = hours;
   }
@@ -2830,7 +2841,7 @@ function buildEstimateHTML(o) {
   h += '<div class="bd"><div class="badge">'+t('est_repairEstimate')+'</div>';
 
   function renderRep(r, n) {
-    var tag = r.service ? '<span class="tag">'+esc(r.service)+'</span>' : '';
+    var tag = r.service ? '<span class="tag">'+esc(svcTag(r.service))+'</span>' : '';
     var priceStr = exact
       ? money(r.subtotal)
       : '<span style="font-size:.6em;font-weight:700;color:#999;letter-spacing:.3px;margin-right:3px">均價</span>'+money(r.subtotal);
