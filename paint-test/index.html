@@ -1683,10 +1683,23 @@ function renderModeButtons() {
 function setPdrView(v) { S.pdrView = v; renderModeButtons(); recalc(); }
 function setExact(b)   { S.exact = !!b; renderModeButtons(); recalc(); }
 
+// 分類與標籤：重機油箱/土除 歸「凹痕修復 PDR」；車牌 標「板金修復」；其餘 鈑金烤漆
+function isPdrCategory(service){ return service === 'PDR' || service === '重機'; }
+function svcLabelText(service){
+  if (isPdrCategory(service)) return '凹痕修復';
+  if (service === '車牌') return '板金修復';
+  return '鈑金烤漆';
+}
+// 非PDR區塊標題：若全是車牌則標「板金修復」，否則沿用保險桿與鈑金烤漆
+function bumpSectionTitle(list){
+  if (list && list.length && list.every(function(r){ return r.service === '車牌'; })) return '板金修復';
+  return t('est_bumperSection');
+}
+
 // How many of each service are in the estimate
 function serviceCounts(reps) {
   var pdr = 0, bump = 0;
-  reps.forEach(function(r){ if (r.service === 'PDR') pdr++; else bump++; });
+  reps.forEach(function(r){ if (isPdrCategory(r.service)) pdr++; else bump++; });
   return { pdr: pdr, bump: bump, both: (pdr > 0 && bump > 0) };
 }
 // When the estimate has BOTH services we always group by service so each
@@ -2485,8 +2498,8 @@ function recalc() {
   if (isSplit(reps)) {
     totalEl.style.display = '';
     lblEl.textContent = exact ? t('est_combinedTotal') : t('est_combinedRange');
-    var pdrR  = reps.filter(function(r){ return r.service === 'PDR'; });
-    var bumpR = reps.filter(function(r){ return r.service !== 'PDR'; });
+    var pdrR  = reps.filter(function(r){ return isPdrCategory(r.service); });
+    var bumpR = reps.filter(function(r){ return !isPdrCategory(r.service); });
     var pdrSum  = pdrR.reduce(function(a,r){ return a+r.subtotal; }, 0);
     var bumpSum = bumpR.reduce(function(a,r){ return a+r.subtotal; }, 0);
     function section(title, list, sum) {
@@ -2495,7 +2508,7 @@ function recalc() {
       rows.push('<div class="brow ssub"><span class="bn">'+title+' '+t('est_subtotal')+'</span><span class="bp">'+px(sum)+'</span></div>');
     }
     section(t('est_pdrSection'), pdrR, pdrSum);
-    section(t('est_bumperSection'), bumpR, bumpSum);
+    section(bumpSectionTitle(bumpR), bumpR, bumpSum);
     var grand = pdrSum + bumpSum;
     totalEl.textContent = px(grand);
     rows.push('<div class="brow tot"><span class="bn">'+(exact?t('est_combinedTotal'):t('est_estimatedRange'))+'</span><span class="bp">'+px(grand)+'</span></div>');
@@ -2686,8 +2699,8 @@ function updateRepairTimeField() {
   }
   if (card) card.style.display = '';
   if (!_rtUserEdited) {
-    var bumpReps = reps.filter(function(r){ return r.service !== 'PDR'; });
-    var pdrReps  = reps.filter(function(r){ return r.service === 'PDR'; });
+    var bumpReps = reps.filter(function(r){ return !isPdrCategory(r.service); });
+    var pdrReps  = reps.filter(function(r){ return isPdrCategory(r.service); });
     var days = 0, hours = 0;
     if (bumpReps.length > 0) {
       days += calcPaintingDays(bumpReps.length);
@@ -2845,8 +2858,8 @@ function buildEstimateHTML(o) {
       list.forEach(function(r){ sn++; h += renderRep(r, sn); });
       h += '<div class="svc-sub"><span>'+title+' '+t('est_subtotal')+'</span><span>'+(exact?money(sum):rng(sum))+'</span></div>';
     }
-    svcSection(t('est_pdrSection'), reps.filter(function(r){ return r.service === 'PDR'; }));
-    svcSection(t('est_bumperSection'), reps.filter(function(r){ return r.service !== 'PDR'; }));
+    svcSection(t('est_pdrSection'), reps.filter(function(r){ return isPdrCategory(r.service); }));
+    svcSection(bumpSectionTitle(reps.filter(function(r){ return !isPdrCategory(r.service); })), reps.filter(function(r){ return !isPdrCategory(r.service); }));
     h += '<div class="tot"><div class="l">'+(exact?t('est_combinedTotal'):totalLbl)+'</div><div class="v">'+totalStr+'</div></div>';
 
   } else if (view === 'itemized') {
@@ -3154,7 +3167,7 @@ function buildPitchMessage(channel) {
     var plan = presentationPlan(reps);
     reps.forEach(function(r, i){
       var dmg = (r.factors||[]).map(function(fx){ return fx.label; }).join(', ');
-      var svcLabel = r.service === 'PDR' ? '凹痕修復' : '鈑金烤漆';
+      var svcLabel = svcLabelText(r.service);
       var pn = paintNote(r);
       var dmgLine = (dmg || 'Base repair') + (pn ? '（' + pn + '）' : '');
       repairLines += (i+1) + '. ' + r.panel + '（' + svcLabel + '）\n   ' + dmgLine + '\n';
