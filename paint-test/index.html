@@ -688,7 +688,7 @@
 
    locale: 'zh' = Traditional Chinese (繁體中文)
    currency: NT$ (New Taiwan Dollar)
-   pricing: Dent Time base × 0.6 (40% less) → converted to TWD (~32:1)
+   pricing: base × 0.6 (40% less) → converted to TWD (~32:1)
 
    ★ This file is SAFE across engine updates. When the seller ships a new
      calculator.html with new features, this config is never touched — the
@@ -730,7 +730,7 @@ window.SHOP_CONFIG = {
   },
 
   // ---- PRICING (TWD — New Taiwan Dollar) ----------------------------
-  // Base: Dent Time USD prices × 0.6 (40% less) × 32 (USD→TWD), rounded to nearest 100
+  // Base: USD prices × 0.6 (40% less) × 32 (USD→TWD), rounded to nearest 100
   pricing: {
     pdrSizes: [1500,2000,2600,3200,3800,4400,5100,5700,6300,6900,7500,8100,8800,9400,10000,10600,11200,11800,12400,13100,13700,14300,14900,15500],
     pdrSizeLabels: [3,5,8,10,13,15,18,20,23,25,28,30,33,35,38,40,43,45,48,50,53,55,58,60],
@@ -1161,14 +1161,14 @@ window.SHOP_CONFIG = {
 // =====================================================================
 var SHOP = (typeof window!=='undefined' && window.SHOP_CONFIG) ? window.SHOP_CONFIG : {};
 var CONFIG = SHOP.brand || {
-  companyName:'Dent Time', logoUrl:'https://denttime.com/wp-content/uploads/2022/03/denttime_500.png',
+  companyName:'Superior PDR', logoUrl:'logo.png',
   phone:'858-408-6200', phonePretty:'(858) 408-6200', website:'https://www.tar-tw.com/',
   accentColor:'#ff4444', imageAccent:'#cc0000', validityDays:30,
   experienceLine:'', guaranteeShort:'', guaranteeLong:'',
   apiBase:'', smsEndpoint:'/api/estimate-sms/send', emailEndpoint:'/api/estimate-email/send',
   aluminum:{ enabled:false }
 };
-CONFIG.shopId = SHOP.shopId || 'denttime';
+CONFIG.shopId = SHOP.shopId || 'superior-pdr';
 var PRICING = SHOP.pricing || {};
 var LOCALE = (SHOP.locale === 'zh' || SHOP.locale === 'es') ? SHOP.locale : 'en';
 
@@ -2826,7 +2826,7 @@ function buildEstimateHTML(o) {
   h += '.labor{display:flex;justify-content:space-between;align-items:center;background:#f5f5f5;border-radius:6px;padding:10px 14px;margin-bottom:12px;font-size:.84em;}';
   h += '.labor .ll{color:#888;font-weight:600;}';
   h += '.labor .lv{color:#222;font-weight:800;}';
-  // option-card (tiered) styles — matches the original Dent Time estimate
+  // option-card (tiered) styles — matches the original estimate
   h += '.intro{margin-bottom:16px;line-height:1.6;color:#444;font-size:.85em}';
   h += '.covers{font-size:.8em;color:#555;margin-bottom:16px;line-height:1.55}';h += '.locs{background:#f7f7f7;border:1px solid #ececec;border-radius:9px;padding:11px 14px;margin-bottom:15px}';h += '.locs-t{font-size:.62em;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#cc0000;margin-bottom:7px}';h += '.loc-row{display:flex;justify-content:space-between;gap:10px;font-size:.82em;color:#444;padding:4px 0;border-top:1px solid #eee}';h += '.loc-row:first-of-type{border-top:none}';h += '.loc-row .ln-name{font-weight:600;color:#222}';h += '.loc-row .ln-dmg{font-size:.92em;color:#888}';
   h += '.covers b{color:#111}';
@@ -3015,7 +3015,7 @@ function shareOrDownloadCanvas(canvas, vehicle, done) {
     try {
       var file = new File([blob], fname, { type:'image/png' });
       if (navigator.canShare && navigator.canShare({ files:[file] }) && navigator.share) {
-        navigator.share({ files:[file], title:'Dent Time Estimate' })
+        navigator.share({ files:[file], title:(CONFIG.companyName||'Superior PDR')+' 估價單' })
           .then(function(){ done(); })
           .catch(function(e){ if (e && e.name === 'AbortError') { done(); } else { download(blob); } });
         return;
@@ -3180,7 +3180,7 @@ function pitchHasTiers() {
   return S.service === 'pdr' && S.pdrView !== 'itemized' && !isSplit(reps) && hasTierWork(reps);
 }
 
-// Articulate, value-first Dent Time message (no exclaim, no em-dash). channel: 'email' | 'sms'
+// Articulate, value-first message (no exclaim, no em-dash). channel: 'email' | 'sms'
 function getVinValue(){ return (document.getElementById('vin-input')||{}).value||''; }
 function buildPitchMessage(channel) {
   var name = getClientName(); var nm = (name && name !== '—') ? name : '';
@@ -3849,7 +3849,7 @@ var PLATE_TYPES = [
 var PLATE_DMG = [
   { id:'partial', label:'局部損傷', price:1000, min:800,  max:1200 },
   { id:'full',    label:'整片損傷', price:1300, min:1000, max:1500 },
-  { id:'crease',  label:'摺痕損傷', price:2000 }
+  { id:'crease',  label:'摺痕損傷', price:1800, min:1600, max:2200 }
 ];
 var PLATE_PAINT = [
   { id:'flat',  label:'不烤漆',   price:0    },
@@ -3967,7 +3967,7 @@ function handlePhotoUpload(input) {
         if (status) status.textContent = 'Uploading...';
 
         var apiBase = (typeof CONFIG !== 'undefined' && CONFIG.apiBase) || '';
-        var shopId = (typeof CONFIG !== 'undefined' && CONFIG.shopId) || 'denttime';
+        var shopId = (typeof CONFIG !== 'undefined' && CONFIG.shopId) || 'superior-pdr';
 
         fetch(apiBase + '/api/estimates/upload-photo', {
           method: 'POST',
@@ -4021,7 +4021,7 @@ function saveEstimateRecord(extraFields) {
   if (!reps.length) return;
   var tt = tierTotals(reps);
   var apiBase = (typeof CONFIG !== 'undefined' && CONFIG.apiBase) || '';
-  var shopId = (typeof CONFIG !== 'undefined' && CONFIG.shopId) || 'denttime';
+  var shopId = (typeof CONFIG !== 'undefined' && CONFIG.shopId) || 'superior-pdr';
 
   fetch(apiBase + '/api/estimates/save', {
     method: 'POST',

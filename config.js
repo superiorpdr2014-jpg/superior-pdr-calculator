@@ -3,7 +3,7 @@
 
    locale: 'zh' = Traditional Chinese (繁體中文)
    currency: NT$ (New Taiwan Dollar)
-   pricing: Dent Time base × 0.6 (40% less) × converted to TWD (~32:1)
+   pricing: base × 0.6 (40% less) × converted to TWD (~32:1)
 
    ★ This file is SAFE across engine updates. When the seller ships a new
      calculator.html with new features, this config is never touched — the
@@ -45,7 +45,7 @@ window.SHOP_CONFIG = {
   },
 
   // ---- PRICING (TWD — New Taiwan Dollar) ----------------------------
-  // Base: Dent Time USD prices × 0.6 (40% less) × 32 (USD→TWD), rounded to nearest 100
+  // Base: USD prices × 0.6 (40% less) × 32 (USD→TWD), rounded to nearest 100
   pricing: {
     pdrSizes: [1500,2000,2600,3200,3800,4400,5100,5700,6300,6900,7500,8100,8800,9400,10000,10600,11200,11800,12400,13100,13700,14300,14900,15500],
     pdrSizeLabels: [3,5,8,10,13,15,18,20,23,25,28,30,33,35,38,40,43,45,48,50,53,55,58,60],
