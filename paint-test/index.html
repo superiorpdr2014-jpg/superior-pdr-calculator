@@ -1216,6 +1216,13 @@ var UI_ONLY_LOCALES = ['fa'];
 var LOCALE = (LOCALES.indexOf(SHOP.locale) > -1) ? SHOP.locale : 'en';
 var SHOP_LOCALE = LOCALE;   // the shop's own language — never changed by the toggle
 
+// ?lang=fa — the Persian store manager opens this straight from his MOC panel, so
+// it should already be in his language instead of making him hunt for the toggle.
+// This moves the UI ONLY: SHOP_LOCALE above is already captured, so docLocale()
+// still returns the shop's language and the customer's estimate stays 中文.
+var _urlLang = new URLSearchParams(location.search).get('lang');
+if (LOCALES.indexOf(_urlLang) > -1) LOCALE = _urlLang;
+
 function isRtl(l){ return RTL_LOCALES.indexOf(l||LOCALE) > -1; }
 // The language customer-facing documents are written in.
 function docLocale(){ return (UI_ONLY_LOCALES.indexOf(LOCALE) > -1) ? SHOP_LOCALE : LOCALE; }
@@ -1316,7 +1323,10 @@ var I18N = {
     plate_partial:'Partial Damage', plate_full:'Full-Panel Damage', plate_crease:'Crease Damage',
     plate_noPaint:'No Paint', plate_paint:'Paint (add-on)',
     range_narrow:'Narrower', range_std:'Standard range', range_wide:'Wider',
-    line_send:'Send to LINE user'
+    line_send:'Send to LINE user',
+    line_noId:'No LINE user ID — reopen this estimate from the panel.', line_notReady:'The calculator is still loading, try again in a moment.',
+    line_noItems:'Add at least one repair first.', line_sending:'Sending…', line_sent:'✅ Sent!',
+    line_imgFail:'Could not build the image: ', line_failed:'Send failed: ', line_netErr:'Network error: '
   },
   es: {
     subtitle:'Calculadora de Estimados', customer:'Cliente', vehicle:'Vehículo',
@@ -1407,7 +1417,10 @@ var I18N = {
     plate_partial:'Daño Parcial', plate_full:'Daño Total', plate_crease:'Daño por Pliegue',
     plate_noPaint:'Sin Pintura', plate_paint:'Pintura (adicional)',
     range_narrow:'Más estrecho', range_std:'Rango estándar', range_wide:'Más amplio',
-    line_send:'Enviar al usuario de LINE'
+    line_send:'Enviar al usuario de LINE',
+    line_noId:'Sin ID de usuario LINE — vuelva a abrir el estimado desde el panel.', line_notReady:'La calculadora aún está cargando, intente en un momento.',
+    line_noItems:'Agregue al menos una reparación primero.', line_sending:'Enviando…', line_sent:'✅ ¡Enviado!',
+    line_imgFail:'No se pudo generar la imagen: ', line_failed:'Envío fallido: ', line_netErr:'Error de red: '
   },
   zh: {
     subtitle:'估價計算器', customer:'客戶', vehicle:'車輛',
@@ -1498,7 +1511,10 @@ var I18N = {
     plate_partial:'局部損傷', plate_full:'整片損傷', plate_crease:'摺痕損傷',
     plate_noPaint:'不烤漆', plate_paint:'烤漆加價',
     range_narrow:'縮小範圍', range_std:'標準範圍', range_wide:'擴大範圍',
-    line_send:'傳到LINE用戶'
+    line_send:'傳到LINE用戶',
+    line_noId:'找不到 LINE 用戶 ID，請從面板重新開啟估價頁面。', line_notReady:'估價工具尚未載入，請稍後再試。',
+    line_noItems:'請先新增至少一個修復項目。', line_sending:'傳送中…', line_sent:'✅ 已傳送！',
+    line_imgFail:'圖片生成失敗：', line_failed:'傳送失敗：', line_netErr:'網路錯誤：'
   },
   // ── Persian / فارسی ─────────────────────────────────────
   // Operator language (see UI_ONLY_LOCALES): Superior's Iranian technician
@@ -1597,7 +1613,10 @@ var I18N = {
     plate_partial:'آسیب موضعی', plate_full:'آسیب کل صفحه', plate_crease:'تاخوردگی',
     plate_noPaint:'بدون رنگ', plate_paint:'رنگ (هزینه افزوده)',
     range_narrow:'باریک‌تر', range_std:'بازه استاندارد', range_wide:'گسترده‌تر',
-    line_send:'ارسال به کاربر LINE'
+    line_send:'ارسال به کاربر LINE',
+    line_noId:'شناسه کاربر LINE پیدا نشد — برآورد را دوباره از پنل باز کنید.', line_notReady:'محاسبه‌گر هنوز در حال بارگذاری است، کمی بعد دوباره تلاش کنید.',
+    line_noItems:'اول حداقل یک تعمیر اضافه کنید.', line_sending:'در حال ارسال…', line_sent:'✅ ارسال شد!',
+    line_imgFail:'ساخت تصویر ناموفق بود: ', line_failed:'ارسال ناموفق بود: ', line_netErr:'خطای شبکه: '
   }
 };
 

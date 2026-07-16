@@ -84,3 +84,83 @@ window.SHOP_CONFIG = {
   }
 };
 
+
+// ── LINE 傳送整合 ──────────────────────────────────────────────────────────────
+// 從正式版 config.js 移植過來（原本 paint-test 沒有這段，所以按不了「傳到LINE用戶」）。
+// index.html 的 modal-actions 已有靜態按鈕 #line-send-btn（display:none）。
+// 當 URL 帶有 line_id 時顯示該按鈕，並定義 sendToLineUser() 供它 onclick 呼叫。
+// 點擊後：渲染估價圖 → base64 → POST /echo/send-line-estimate → 傳給客戶並更新 Airtable 已報價。
+//
+// 波斯語版 MOC 的店長也走這條路：他的介面是 فارسی，但 renderEstimateCanvas()
+// 內部走 docLocale()＝店家語言，所以送出去的估價圖仍然是中文的 —— 收的人是台灣車主。
+(function () {
+  var LINE_ENDPOINT = 'https://echo.pdrsuperior.com/echo/send-line-estimate';
+  var LINE_ID = new URLSearchParams(window.location.search).get('line_id') || null;
+  var LINE_TOKEN = new URLSearchParams(window.location.search).get('token') || '';
+
+  // 狀態字串走 t()：這些是給「操作的人」看的，波斯籍店長要讀得懂。
+  // t() 由 index.html 定義；萬一還沒載入就退回中文，不要讓按鈕整個爆掉。
+  function T(k, zh) { try { return (typeof t === 'function') ? t(k) : zh; } catch (e) { return zh; } }
+
+  window.sendToLineUser = function (btn) {
+    if (!LINE_ID) { alert(T('line_noId', '找不到 LINE 用戶 ID，請從 Telegram 重新開啟估價頁面。')); return; }
+    if (typeof collectRepairs === 'undefined') { alert(T('line_notReady', '估價工具尚未載入，請稍後再試。')); return; }
+    var reps = collectRepairs();
+    if (!reps.length) { alert(T('line_noItems', '請先新增至少一個修復項目。')); return; }
+    var span = btn ? btn.querySelector('span') : null;
+    var orig = span ? span.textContent : '';
+    if (span) span.textContent = T('line_sending', '傳送中…');
+    if (btn) btn.disabled = true;
+
+    var priceEl = document.getElementById('total-val') || document.querySelector('.total-val');
+    var priceText = priceEl ? priceEl.textContent.trim() : '';
+
+    renderEstimateCanvas(reps, function (canvas, err) {
+      if (!canvas) {
+        alert(T('line_imgFail', '圖片生成失敗：') + (err && err.message || err || ''));
+        if (span) span.textContent = orig;
+        if (btn) btn.disabled = false;
+        return;
+      }
+      fetch(LINE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lineUserId:  LINE_ID,
+          imageBase64: canvas.toDataURL('image/jpeg', 0.88),
+          priceText:   priceText,
+          token:       LINE_TOKEN
+        })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.ok) {
+            if (span) span.textContent = T('line_sent', '✅ 已傳送！');
+            setTimeout(function () { if (span) span.textContent = orig; if (btn) btn.disabled = false; }, 3000);
+          } else {
+            alert(T('line_failed', '傳送失敗：') + (d.error || ''));
+            if (span) span.textContent = orig;
+            if (btn) btn.disabled = false;
+          }
+        })
+        .catch(function (e) {
+          alert(T('line_netErr', '網路錯誤：') + e.message);
+          if (span) span.textContent = orig;
+          if (btn) btn.disabled = false;
+        });
+    });
+  };
+
+  // 顯示按鈕（僅在有 line_id 時）
+  if (LINE_ID) {
+    function showLineBtn() {
+      var lb = document.getElementById('line-send-btn');
+      if (lb) lb.style.display = 'flex';
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { setTimeout(showLineBtn, 300); });
+    } else {
+      setTimeout(showLineBtn, 300);
+    }
+  }
+})();
