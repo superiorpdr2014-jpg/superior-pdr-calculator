@@ -3382,6 +3382,12 @@ function saveEstimateImage(btn) {
 var LINE_USER_ID = (function(){
   try { return new URLSearchParams(location.search).get('line_id') || ''; } catch(e) { return ''; }
 })();
+// /echo/send-line-estimate 會驗 token（由 /echo/estimate 啟動時帶進 URL）。
+// paint-test 這支一直沒帶 → 伺服器一律回 401「傳送失敗」。以前沒被發現是因為
+// 面板都開正式版；波斯版 MOC 接上 paint-test 才踩到。正式版 index.html 本來就有。
+var LINE_TOKEN_PARAM = (function(){
+  try { return new URLSearchParams(location.search).get('token') || ''; } catch(e) { return ''; }
+})();
 
 (function(){
   if (LINE_USER_ID) {
@@ -3391,16 +3397,16 @@ var LINE_USER_ID = (function(){
 })();
 
 function sendToLineUser(btn) {
-  if (!LINE_USER_ID) { alert('找不到 LINE 用戶 ID，請從 Telegram 開始估價按鈕進入。'); return; }
+  if (!LINE_USER_ID) { alert(t('line_noId')); return; }
   var span = btn ? btn.querySelector('span') : null;
   var orig = span ? span.textContent : t('line_send');
   function done(ok) {
     if (span) {
-      span.textContent = ok ? '✓ 已傳送' : '傳送失敗';
+      span.textContent = ok ? t('line_sent') : t('line_failed');
       setTimeout(function(){ span.textContent = orig; if (btn) btn.disabled = false; }, 2500);
     } else { if (btn) btn.disabled = false; }
   }
-  if (span) span.textContent = '傳送中…';
+  if (span) span.textContent = t('line_sending');
   if (btn) btn.disabled = true;
 
   function sendBase64(base64) {
@@ -3409,7 +3415,7 @@ function sendToLineUser(btn) {
     fetch('https://echo.pdrsuperior.com/echo/send-line-estimate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lineUserId: LINE_USER_ID, imageBase64: base64, priceText: priceText })
+      body: JSON.stringify({ lineUserId: LINE_USER_ID, imageBase64: base64, priceText: priceText, token: LINE_TOKEN_PARAM })
     }).then(function(r){ return r.json(); }).then(function(j){
       done(!!j.ok);
     }).catch(function(e){ console.error(e); done(false); });
@@ -3421,9 +3427,9 @@ function sendToLineUser(btn) {
     return;
   }
   var reps = collectRepairs();
-  if (!reps.length) { alert('請先新增修復項目再傳送。'); if (btn) btn.disabled = false; return; }
+  if (!reps.length) { alert(t('line_noItems')); if (btn) btn.disabled = false; return; }
   renderEstimateCanvas(reps, function(c, err){
-    if (!c) { alert('圖片產生失敗：' + (err && err.message || err)); done(false); return; }
+    if (!c) { alert(t('line_imgFail') + (err && err.message || err)); done(false); return; }
     sendBase64(c.toDataURL('image/jpeg', 0.92));
   });
 }
