@@ -1229,7 +1229,24 @@ function docLocale(){ return (UI_ONLY_LOCALES.indexOf(LOCALE) > -1) ? SHOP_LOCAL
 // Run fn() with a different active locale, then restore. SYNCHRONOUS ONLY —
 // LOCALE is global, so anything deferred to a callback would run after the
 // restore and silently pick up the wrong language.
-function withLocale(loc, fn){ var prev = LOCALE; LOCALE = loc; try { return fn(); } finally { LOCALE = prev; } }
+//
+// ⚠️ 換 LOCALE 還不夠。標籤有一半不是即時算的，是快取在模組級陣列裡
+//    （PDR_LABELS / FACTORS / PAINT / PDR_GROUPS / MOTO_GROUPS），只有切語言時
+//    才由 rebuildLocalizedData() 重建。只改 LOCALE 的話 t() 會回中文，但
+//    pdrLines() 讀的 PDR_LABELS[id] 仍是波斯文 → 客戶的估價單上，修復因素
+//    那幾行是波斯文（2026-07-16 真的送到台灣車主手機上）。
+//    所以進出都要重建，withLocale 才名副其實。純資料運算、不碰 DOM，不會閃。
+function withLocale(loc, fn){
+  var prev = LOCALE;
+  if (loc === prev) return fn();
+  LOCALE = loc;
+  if (typeof rebuildLocalizedData === 'function') rebuildLocalizedData();
+  try { return fn(); }
+  finally {
+    LOCALE = prev;
+    if (typeof rebuildLocalizedData === 'function') rebuildLocalizedData();
+  }
+}
 
 var I18N = {
   en: {
@@ -2924,24 +2941,44 @@ var DT_LOGO = CONFIG.logoUrl;
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // All repairs to include in the estimate = added items + the one in progress
+// 「進行中」的項目（還沒按新增到估價）也會被印進客戶的估價單——技師常常是
+// 選一選就直接送出，根本不按新增。所以這裡跟 pdrAddItem 一樣要雙語：
+// panel/factors 存客戶語言（估價單/簡訊用），panelUi/factorsUi 留技師語言（畫面用）。
+//
+// ⚠️ 不能只靠呼叫端包 withLocale：sendToLineUser / previewEstimate 都是在文件語境
+//    「外面」呼叫 collectRepairs()，字串一旦在這裡烤成波斯文就救不回來了——
+//    伊朗店長送出的估價單項目真的變成波斯文給台灣客戶看（2026-07-16）。
+//    在來源就雙語，不管誰在哪呼叫都對。
+function dualLocale(build) {
+  var doc = withLocale(docLocale(), build);
+  var ui  = build();
+  return { panel: doc.panel, factors: doc.factors, panelUi: ui.panel, factorsUi: ui.factors };
+}
+
 function collectRepairs() {
   var reps = S.items.slice();
   // While editing, the saved item is mirrored by the live working repair below —
   // drop it from the list so the running total reflects edits without double-counting.
   if (S.editIndex != null && S.editIndex < reps.length) reps.splice(S.editIndex, 1);
   if (S.service === 'bumper' && workingHasFactors()) {
-    var fs = [];
-    Object.keys(S.factors).forEach(function(id){
-      fs.push({ label:factorLabel(id), price:S.factors[id] });
-    });
     var bsub = workingSubtotal();
-    reps.push({ service:'Painting', vehicle:getVehicleInfo(), panel:tp(S.panelDiag)||t('unspecified'), factors:fs, paint:(S.paint.price>0?S.paint.price:0), subtotal:bsub, tierBase:0, tierFixed:bsub });
+    reps.push(Object.assign({ service:'Painting', vehicle:getVehicleInfo(), paint:(S.paint.price>0?S.paint.price:0), subtotal:bsub, tierBase:0, tierFixed:bsub },
+      dualLocale(function(){
+        var fs = [];
+        Object.keys(S.factors).forEach(function(id){ fs.push({ label:factorLabel(id), price:S.factors[id] }); });
+        return { panel: tp(S.panelDiag) || t('unspecified'), factors: fs };
+      })));
   } else if (S.service === 'pdr' && S.pdrSize) {
-    reps.push({ service:'PDR', vehicle:getVehicleInfo(), panel:pdrHeader(), factors:pdrLines(), paint:0, subtotal:pdrSubtotal(), tierBase:pdrTierBase(), tierFixed:pdrRiCost()+spExtraTotal() });
+    reps.push(Object.assign({ service:'PDR', vehicle:getVehicleInfo(), paint:0, subtotal:pdrSubtotal(), tierBase:pdrTierBase(), tierFixed:pdrRiCost()+spExtraTotal() },
+      dualLocale(function(){ return { panel: pdrHeader(), factors: pdrLines() }; })));
   } else if (S.service === 'moto' && S.motoPart && S.motoSize) {
-    reps.push(motoWorkingItem());
+    var mw = withLocale(docLocale(), motoWorkingItem);
+    mw.panelUi = motoHeader(); mw.factorsUi = motoLines();
+    reps.push(mw);
   } else if (S.service === 'plate' && plateHasDmg()) {
-    reps.push(plateWorkingItem());
+    var pw = withLocale(docLocale(), plateWorkingItem);
+    pw.panelUi = plateTypeName(); pw.factorsUi = plateLines();
+    reps.push(pw);
   }
   return reps;
 }
@@ -3893,7 +3930,7 @@ function pdrLines() {
     if (amt > 0) lines.push({ label:(PDR_LABELS[id]||id), price:amt });
   });
   var ri = pdrRiCost();
-  if (ri > 0) lines.push({ label:'R&I (Removal & Install)', price:ri });
+  if (ri > 0) lines.push({ label:t('riLabel'), price:ri });
   _spRows.forEach(function(r) {
     var amt = (r.qty||0)*(r.price||0);
     if (amt > 0) lines.push({ label:t('sp_title')+' ×'+r.qty, price:amt });
