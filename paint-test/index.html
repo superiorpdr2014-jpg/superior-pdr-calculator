@@ -927,13 +927,20 @@ window.SHOP_CONFIG = {
 
     <!-- ─── BUMPER OPTIONS ─── -->
     <div id="svc-bumper" class="svc-opts" style="display:none;">
-      <div class="r-card">
+      <div class="r-card" id="bumper-dmg-card">
         <div class="r-card-head"><span class="step">2</span><span data-i18n="step_damage">Damage Type</span><span class="head-note" data-i18n="selectAllApply">select all that apply</span></div>
         <div class="factor-grid" id="factor-grid"></div>
       </div>
-      <div class="r-card">
+      <div class="r-card" id="bumper-paint-card">
         <div class="r-card-head"><span class="step">3</span><span data-i18n="step_paint">Paint</span></div>
         <div class="paint-row" id="paint-row"></div>
+      </div>
+      <div class="r-card" id="wholecar-card" style="display:none;">
+        <div class="r-card-head"><span class="step">2</span><span>全車鈑金烤漆</span><span class="head-note">店長填總金額（含烤漆）</span></div>
+        <div style="padding:14px 4px 4px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:13px;color:#ddd;font-weight:600;">整車鈑金＋烤漆總價</span>
+          <div class="ri-wrap" style="padding:6px 12px;"><span>NT$</span><input type="number" id="wholecar-amt" min="0" step="500" value="0" style="width:110px;text-align:right;" oninput="wholeCarAmtInput(this.value)"></div>
+        </div>
       </div>
       <button class="add-btn" id="add-btn" disabled onclick="addItem()">
         <span class="plus">+</span><span id="add-btn-label" data-i18n="addRepair">Add Repair to Estimate</span>
@@ -964,20 +971,6 @@ window.SHOP_CONFIG = {
           <div class="ri-row">
             <span class="ri-label" data-i18n="riLabel">R&amp;I (Removal &amp; Install)</span>
             <div class="ri-wrap"><span id="ri-cs">$</span><input type="number" id="pdr-ri" min="0" step="100" value="0" oninput="pdrRecalc()"></div>
-          </div>
-          <div class="repair-time-card" id="repair-time-card" style="display:none;">
-            <span class="repair-time-lbl" data-i18n="rt_label">預估維修工時</span>
-            <div class="repair-time-wrap">
-              <div class="ri-wrap" style="padding:6px 10px;">
-                <input type="number" id="repair-days" min="0" step="1" value="0" style="width:36px;text-align:right;" oninput="repairTimeEdited()">
-                <span style="color:#ddd;font-size:13px;font-weight:600;" data-i18n="rt_days">天</span>
-              </div>
-              <div class="ri-wrap" style="padding:6px 10px;">
-                <input type="number" id="repair-hours" min="0" max="23" step="1" value="0" style="width:36px;text-align:right;" oninput="repairTimeEdited()">
-                <span style="color:#ddd;font-size:13px;font-weight:600;" data-i18n="rt_hours">小時</span>
-              </div>
-              <button class="repair-time-reset" title="重新計算" data-i18n-title="rt_resetTitle" onclick="repairTimeReset()">↺</button>
-            </div>
           </div>
           <div class="pdr-sub" id="pdr-sub" style="display:none;">
             <span data-i18n="dentSubtotal">Dent subtotal</span><span id="pdr-sub-amt">$0</span>
@@ -1088,6 +1081,20 @@ window.SHOP_CONFIG = {
 
 
   <div class="total-card">
+    <div class="repair-time-card" id="repair-time-card" style="display:none;margin-top:0;padding-top:0;border-top:none;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08);">
+      <span class="repair-time-lbl" data-i18n="rt_label">預估維修工時</span>
+      <div class="repair-time-wrap">
+        <div class="ri-wrap" style="padding:6px 10px;">
+          <input type="number" id="repair-days" min="0" step="1" value="0" style="width:36px;text-align:right;" oninput="repairTimeEdited()">
+          <span style="color:#ddd;font-size:13px;font-weight:600;" data-i18n="rt_days">天</span>
+        </div>
+        <div class="ri-wrap" style="padding:6px 10px;">
+          <input type="number" id="repair-hours" min="0" max="23" step="1" value="0" style="width:36px;text-align:right;" oninput="repairTimeEdited()">
+          <span style="color:#ddd;font-size:13px;font-weight:600;" data-i18n="rt_hours">小時</span>
+        </div>
+        <button class="repair-time-reset" title="重新計算" data-i18n-title="rt_resetTitle" onclick="repairTimeReset()">↺</button>
+      </div>
+    </div>
     <div class="mode-row" id="mode-row"></div>
     <div class="total-lbl" id="total-lbl">Estimated Total</div>
     <div class="total-amt ph" id="total-amt">Add a repair to calculate</div>
@@ -1964,6 +1971,7 @@ var PANEL_GROUPS = {
 // ─── STATE ───────────────────────────────────────────────────────────────────
 
 var S = { service:'pdr', vehicle:'sedan', panelDiag:null, factors:{}, customName:'', paint:{id:'flat',price:0},
+          wholeCar:false, wholeCarAmount:0, wholeCarExcluded:{},
           pdrView:'itemized', exact:false, items:[],
           pdrSize:null, pdrFactors:{}, pdrRI:0,
           samePanelItems:[],
@@ -2396,6 +2404,7 @@ function removeRockerChooser() {
 
 function onDiagClick(panelName, shapeEl) {
   removeRockerChooser();
+  if (S.wholeCar) { wholeCarToggleExclude(panelName); return; }
   clearDiagSel(); shapeEl.classList.add('sel');
   selectPanel(panelName, panelName);
 }
@@ -2428,6 +2437,7 @@ function togglePanelList() {
 }
 
 function selectPanel(diagName, displayLabel) {
+  if (S.wholeCar) { S.wholeCar = false; setWholeCarMode(false); }
   S.panelDiag = diagName;
   var sel = document.getElementById('drawer-sel');
   sel.textContent = tp(displayLabel || diagName);
@@ -2440,6 +2450,7 @@ function selectPanel(diagName, displayLabel) {
 
 function clearPanel() {
   S.panelDiag = null;
+  if (S.wholeCar) { S.wholeCar = false; setWholeCarMode(false); }
   clearDiagSel();
   var sel = document.getElementById('drawer-sel');
   sel.textContent = t('noneSelected');
@@ -2447,6 +2458,114 @@ function clearPanel() {
   document.getElementById('pl-clear').style.display = 'none';
   document.querySelectorAll('.pl-btn').forEach(function(b){ b.classList.remove('on'); });
   buildPdrSizes();
+}
+
+// ─── 全車鈑金烤漆（整車一口價，合併損傷+烤漆，店長填金額）────────────────────────
+function setWholeCarMode(on) {
+  var dmg = document.getElementById('bumper-dmg-card');
+  var pnt = document.getElementById('bumper-paint-card');
+  var wc  = document.getElementById('wholecar-card');
+  if (dmg) dmg.style.display = on ? 'none' : '';
+  if (pnt) pnt.style.display = on ? 'none' : '';
+  if (wc)  wc.style.display  = on ? '' : 'none';
+}
+
+// 套用全車模式的畫面（不含切換服務/取消編輯；供 selectWholeCar 與編輯還原共用）
+// 全部板金反白＋清單格全選；已排除的板金（如客戶不烤車頂）變暗、清單格取消
+function applyWholeCarUI() {
+  S.wholeCar = true;
+  S.panelDiag = '全車鈑金烤漆';
+  document.querySelectorAll('#diag .panel-shape').forEach(function(s){
+    s.classList.toggle('sel', !S.wholeCarExcluded[s.dataset.panel]);
+  });
+  document.querySelectorAll('.pl-btn').forEach(function(b){
+    if (b.dataset.wholecar === '1') { b.classList.add('on'); return; }
+    b.classList.toggle('on', !!b.dataset.diag && !S.wholeCarExcluded[b.dataset.diag]);
+  });
+  var sel = document.getElementById('drawer-sel');
+  if (sel) { sel.textContent = '全車鈑金烤漆' + wholeCarExcludeNote(); sel.classList.remove('none'); }
+  var plc = document.getElementById('pl-clear'); if (plc) plc.style.display = '';
+  setWholeCarMode(true);
+  var amt = document.getElementById('wholecar-amt'); if (amt) amt.value = S.wholeCarAmount || 0;
+}
+
+function selectWholeCar() {
+  if (S.wholeCar) {   // 再點一次 = 退出全車模式
+    S.wholeCar = false; S.wholeCarExcluded = {};
+    setWholeCarMode(false);
+    clearPanel();
+    recalc();
+    return;
+  }
+  if (S.editIndex != null) cancelEdit();
+  setService('bumper');
+  S.wholeCarAmount = 0;
+  S.wholeCarExcluded = {};
+  applyWholeCarUI();
+  recalc();
+}
+
+// 全車模式下點單一板金 → 切換「排除/納入」
+function wholeCarToggleExclude(diag) {
+  if (!diag) return;
+  if (S.wholeCarExcluded[diag]) delete S.wholeCarExcluded[diag];
+  else S.wholeCarExcluded[diag] = true;
+  applyWholeCarUI();
+  recalc();
+}
+
+// 由 diag 名稱找出中文板金標籤（用於「除外」註記）
+function panelLabelForDiag(diag) {
+  var vs = ['sedan','suv','truck'];
+  for (var vi=0; vi<vs.length; vi++) {
+    var groups = PANEL_GROUPS[vs[vi]] || [];
+    for (var gi=0; gi<groups.length; gi++) {
+      var items = groups[gi].items;
+      for (var ii=0; ii<items.length; ii++) {
+        if (items[ii].diag === diag) return tp(items[ii].label);
+      }
+    }
+  }
+  return tp(diag);
+}
+
+// 「（車頂除外）」或「（車頂、行李廂蓋除外）」；無排除則空字串
+function wholeCarExcludeNote() {
+  var ds = Object.keys(S.wholeCarExcluded).filter(function(d){ return S.wholeCarExcluded[d]; });
+  if (!ds.length) return '';
+  return '（' + ds.map(function(d){ return panelLabelForDiag(d); }).join('、') + '除外）';
+}
+
+function wholeCarAmtInput(val) {
+  S.wholeCarAmount = parseInt(val, 10) || 0;
+  recalc();
+}
+
+// 全車項目物件（collectRepairs 即時預覽與 addItem 落單共用）
+function wholeCarItem() {
+  var amt = S.wholeCarAmount || 0;
+  var name = '全車鈑金烤漆' + wholeCarExcludeNote();
+  return {
+    service: 'Bumper',
+    vehicle: getVehicleInfo(),
+    panel: name,
+    factors: [{ label:'鈑金＋烤漆', price:amt }],
+    panelUi: name,
+    factorsUi: [{ label:'鈑金＋烤漆', price:amt }],
+    paint: 0,
+    subtotal: amt,
+    tierBase: 0,
+    tierFixed: amt,
+    wholeCar: true,
+    _edit: {
+      kind:'bumper', wholeCar:true, wholeCarAmount:amt,
+      wholeCarExcluded:Object.assign({}, S.wholeCarExcluded),
+      panelDiag:'全車鈑金烤漆', panelLabel:name,
+      year:(document.getElementById('veh-year').value||''),
+      make:(document.getElementById('veh-make').value||''),
+      model:(document.getElementById('veh-model').value||'')
+    }
+  };
 }
 
 function syncPanelBtns(diagName) {
@@ -2460,9 +2579,15 @@ function syncPanelBtns(diagName) {
 function buildPanelList() {
   var list = document.getElementById('panel-list');
   var groups = PANEL_GROUPS[S.vehicle] || [];
-  list.innerHTML = groups.map(function(g) {
+  // 整車：一鍵全車鈑金烤漆（合併損傷+烤漆，店長填總價）
+  var wholeCarHtml = '<div>'
+    +'<div class="pl-group-lbl">整車</div>'
+    +'<div class="pl-btns"><button class="pl-btn'+(S.wholeCar?' on':'')+'" data-wholecar="1" style="grid-column:1 / -1;">全車鈑金烤漆</button></div>'
+    +'</div>';
+  list.innerHTML = wholeCarHtml + groups.map(function(g) {
     var btns = g.items.map(function(item) {
-      return '<button class="pl-btn '+(item.diag && S.panelDiag===item.diag?'on':'')+'" '
+      var on = S.wholeCar ? (item.diag && !S.wholeCarExcluded[item.diag]) : (item.diag && S.panelDiag===item.diag);
+      return '<button class="pl-btn '+(on?'on':'')+'" '
         +'data-diag="'+(item.diag||'')+'" data-label="'+item.label+'">'
         +tp(item.label)+'</button>';
     }).join('');
@@ -2473,7 +2598,9 @@ function buildPanelList() {
   }).join('');
   list.querySelectorAll('.pl-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
+      if (btn.dataset.wholecar === '1') { selectWholeCar(); return; }
       var diagName = btn.dataset.diag, label = btn.dataset.label;
+      if (S.wholeCar) { wholeCarToggleExclude(diagName); return; }
       if (diagName) { highlightDiag(diagName); } else { clearDiagSel(); }
       selectPanel(diagName || label, label);
     });
@@ -2607,6 +2734,18 @@ function panelLabelNow() {
 }
 
 function addItem() {
+  if (S.wholeCar) {
+    if (!(S.wholeCarAmount > 0)) return;
+    var wItem = wholeCarItem();
+    if (S.editIndex != null && S.editKind === 'bumper') { S.items[S.editIndex] = wItem; finishEdit(); }
+    else { S.items.push(wItem); }
+    clearWorking();
+    renderItems();
+    recalc();
+    renderModeButtons();
+    scrollToPanel();
+    return;
+  }
   if (!workingHasFactors()) return;
   var factors = [];
   Object.keys(S.factors).forEach(function(id){
@@ -2683,6 +2822,12 @@ function editItem(idx) {
 
 function restoreBumperWorking(e) {
   clearWorking();
+  if (e.wholeCar) {
+    S.wholeCarAmount = e.wholeCarAmount || 0;
+    S.wholeCarExcluded = Object.assign({}, e.wholeCarExcluded || {});
+    applyWholeCarUI();
+    return;
+  }
   Object.keys(e.factors||{}).forEach(function(id){
     var v = e.factors[id];
     var tile=document.querySelector('.ftile[data-fid="'+id+'"]'); if(tile) tile.classList.add('on');
@@ -2730,6 +2875,9 @@ function clearWorking() {
   S.factors = {};
   S.customName = '';
   var cnEl = document.getElementById('custom-name'); if(cnEl) cnEl.value = '';
+  S.wholeCar = false; S.wholeCarAmount = 0; S.wholeCarExcluded = {};
+  var wcaEl = document.getElementById('wholecar-amt'); if(wcaEl) wcaEl.value = 0;
+  setWholeCarMode(false);
   S.paint = { id:'flat', price:0 };
   document.querySelectorAll('.ftile').forEach(function(t){ t.classList.remove('on'); });
   FACTORS.forEach(function(f){
@@ -2788,7 +2936,7 @@ function renderItems() {
 function updateAddBtn() {
   var btn = document.getElementById('add-btn');
   var lbl = document.getElementById('add-btn-label');
-  btn.disabled = !workingHasFactors();
+  btn.disabled = !(workingHasFactors() || (S.wholeCar && S.wholeCarAmount > 0));
   lbl.textContent = (S.editIndex != null && S.editKind === 'bumper') ? t('updateRepair')
                   : (S.items.length ? t('addAnother') : t('addRepair'));
 }
@@ -2961,7 +3109,9 @@ function collectRepairs() {
   // While editing, the saved item is mirrored by the live working repair below —
   // drop it from the list so the running total reflects edits without double-counting.
   if (S.editIndex != null && S.editIndex < reps.length) reps.splice(S.editIndex, 1);
-  if (S.service === 'bumper' && workingHasFactors()) {
+  if (S.service === 'bumper' && S.wholeCar) {
+    if (S.wholeCarAmount > 0) reps.push(wholeCarItem());
+  } else if (S.service === 'bumper' && workingHasFactors()) {
     var bsub = workingSubtotal();
     reps.push(Object.assign({ service:'Painting', vehicle:getVehicleInfo(), paint:(S.paint.price>0?S.paint.price:0), subtotal:bsub, tierBase:0, tierFixed:bsub },
       dualLocale(function(){
