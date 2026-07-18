@@ -765,9 +765,9 @@ window.SHOP_CONFIG = {
     pdrSizeLabels: [3,5,8,10,13,15,18,20,23,25,28,30,33,35,38,40,43,45,48,50,53,55,58,60],
 
     pdrGroups: [
-      { id:'access',   factors:[ {id:'braced',pct:25}, {id:'edge',pct:25}, {id:'obstructed',pct:25}, {id:'bodyline',pct:50}, {id:'curvature',pct:10} ] },
+      { id:'access',   factors:[ {id:'braced',pct:25}, {id:'edge',pct:25}, {id:'obstructed',pct:25}, {id:'bodyline',pct:50}, {id:'curvature',pct:10}, {id:'lowerbody',pct:20,minPct:10,maxPct:30} ] },
       { id:'severity', factors:[ {id:'shallow',pct:0}, {id:'medium',pct:15}, {id:'deep',pct:30}, {id:'crease',pct:25} ] },
-      { id:'material', factors:[ {id:'aluminum',pct:50}, {id:'classic',pct:30}, {id:'exotic',pct:40}, {id:'glue',pct:50}, {id:'structural',pct:35}, {id:'lateral',pct:25}, {id:'laminated',pct:25}, {id:'sound',pct:25} ] }
+      { id:'material', factors:[ {id:'aluminum',pct:50}, {id:'classic',pct:30}, {id:'exotic',pct:40}, {id:'glue',pct:50}, {id:'structural',pct:35}, {id:'lateral',pct:25}, {id:'laminated',pct:25}, {id:'sound',pct:25}, {id:'stretch',flat:4000,min:2500,max:8500} ] }
     ],
 
     bumperFactors: [
@@ -1275,11 +1275,11 @@ var I18N = {
     shownByService:'PDR + Bumper shown by service',
     cancel:'Cancel', dentWord:'Dent', unspecified:'Unspecified panel',
     pgroup_access:'Location & Access', pgroup_severity:'Damage Severity', pgroup_material:'Material & Special',
-    pf_braced:'Braced Panel', pf_edge:'Panel Edge', pf_obstructed:'Obstructed Access', pf_bodyline:'On Body Line', pf_curvature:'Concave Curvature Multiplier',
+    pf_braced:'Braced Panel', pf_edge:'Panel Edge', pf_obstructed:'Obstructed Access', pf_bodyline:'On Body Line', pf_curvature:'Concave Curvature Multiplier', pf_lowerbody:'Lower Body Position',
     pf_shallow:'Shallow Depth', pf_medium:'Medium Depth', pf_deep:'Deep Depth', pf_crease:'Crease',
     pf_aluminum:'Aluminum / HSS', pf_classic:'Classic / Vintage Metal', pf_exotic:'Exotic Vehicle',
     pf_glue:'Glue Pull Required', pf_structural:'Structural Panel Conditioning', pf_lateral:'Lateral Tension',
-    pf_laminated:'Laminated Glass (No R&I)', pf_sound:'Sound Deadener',
+    pf_laminated:'Laminated Glass (No R&I)', pf_sound:'Sound Deadener', pf_stretch:'Metal Stretch & Shrink',
     bf_scuff:'Scuff or Scratch', bf_blend:'Metal Blend', bf_scratch:'Metal Panel Scratch',
     bf_xl:'Metal XL Panel Scratch', bf_xl_body:'Large Area Body Work', bf_body:'Body Work',
     bf_alu_body:'Aluminum Body Work', bf_alu_xl_body:'Aluminum XL Body Work',
@@ -1371,11 +1371,11 @@ var I18N = {
     shownByService:'PDR + Defensa mostrados por servicio',
     cancel:'Cancelar', dentWord:'Abolladura', unspecified:'Panel sin especificar',
     pgroup_access:'Ubicación y Acceso', pgroup_severity:'Severidad del Daño', pgroup_material:'Material y Especial',
-    pf_braced:'Panel Reforzado', pf_edge:'Borde del Panel', pf_obstructed:'Acceso Obstruido', pf_bodyline:'En la Línea de Carrocería', pf_curvature:'Multiplicador de Curvatura Cóncava',
+    pf_braced:'Panel Reforzado', pf_edge:'Borde del Panel', pf_obstructed:'Acceso Obstruido', pf_bodyline:'En la Línea de Carrocería', pf_curvature:'Multiplicador de Curvatura Cóncava', pf_lowerbody:'Posición Inferior de Carrocería',
     pf_shallow:'Profundidad Leve', pf_medium:'Profundidad Media', pf_deep:'Profundidad Profunda', pf_crease:'Pliegue',
     pf_aluminum:'Aluminio / HSS', pf_classic:'Metal Clásico / Antiguo', pf_exotic:'Vehículo Exótico',
     pf_glue:'Requiere Extracción con Pegamento', pf_structural:'Acondicionamiento Estructural del Panel', pf_lateral:'Tensión Lateral',
-    pf_laminated:'Vidrio Laminado (Sin R&I)', pf_sound:'Aislante de Sonido',
+    pf_laminated:'Vidrio Laminado (Sin R&I)', pf_sound:'Aislante de Sonido', pf_stretch:'Estirado y Encogido de Metal',
     bf_scuff:'Raspón o Rayón', bf_blend:'Mezcla de Metal', bf_scratch:'Rayón en Panel Metálico',
     bf_xl:'Rayón XL en Panel Metálico', bf_xl_body:'Carrocería Área Grande', bf_body:'Trabajo de Carrocería',
     bf_alu_body:'Carrocería de Aluminio', bf_alu_xl_body:'Carrocería XL de Aluminio',
@@ -1465,11 +1465,11 @@ var I18N = {
     shownByService:'鈑金 + 保險桿依服務分類顯示',
     cancel:'取消', dentWord:'損傷', unspecified:'未指定鈑件',
     pgroup_access:'位置與通道', pgroup_severity:'損傷程度', pgroup_material:'材質與特殊',
-    pf_braced:'加固鈑件', pf_edge:'鈑件邊緣', pf_obstructed:'受阻通道', pf_bodyline:'車身折線上', pf_curvature:'內凹弧度加乘',
+    pf_braced:'加固鈑件', pf_edge:'鈑件邊緣', pf_obstructed:'受阻通道', pf_bodyline:'車身折線上', pf_curvature:'內凹弧度加乘', pf_lowerbody:'下部車身位置',
     pf_shallow:'淺層凹痕', pf_medium:'中度凹痕', pf_deep:'深層凹痕', pf_crease:'摺痕',
     pf_aluminum:'鋁合金／高強度鋼', pf_classic:'經典／古董車金屬', pf_exotic:'稀有車款',
     pf_glue:'需膠拉修復', pf_structural:'結構鈑件調整', pf_lateral:'側向張力',
-    pf_laminated:'膠合玻璃（免R&I）', pf_sound:'隔音材',
+    pf_laminated:'膠合玻璃（免R&I）', pf_sound:'隔音材', pf_stretch:'板金延展收縮',
     bf_scuff:'擦傷或刮傷', bf_blend:'局部刮傷補修', bf_scratch:'金屬鈑件刮傷',
     bf_xl:'大面積金屬刮傷', bf_xl_body:'大面積鈑金作業', bf_body:'鈑金作業',
     bf_alu_body:'鋁合金鈑金', bf_alu_xl_body:'大面積鋁合金鈑金',
@@ -1567,11 +1567,11 @@ var I18N = {
     shownByService:'صافکاری + سپر به تفکیک خدمت نمایش داده می‌شود',
     cancel:'لغو', dentWord:'آسیب', unspecified:'قطعه نامشخص',
     pgroup_access:'موقعیت و دسترسی', pgroup_severity:'شدت آسیب', pgroup_material:'جنس و موارد خاص',
-    pf_braced:'قطعه دارای تقویتی', pf_edge:'لبه قطعه', pf_obstructed:'دسترسی محدود', pf_bodyline:'روی خط بدنه', pf_curvature:'ضریب انحنای مقعر',
+    pf_braced:'قطعه دارای تقویتی', pf_edge:'لبه قطعه', pf_obstructed:'دسترسی محدود', pf_bodyline:'روی خط بدنه', pf_curvature:'ضریب انحنای مقعر', pf_lowerbody:'موقعیت پایین بدنه',
     pf_shallow:'عمق کم', pf_medium:'عمق متوسط', pf_deep:'عمق زیاد', pf_crease:'تاخوردگی',
     pf_aluminum:'آلومینیوم / فولاد پراستحکام', pf_classic:'فلز کلاسیک / قدیمی', pf_exotic:'خودرو خاص',
     pf_glue:'نیاز به کشش با چسب', pf_structural:'اصلاح قطعه ساختاری', pf_lateral:'کشش جانبی',
-    pf_laminated:'شیشه لمینت (بدون باز و بست)', pf_sound:'عایق صوتی',
+    pf_laminated:'شیشه لمینت (بدون باز و بست)', pf_sound:'عایق صوتی', pf_stretch:'کشش و جمع‌شدگی فلز',
     bf_scuff:'ساییدگی یا خراش', bf_blend:'محوکاری موضعی', bf_scratch:'خراش قطعه فلزی',
     bf_xl:'خراش بزرگ قطعه فلزی', bf_xl_body:'صافکاری سطح وسیع', bf_body:'صافکاری',
     bf_alu_body:'صافکاری آلومینیوم', bf_alu_xl_body:'صافکاری وسیع آلومینیوم',
@@ -1803,8 +1803,8 @@ function updateLangToggle(){
 function rebuildLocalizedData(){
   FACTORS = (PRICING.bumperFactors || []).map(function(b){ return { id:b.id, base:b.base, min:b.min, max:b.max, custom:b.custom, label:t('bf_'+b.id) }; });
   PAINT = (PRICING.paint || []).map(function(p){ return { id:p.id, price:p.price, label:t('paint_'+p.id), sub:(p.price>0?('+'+CS+p.price):t('paint_flatSub')) }; });
-  PDR_GROUPS = (PRICING.pdrGroups || []).map(function(g){ return { title:t('pgroup_'+g.id), factors:g.factors.map(function(fr){ return { id:fr.id, pct:fr.pct, label:t('pf_'+fr.id) }; }) }; });
-  PDR_LABELS = {}; PDR_GROUPS.forEach(function(g){ g.factors.forEach(function(fr){ PDR_LABELS[fr.id]=fr.label; }); });
+  PDR_GROUPS = (PRICING.pdrGroups || []).map(function(g){ return { title:t('pgroup_'+g.id), factors:g.factors.map(function(fr){ return { id:fr.id, pct:fr.pct, flat:fr.flat, min:fr.min, max:fr.max, minPct:fr.minPct, maxPct:fr.maxPct, label:t('pf_'+fr.id) }; }) }; });
+  PDR_LABELS = {}; PDR_FDEF = {}; PDR_GROUPS.forEach(function(g){ g.factors.forEach(function(fr){ PDR_LABELS[fr.id]=fr.label; PDR_FDEF[fr.id]=fr; }); });
   PDR_VIEWS = [ {v:'2opt', label:t('view_2opt')}, {v:'3tier', label:t('view_3tier')}, {v:'itemized', label:t('view_flat')} ];
   TIER_DESC = { premium:t('tier_premiumDesc'), practical:t('tier_practicalDesc'), improvement:t('tier_improvementDesc') };
   // MOTO_GROUPS is derived from PDR_GROUPS, so it has to be re-derived after
@@ -2047,9 +2047,10 @@ function presentationPlan(reps) {
 var PDR_SIZES = PRICING.pdrSizes || [];
 var PDR_SIZE_LABELS = PRICING.pdrSizeLabels || [];
 var PANEL_MIN_PRICES = PRICING.panelMinPrices || {};
-var PDR_GROUPS = (PRICING.pdrGroups || []).map(function(g){ return { title:t('pgroup_'+g.id), factors:g.factors.map(function(fr){ return { id:fr.id, pct:fr.pct, label:t('pf_'+fr.id) }; }) }; });
+var PDR_GROUPS = (PRICING.pdrGroups || []).map(function(g){ return { title:t('pgroup_'+g.id), factors:g.factors.map(function(fr){ return { id:fr.id, pct:fr.pct, flat:fr.flat, min:fr.min, max:fr.max, minPct:fr.minPct, maxPct:fr.maxPct, label:t('pf_'+fr.id) }; }) }; });
 var PDR_LABELS = {};
-PDR_GROUPS.forEach(function(g){ g.factors.forEach(function(f){ PDR_LABELS[f.id] = f.label; }); });
+var PDR_FDEF = {};
+PDR_GROUPS.forEach(function(g){ g.factors.forEach(function(f){ PDR_LABELS[f.id] = f.label; PDR_FDEF[f.id] = f; }); });
 
 // ─── SVG ─────────────────────────────────────────────────────────────────────
 
@@ -3858,8 +3859,8 @@ function buildPdrFactors() {
   var wrap = document.getElementById('pdr-factors');
   wrap.innerHTML = PDR_GROUPS.map(function(g){
     var items = g.factors.map(function(f){
-      var badge = (f.pct>0) ? ('+'+f.pct+'%') : 'No cost';
-      return '<div class="pdr-f" data-fid="'+f.id+'" onclick="pdrToggleFactor(\''+f.id+'\','+f.pct+')">'
+      var badge = (f.flat != null) ? ('+'+CS+f.flat) : ((f.pct>0) ? ('+'+f.pct+'%') : 'No cost');
+      return '<div class="pdr-f" data-fid="'+f.id+'" onclick="pdrToggleFactor(\''+f.id+'\')">'
         +'<div class="pdr-f-row">'
         +'<div class="pdr-chk"></div>'
         +'<div class="pdr-fname">'+f.label+'</div>'
@@ -3867,7 +3868,7 @@ function buildPdrFactors() {
         +'</div>'
         +'<div class="pdr-f-slider" onclick="event.stopPropagation()">'
         +'<div class="pdr-sl-row">'
-        +'<span class="pdr-adj-edge">'+CS+'0</span>'
+        +'<span class="pdr-adj-edge" id="pdrmin-'+f.id+'">'+CS+'0</span>'
         +'<input type="range" id="pdrsl-'+f.id+'" min="0" max="200" step="5" value="0" oninput="slidePdrFactor(\''+f.id+'\',this.value)">'
         +'<span class="pdr-adj-edge" id="pdrmax-'+f.id+'">'+CS+'200</span>'
         +'</div>'
@@ -3879,31 +3880,51 @@ function buildPdrFactors() {
   }).join('');
 }
 
-function pdrFactorDefault(pct) {
+// Default $ for a factor: flat factors use a fixed fee (size-independent); others = base × pct
+function pdrFactorDefault(id) {
+  var d = PDR_FDEF[id] || {};
+  if (d.flat != null) return d.flat;
   var base = S.pdrSize ? S.pdrSize.price : 0;
-  return Math.round(base * pct / 100);
+  return Math.round(base * (d.pct||0) / 100);
 }
 
-// Set a factor's inline slider max/value from its current amount + base
+// Set a factor's inline slider min/max/value from its definition + current amount
 function configPdrSlider(id) {
   var f = S.pdrFactors[id]; if (!f) return;
-  var mx = Math.max(200, Math.round(pdrFactorDefault(f.pct) * 2 / 5) * 5);
-  var sl = document.getElementById('pdrsl-'+id);   if (sl) { sl.max = mx; sl.value = f.amount; }
+  var d = PDR_FDEF[id] || {};
+  var mn, mx;
+  if (d.flat != null) {
+    mn = (d.min != null) ? d.min : 0;
+    mx = (d.max != null) ? d.max : Math.max(mn, Math.round(d.flat * 2 / 5) * 5);
+  } else if (d.minPct != null || d.maxPct != null) {
+    // 百分比因素但指定了範圍：滑桿鎖在 尺寸價×minPct% ~ 尺寸價×maxPct%
+    // （例：下部車身位置 pct20 + minPct10/maxPct30 → 拉桿只能在 10%~30% 之間）
+    var bp = S.pdrSize ? S.pdrSize.price : 0;
+    mn = Math.round(bp * (d.minPct != null ? d.minPct : 0) / 100);
+    mx = Math.round(bp * (d.maxPct != null ? d.maxPct : (d.pct || 0) * 2) / 100);
+  } else {
+    mn = 0;
+    mx = Math.max(200, Math.round(pdrFactorDefault(id) * 2 / 5) * 5);
+  }
+  var sl = document.getElementById('pdrsl-'+id);   if (sl) { sl.min = mn; sl.max = mx; sl.value = f.amount; }
+  var mnEl = document.getElementById('pdrmin-'+id); if (mnEl) mnEl.textContent = CS+mn;
   var mxEl = document.getElementById('pdrmax-'+id); if (mxEl) mxEl.textContent = CS+mx;
   var curEl = document.getElementById('pdrcur-'+id); if (curEl) curEl.textContent = CS+f.amount;
 }
 
-function pdrToggleFactor(id, pct) {
+function pdrToggleFactor(id) {
   var el = document.querySelector('.pdr-f[data-fid="'+id+'"]');
   if (S.pdrFactors[id]) { delete S.pdrFactors[id]; el.classList.remove('on'); }
-  else { S.pdrFactors[id] = { pct:pct, amount:pdrFactorDefault(pct) }; el.classList.add('on'); configPdrSlider(id); }
+  else { var d = PDR_FDEF[id] || {}; S.pdrFactors[id] = { pct:(d.pct||0), amount:pdrFactorDefault(id) }; el.classList.add('on'); configPdrSlider(id); }
   pdrRecalc();
 }
 
-// When base (size) changes, refresh selected factors' default $ amounts + sliders
+// When base (size) changes, refresh selected factors' default $ amounts + sliders.
+// Flat factors are size-independent — keep the user's amount, just refresh the slider.
 function recomputePdrFactors() {
   Object.keys(S.pdrFactors).forEach(function(id){
-    S.pdrFactors[id].amount = pdrFactorDefault(S.pdrFactors[id].pct);
+    var d = PDR_FDEF[id] || {};
+    if (d.flat == null) S.pdrFactors[id].amount = pdrFactorDefault(id);
     configPdrSlider(id);
   });
 }
@@ -4619,7 +4640,7 @@ function checkAluminum() {
       if (S.pdrFactors['aluminum'] == null && S.pdrSize) {
         var el = document.querySelector('.pdr-f[data-fid="aluminum"]');
         if (el) {
-          S.pdrFactors['aluminum'] = { pct:50, amount:pdrFactorDefault(50) };
+          S.pdrFactors['aluminum'] = { pct:50, amount:pdrFactorDefault('aluminum') };
           el.classList.add('on');
           if (typeof configPdrSlider === 'function') configPdrSlider('aluminum');
           pdrRecalc();
